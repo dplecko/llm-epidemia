@@ -1,0 +1,309 @@
+{
+  "mec_wgh": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DEMO_L",
+          "val_var": "WTMEC2YR",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "diet_wgh": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DR1IFF_L",
+          "val_var": "WTDRD1",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "age": {
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DEMO_L",
+          "val_var": "RIDAGEYR",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "sex": {
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DEMO_L",
+          "val_var": "RIAGENDR",
+          "class": "col_itm",
+          "callback": "nhanes_sex"
+        }
+      ]
+    }
+  },
+  "race": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DEMO_L",
+          "val_var": "RIDRETH3",
+          "class": "col_itm",
+          "callback": "nhanes_race"
+        }
+      ]
+    }
+  },
+  "height": {
+    "sources": {
+      "nhanes": [
+        {
+          "table": "BMX_L",
+          "val_var": "BMXHT",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "weight": {
+    "sources": {
+      "nhanes": [
+        {
+          "table": "BMX_L",
+          "val_var": "BMXWT",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "waist": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "BMX_L",
+          "val_var": "BMXWAIST",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "diastolic_bp": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "BPXO_L",
+          "val_var": "BPXODI1",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "systolic_bp": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "BPXO_L",
+          "val_var": "BPXOSY1",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "pulse": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "BPXO_L",
+          "val_var": "BPXOPLS1",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "cholesterol": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "TCHOL_L",
+          "val_var": "LBXTC",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "hdl": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "HDL_L",
+          "val_var": "LBDHDD",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "hb_a1c": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "GHB_L",
+          "val_var": "LBXGH",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "insulin": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "INS_L",
+          "val_var": "LBXIN",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "smoking": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "SMQ_L",
+          "val_var": "SMQ040",
+          "class": "col_itm",
+          "callback": "nhanes_smoke"
+        }
+      ]
+    }
+  },
+  "alcohol_weekly": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "ALQ_L",
+          "val_var": "ALQ121",
+          "class": "col_itm",
+          "callback": "nhanes_alcohol"
+        }
+      ]
+    }
+  },
+  "sleep_hours": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "SLQ_L",
+          "val_var": "SLD012",
+          "class": "col_itm"
+        }
+      ]
+    }
+  },
+  "diabetes": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DIQ_L",
+          "val_var": "DIQ010",
+          "class": "col_itm",
+          "callback": "nhanes_diab"
+        }
+      ]
+    }
+  },
+  "kidney_failure": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "KIQ_U_L",
+          "val_var": "KIQ022",
+          "class": "col_itm",
+          "callback": "nhanes_kidney"
+        }
+      ]
+    }
+  },
+  "kcal": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DR1IFF_L",
+          "val_var": "DR1IKCAL",
+          "class": "col_itm",
+          "callback": "nhanes_kcal"
+        }
+      ]
+    }
+  },
+  "protein": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DR1IFF_L",
+          "val_var": "DR1IPROT",
+          "class": "col_itm",
+          "callback": "nhanes_kcal"
+        }
+      ]
+    }
+  },
+  "carbs": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DR1IFF_L",
+          "val_var": "DR1ICARB",
+          "class": "col_itm",
+          "callback": "nhanes_kcal"
+        }
+      ]
+    }
+  },
+  "sugar": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DR1IFF_L",
+          "val_var": "DR1ISUGR",
+          "class": "col_itm",
+          "callback": "nhanes_kcal"
+        }
+      ]
+    }
+  },
+  "fat": {
+    "target": "id_tbl",
+    "sources": {
+      "nhanes": [
+        {
+          "table": "DR1IFF_L",
+          "val_var": "DR1ITFAT",
+          "class": "col_itm",
+          "callback": "nhanes_kcal"
+        }
+      ]
+    }
+  }
+}
