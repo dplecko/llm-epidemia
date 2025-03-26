@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "py"))
 from model_load import load_model
-from evaluator_workhorse import extract_pv
+from py.evaluator_helpers import extract_pv
 from task_spec import task_specs
 
 def evaluator(model_name, model, tokenizer, task_spec):
@@ -39,7 +39,7 @@ def evaluator(model_name, model, tokenizer, task_spec):
         marginal = False
     
     # Step 2: check if the outcome is binary
-    data = pd.read_csv(task_spec["dataset"])
+    data = pd.read_parquet(task_spec["dataset"])
      
     results = []
     if marginal:
@@ -64,7 +64,7 @@ def evaluator(model_name, model, tokenizer, task_spec):
             # filter the dataset for the current level
             filtered_data = data[data[task_spec["variables"][1]] == cond]
             
-            if task_spec["levels"] is not None and not pd.api.types.is_integer_dtype(data[task_spec["variables"][0]]):
+            if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
                 level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
                 true_vals = filtered_data[task_spec["variables"][0]].map(level_map).tolist()
             else:
@@ -75,7 +75,7 @@ def evaluator(model_name, model, tokenizer, task_spec):
             else:
                 wghs = None
 
-            model_vals = extract_pv(
+            model_vals, model_texts = extract_pv(
                 task_spec["prompt"].format(cond), task_spec["levels"], task_spec["mode"], 
                 model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
             )
@@ -85,6 +85,7 @@ def evaluator(model_name, model, tokenizer, task_spec):
                 "true_vals": true_vals,
                 "weights": wghs,
                 "model_vals": model_vals,
+                "model_texts": model_texts,
             })
 
     file_name = f"{model_name}_{task_spec['mode']}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
@@ -95,10 +96,10 @@ def evaluator(model_name, model, tokenizer, task_spec):
     with open(os.path.join("data", "results", "benchmark", file_name), "w") as f:
         json.dump(results, f, indent=4)
 
-model_name = "llama3_8b_instruct"  # Example model name
+model_name = "llama3_70b_instruct"  # Example model name
 tokenizer, model, is_instruct = load_model(model_name)
 
-evaluator(model_name, model, tokenizer, task_specs[7])
+# evaluator(model_name, model, tokenizer, task_specs[3])
 
 for i in range(len(task_specs)):
     evaluator(model_name, model, tokenizer, task_specs[i])

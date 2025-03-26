@@ -43,7 +43,7 @@ def lvl_probs(model, tokenizer, inputs, levels):
 
     level_probs = [sum(probs[0, tid].item() for tid in lvl_ids) for lvl_ids in level_ids]
     total_prob = sum(level_probs)
-    return [p / total_prob for p in level_probs]
+    return [p / total_prob for p in level_probs], None
 
 def txt_to_lvl(text, levels):
     """
@@ -121,7 +121,7 @@ def lvl_sample(model, tokenizer, inputs, levels, n_mc, max_batch_size):
         # Map text to levels
         samples.extend(txt_to_lvl(token, levels) for token in generated_tokens)
 
-    return samples
+    return samples, generated_tokens
 
 def cts_sample(model, tokenizer, inputs, n_mc, max_batch_size, max_tokens=10):
     """
@@ -159,7 +159,7 @@ def cts_sample(model, tokenizer, inputs, n_mc, max_batch_size, max_tokens=10):
         # Convert text to numeric values
         samples.extend(txt_to_num(text) for text in generated_texts)
 
-    return samples
+    return samples, generated_texts
 
 def story_sample(model, tokenizer, inputs, second_prompt, levels, n_mc, max_batch_size, max_tokens=50):
     """
@@ -225,7 +225,7 @@ def story_sample(model, tokenizer, inputs, second_prompt, levels, n_mc, max_batc
             else:
                 samples.append(txt_to_num(response))
 
-    return samples
+    return samples, generated_texts
 
 ### Generalized extraction function ###
 def extract_pv(prompt, levels, mode, model_name, model, tokenizer, second_prompt=None, n_mc=128):
