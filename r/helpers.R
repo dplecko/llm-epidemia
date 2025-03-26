@@ -21,5 +21,5 @@ model_unname <- function(mod) {
 
 dat_name_clean <- function(x) {
   
-  gsub(".csv", "", tail(strsplit(x, split = "/")[[1]], n = 1))
+  sub("\\.csv$|\\.parquet$", "", tail(strsplit(x, split = "/")[[1]], n = 1))
 }

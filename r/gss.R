@@ -2,9 +2,17 @@
 library(tidyverse)
 library(haven)
 library(survey)
+library(mice)
 
 # Read GSS 2022 dataset
-dt <- read_dta("data/raw/gss/GSS2022.dta")
+url <- "https://gss.norc.org/content/dam/gss/get-the-data/documents/stata/2022_stata.zip"
+tmp_zip <- tempfile(fileext = ".zip")
+tmp_dir <- tempdir()
+
+download.file(url, tmp_zip, mode = "wb")
+unzip(tmp_zip, exdir = tmp_dir)
+
+dt <- read_dta(file.path(tmp_dir, "2022", "GSS2022.dta"))
 
 # Select relevant variables
 gss_sel <- dt %>%
@@ -26,7 +34,7 @@ gss_sel <- dt %>%
 gss_sel <- gss_sel[!is.na(gss_sel$wtssnrps), ]
 sort(colMeans(is.na(gss_sel))) * 100
 
-# 
+# get the weights
 gss <- data.frame(wgh = as.numeric(gss_sel$wtssnrps))
 
 # clean the sex variable
@@ -61,8 +69,9 @@ for (var in names(gss)) {
     gss[[var]] <- as.factor(gss[[var]])
 }
 
+set.seed(2025)
 gss_impute <- complete(mice(gss, m = 1))
 
-write.csv(gss_impute, file = "data/clean/gss.csv")
+arrow::write_parquet(gss_impute, sink = "data/clean/gss.parquet")
 
 

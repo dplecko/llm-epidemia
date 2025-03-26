@@ -51,6 +51,7 @@ dat[is.na(diet_wgh), diet_wgh := 0]
 # what is the NA pattern?
 colMeans(is.na(dat))
 
+set.seed(2025)
 dat <- as.data.table(complete(mice(dat, m = 1)))
 
 # BMI bin
@@ -67,6 +68,6 @@ dat[, age_group := factor(
              "50-60 years", "60-70 years", "70+ years")
 )]
 
-write.csv(as.data.frame(dat), file = "data/clean/nhanes.csv")
+arrow::write_parquet(as.data.frame(dat), sink = "data/clean/nhanes.parquet")
 
 colMeans(is.na(dat))

@@ -19,7 +19,7 @@ eval_task <- function(model_name, task) {
   
   fl <- paste(c(model_name, mode, dataset, v1, v2), collapse = "_")
   fl <- paste0(fl, ".json")
-  res <- jsonlite::read_json(file.path("data", "results", "benchmark", fl))
+  res <- jsonlite::read_json(file.path("data", "benchmark", fl))
   
   if (length(task$levels) == 2) {
     
@@ -98,8 +98,6 @@ eval_cts <- function(res, model_name, mode, dataset, v1, v2) {
 #' @return A data.frame of benchmarking scores, with a "distr" attribute 
 #' containing proportions per categorical levels and value of conditioning variable.
 eval_cat <- function(res, model_name, mode, dataset, v1, v2, levels) {
-  
-  if (v1 == "party") browser()
   
   nbins <- length(levels)
   df <- distr_df <- c()

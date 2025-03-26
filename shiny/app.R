@@ -10,9 +10,10 @@ source("r/zzz-deps.R")
 source_python("py/task_spec.py")
 
 # Models and Tasks
-models <- c("llama3_8b_instruct")#, "llama3_70b_instruct")
+models <- c("llama3_8b_instruct", "llama3_70b_instruct")
 
 tasks <- py$task_specs
+tasks <- tasks[1:7]
 
 df <- expand.grid(model = models, task = seq_along(tasks), stringsAsFactors = FALSE)
 df$score <- df$eval <- NA
@@ -79,7 +80,9 @@ server <- function(input, output, session) {
   
   output$score_plot <- renderPlot({
     req(input$sel_model, input$task_idx)
-    plt_eval(df$eval[[input$task_idx]], model_unname(input$sel_model), 
+    model_name <- model_unname(input$sel_model)
+    df_idx <- which(df$task == input$task_idx & df$model == model_name)
+    plt_eval(df$eval[[df_idx]], model_name, 
              tasks[[input$task_idx]])
   }, res = 120)
 }
