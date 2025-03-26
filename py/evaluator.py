@@ -96,10 +96,10 @@ def evaluator(model_name, model, tokenizer, task_spec):
     with open(os.path.join("data", "results", "benchmark", file_name), "w") as f:
         json.dump(results, f, indent=4)
 
-model_name = "llama3_70b_instruct"  # Example model name
+model_name = "llama3_8b_instruct"  # Example model name
 tokenizer, model, is_instruct = load_model(model_name)
 
-# evaluator(model_name, model, tokenizer, task_specs[3])
+# evaluator(model_name, model, tokenizer, task_specs[0])
 
 for i in range(len(task_specs)):
     evaluator(model_name, model, tokenizer, task_specs[i])
