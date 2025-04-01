@@ -1,6 +1,7 @@
 
 import pandas as pd
 import sys, os
+import numpy as np
 import json
 import pdb
 from tqdm import tqdm
@@ -43,19 +44,48 @@ def evaluator(model_name, model, tokenizer, task_spec):
      
     results = []
     if marginal:
-        if task_spec["levels"] is not None:
-            true_vals = data[task_spec["variables"][0]].isin(task_spec["levels"][0])
+        if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
+            level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
+            true_vals = data[task_spec["variables"][0]].map(level_map).tolist()
         else:
-            true_vals = data[task_spec["variables"][0]]
+            true_vals = data[task_spec["variables"][0]].tolist()
 
-        model_vals = extract_pv(
-            task_spec["prompt"], task_spec["levels"], task_spec["mode"], 
-            model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
-        )
+        if task_spec["wgh_col"] is not None:
+            wghs = data[task_spec["wgh_col"]].tolist()
+        else:
+            wghs = None
+
+        if model is not None:
+            model_vals, model_texts = extract_pv(
+                task_spec["prompt"], task_spec["levels"], task_spec["mode"], 
+                model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
+            )
+        else:
+            mc_data = pd.read_parquet(model_name)
+            n_mc = 128
+            if "nhanes" in model_name:
+                mc_wgh_col = "mec_wgh"
+            elif "census" in model_name:
+                mc_wgh_col = "weight"
+            elif "gss" in model_name:
+                mc_wgh_col = "wgh"
+            else:
+                mc_wgh_col = None
+            
+            if mc_wgh_col in mc_data.columns:
+                mc_wghs = mc_data[mc_wgh_col].values
+                mc_wghs = mc_wghs / mc_wghs.sum()
+            else:
+                mc_wghs = None
+            
+            model_vals = np.random.choice(mc_data[task_spec["variables"][0]].values, size=n_mc, replace=True, p=mc_wghs).tolist()
+            model_texts = None
 
         results.append({
             "true_vals": true_vals,
+            "weights": wghs,
             "model_vals": model_vals,
+            "model_texts": model_texts,
         })
 
     else:
@@ -88,18 +118,20 @@ def evaluator(model_name, model, tokenizer, task_spec):
                 "model_texts": model_texts,
             })
 
-    file_name = f"{model_name}_{task_spec['mode']}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
+    file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['mode']}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
     if len(task_spec["variables"]) > 1:
         file_name += f"_{task_spec['variables'][1]}"
     file_name = file_name + ".json"
-    
+
     with open(os.path.join("data", "results", "benchmark", file_name), "w") as f:
         json.dump(results, f, indent=4)
 
 model_name = "llama3_8b_instruct"  # Example model name
 tokenizer, model, is_instruct = load_model(model_name)
 
-# evaluator(model_name, model, tokenizer, task_specs[0])
+evaluator(model_name, model, tokenizer, task_specs[0])
 
 for i in range(len(task_specs)):
     evaluator(model_name, model, tokenizer, task_specs[i])
+
+evaluator(model_name="data/clean/nhanes.parquet", model=None, tokenizer=None, task_spec=task_specs[0])

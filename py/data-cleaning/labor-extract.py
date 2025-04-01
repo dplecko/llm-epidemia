@@ -104,5 +104,8 @@ df['percent_female'] = df['women']
 # Subset the columns
 df = df[['occupation', 'percent_male', 'percent_female']]
 
-# Save cleaned data as CSV
-df.to_csv("data/clean/labor.csv", index=False)
+df = df.dropna()
+
+df = df.melt(id_vars="occupation", var_name="sex", value_name="weight")
+df["sex"] = df["sex"].str.replace("percent_", "")
+df.to_parquet("data/clean/labor.parquet", index=False)

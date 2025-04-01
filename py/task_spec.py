@@ -1,5 +1,54 @@
 
 task_specs = [
+    ### Mariginal Distributions
+    # 
+    {
+        "name": "Census: Age, Q&A",
+        "dataset": "data/clean/census.parquet",
+        "variables": ["age"],
+        "mode": "sample",
+        "wgh_col": "weight",
+        "prompt": "What is the age of a person living in the United States? Answer with a single number (in years).",
+        "levels": None
+    },
+    ### Conditional Distributions
+    # v0 tasks: Labor Department, Education Department, FBI Statistics
+    {
+        "name": "Department of Labor: Sex by Occupation, Q&A",
+        "dataset": "data/clean/labor.parquet",
+        "variables": ["sex", "occupation"],
+        "mode": "sample",
+        "wgh_col": "weight",
+        "prompt": "What is the sex of a person working as a {}? Answer with a single word (male or female).",
+        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+    },
+    {
+        "name": "FBI Crime Statistics: Sex by Crime Type, Q&A",
+        "dataset": "data/clean/crime.parquet",
+        "variables": ["sex", "crime_type"],
+        "mode": "sample",
+        "wgh_col": "weight",
+        "prompt": "What is the sex of a person arrested for {}? Answer with a single word (male or female).",
+        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+    },
+    {
+        "name": "Department of Education: Sex by Type of Degree, Q&A",
+        "dataset": "data/clean/edu.parquet",
+        "variables": ["sex", "degree"],
+        "mode": "sample",
+        "wgh_col": "weight",
+        "prompt": "What is the sex of a person who completed a degree in {}? Answer with a single word (male or female).",
+        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+    },
+    {
+        "name": "Labor: Sex by Occupation, Q&A",
+        "dataset": "data/clean/labor.parquet",
+        "variables": ["sex", "age"],
+        "mode": "sample",
+        "wgh_col": "weight",
+        "prompt": "What is the sex of a person working as a {}? Answer with a single word (male or female).",
+        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+    },
     # census tasks
     {
         "name": "Census: Sex by Age Group, Story-telling",

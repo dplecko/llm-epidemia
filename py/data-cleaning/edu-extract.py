@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 file_path = "data/raw/education/edu.csv"
-output_file = "data/clean/edu.csv"
+output_file = "data/clean/edu.parquet"
 
 df = pd.read_csv(file_path)
 df['Men'] = pd.to_numeric(df['Men'].str.replace(',', ''), errors='coerce')
@@ -16,4 +16,8 @@ df['percent_female'] = 100 - df['percent_male']
 
 df['degree'] = df['CIP Title'].str.lower().str.strip()
 
-df[['degree', 'percent_male', 'percent_female']].to_csv(output_file, index=False)
+df = df[['degree', 'percent_male', 'percent_female']]
+
+df = df.melt(id_vars="degree", var_name="sex", value_name="weight")
+df["sex"] = df["sex"].str.replace("percent_", "")
+df.to_parquet(output_file, index=False)

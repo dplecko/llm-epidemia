@@ -29,11 +29,14 @@ manual_replacements = {
     "other assaults": "assault",
     "larceny-theft": "theft",
     "stolen property; buying, receiving, possessing": "buying or receiving stolen property",
+    "total": "a crime"
 }
 
 # Apply replacements
 df["crime_type"] = df["crime_type"].replace(manual_replacements)
 
 
-# Save as CSV
-df.to_csv("data/clean/crime.csv", index=False)
+df = df.melt(id_vars="crime_type", var_name="sex", value_name="weight")
+df["sex"] = df["sex"].str.replace("percent_", "")
+
+df.to_parquet("data/clean/crime.parquet", index=False)

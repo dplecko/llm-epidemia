@@ -109,18 +109,20 @@ def lvl_sample(model, tokenizer, inputs, levels, n_mc, max_batch_size):
         with torch.no_grad():
             generated = model.generate(
                 **batch_inputs,
-                max_new_tokens=3,
+                max_new_tokens=30,
                 pad_token_id=tokenizer.eos_token_id,
+                do_sample=True
             )
 
         # Extract generated tokens
         generated_tokens = tokenizer.batch_decode(
-            generated[:, inputs["input_ids"].shape[1]], skip_special_tokens=True
+            generated[:, inputs["input_ids"].shape[1]:], skip_special_tokens=True
         )
 
         # Map text to levels
         samples.extend(txt_to_lvl(token, levels) for token in generated_tokens)
 
+    pdb.set_trace()
     return samples, generated_tokens
 
 def cts_sample(model, tokenizer, inputs, n_mc, max_batch_size, max_tokens=10):
@@ -148,7 +150,8 @@ def cts_sample(model, tokenizer, inputs, n_mc, max_batch_size, max_tokens=10):
                 **batch_inputs,
                 max_new_tokens=max_tokens,
                 pad_token_id=tokenizer.eos_token_id,
-                eos_token_id=tokenizer.eos_token_id,  # Stop generation at EOS
+                eos_token_id=tokenizer.eos_token_id,
+                do_sample=True
             )
 
         # Extract generated text
@@ -191,6 +194,7 @@ def story_sample(model, tokenizer, inputs, second_prompt, levels, n_mc, max_batc
                 **batch_inputs,
                 max_new_tokens=max_tokens,
                 pad_token_id=tokenizer.eos_token_id,
+                do_sample=True
             )
 
         generated_texts = tokenizer.batch_decode(
