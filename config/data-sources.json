@@ -1,0 +1,81 @@
+[
+  {
+    "name": "nhanes",
+    "id_cfg": {
+      "icustay": {
+        "id": "SEQN",
+        "position": 1,
+        "start": "SDDSRVYR",
+        "end": "SDDSRVYR",
+        "table": "DEMO_L"
+      }
+    },
+    "tables": {
+      "DEMO_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "BMX_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "BPXO_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "TCHOL_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "DIQ_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "DR1IFF_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "HDL_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "GHB_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "INS_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "KIQ_U_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "SMQ_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "SLQ_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      },
+      "ALQ_L": {
+        "defaults": {
+          "id_var": "SEQN"
+        }
+      }
+    }
+  }
+]
