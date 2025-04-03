@@ -49,15 +49,6 @@ task_specs = [
         "prompt": "What is the sex of a person who completed a degree in {}? Answer with a single word (male or female).",
         "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
     },
-    {
-        "name": "Labor: Sex by Occupation, Q&A",
-        "dataset": "data/clean/labor.parquet",
-        "variables": ["sex", "age"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "What is the sex of a person working as a {}? Answer with a single word (male or female).",
-        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
-    },
     # Census tasks
     {
         "name": "Census: Sex by Age Group, Story-telling",

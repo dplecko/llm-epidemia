@@ -4,14 +4,18 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Model paths and instruct flags
 MODEL_PATHS = {
-    "llama3_8b": ("/local/eb/dp3144/llama3_8b", False),  # Regular LLaMA 3 8B
+    ### instruct versions
     "llama3_8b_instruct": ("/local/eb/dp3144/llama3_8b_instruct", True),  # LLaMA 3.1 8B-Instruct
     "llama3_70b_instruct": ("/local/eb/dp3144/llama3_70b_instruct", True),  # LLaMA 3.3 70B-Instruct
-    "gpt2": ("/local/eb/dp3144/gpt2", False),  # Regular GPT-2
-    "mistral_7b": ("/local/eb/dp3144/mistral_7b", False),  # Regular Mistral
     "mistral_7b_instruct": ("/local/eb/dp3144/mistral_7b_instruct", True),  # Instruct Mistral
+    "deepseek_7b_chat": ("/local/eb/dp3144/deepseek_7b_chat", True),  # Instruct DeepSeek
+    "phi4": ("/local/eb/dp3144/phi4", True),  # Microsoft Phi-4
+    "gemma3_27b_instruct": ("/local/eb/dp3144/gemma3_27b_instruct", True),  # Microsoft Phi-4
+    ### non-instruct versions
+    "llama3_8b": ("/local/eb/dp3144/llama3_8b", False),  # Regular LLaMA 3 8B
+    "mistral_7b": ("/local/eb/dp3144/mistral_7b", False),  # Regular Mistral
     "deepseek_7b": ("/local/eb/dp3144/deepseek_7b", False),  # Regular DeepSeek
-    "deepseek_7b_chat": ("/local/eb/dp3144/deepseek_7b_chat", True)  # Instruct DeepSeek
+    "gpt2": ("/local/eb/dp3144/gpt2", False),  # Regular GPT-2
 }
 
 def load_model(model_name):

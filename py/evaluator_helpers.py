@@ -123,7 +123,6 @@ def lvl_sample(model, tokenizer, inputs, levels, n_mc, max_batch_size):
         # Map text to levels
         samples.extend(txt_to_lvl(token, levels) for token in generated_tokens)
 
-    pdb.set_trace()
     return samples, generated_tokens
 
 def cts_sample(model, tokenizer, inputs, n_mc, max_batch_size, max_tokens=10):

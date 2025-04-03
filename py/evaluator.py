@@ -11,7 +11,7 @@ from model_load import load_model
 from py.evaluator_helpers import extract_pv, d2d_wgh_col, compress_vals
 from task_spec import task_specs
 
-def evaluator(model_name, model, tokenizer, task_spec):
+def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -29,10 +29,19 @@ def evaluator(model_name, model, tokenizer, task_spec):
             - "mode" (str): One of {"logits", "sample", "story"}.
             - "second_prompt" (str, optional): Follow-up question (for "story" mode).
             - "wgh_col" (str or None): Optional column name for sample weights.
+        check_cache (logical): Check if the task was already solved for the model; skip the run if yes.
 
     Outputs:
         Saves a JSON file under `data/results/benchmark/` with the model predictions, true values, and optional weights.
     """
+    file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['mode']}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
+    if len(task_spec["variables"]) > 1:
+        file_name += f"_{task_spec['variables'][1]}"
+    file_name = file_name + ".json"
+    
+    if check_cache and os.path.exists(os.path.join("data", "benchmark", file_name)):
+        return None
+    
     # Step 1: check if query is marginal or conditional
     if len(task_spec["variables"]) == 1:
         marginal = True
@@ -148,25 +157,24 @@ def evaluator(model_name, model, tokenizer, task_spec):
                 "model_texts": model_texts,
             })
 
-    file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['mode']}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
-    if len(task_spec["variables"]) > 1:
-        file_name += f"_{task_spec['variables'][1]}"
-    file_name = file_name + ".json"
-
     with open(os.path.join("data", "benchmark", file_name), "w") as f:
         json.dump(results, f, indent=4)
 
-d2d = True
+d2d = False
 
 if d2d:
     task_sel = range(2)
     models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
 else:
     task_sel = range(len(task_specs))
-    models = ["llama3_8b_instruct", "llama3_70b_instruct"]
+    models = ["llama3_8b_instruct", "mistral_7b_instruct"]
+    # models = ["llama3_8b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct", "llama3_70b_instruct"]
+
 
 for model_name in models:
     tokenizer, model, is_instruct = load_model(model_name)
     for i in task_sel:
-        evaluator(model_name, model, tokenizer, task_specs[i])
+        evaluator(model_name, model, tokenizer, task_specs[i], check_cache=True)
+    
+
 
