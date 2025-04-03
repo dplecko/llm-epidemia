@@ -17,7 +17,7 @@ MODEL_PATHS = {
 def load_model(model_name):
     """Loads the specified model and tokenizer, and returns instruct flag."""
     if model_name not in MODEL_PATHS:
-        raise ValueError(f"Unknown model: {model_name}")
+        return None, None, None
 
     model_path, is_instruct = MODEL_PATHS[model_name]
     tokenizer = AutoTokenizer.from_pretrained(model_path)

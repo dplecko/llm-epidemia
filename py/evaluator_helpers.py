@@ -274,3 +274,16 @@ def extract_pv(prompt, levels, mode, model_name, model, tokenizer, second_prompt
 
     else:
         raise ValueError("Invalid mode. Choose 'sample', 'story', or 'logits'.")
+
+def d2d_wgh_col(dataset):
+
+    if "nhanes" in dataset:
+        mc_wgh_col = "mec_wgh"
+    elif "census" in dataset:
+        mc_wgh_col = "weight"
+    elif "gss" in dataset:
+        mc_wgh_col = "wgh"
+    else:
+        mc_wgh_col = None
+
+    return mc_wgh_col

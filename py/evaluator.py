@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "py"))
 from model_load import load_model
-from py.evaluator_helpers import extract_pv
+from py.evaluator_helpers import extract_pv, d2d_wgh_col
 from task_spec import task_specs
 
 def evaluator(model_name, model, tokenizer, task_spec):
@@ -39,9 +39,12 @@ def evaluator(model_name, model, tokenizer, task_spec):
     else:
         marginal = False
     
-    # Step 2: check if the outcome is binary
     data = pd.read_parquet(task_spec["dataset"])
-     
+    if model is None:
+        mc_data = pd.read_parquet(model_name)
+        n_mc = 128
+        mc_wgh_col = d2d_wgh_col(model_name)
+
     results = []
     if marginal:
         if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
@@ -61,27 +64,32 @@ def evaluator(model_name, model, tokenizer, task_spec):
                 model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
             )
         else:
-            mc_data = pd.read_parquet(model_name)
-            n_mc = 128
-            if "nhanes" in model_name:
-                mc_wgh_col = "mec_wgh"
-            elif "census" in model_name:
-                mc_wgh_col = "weight"
-            elif "gss" in model_name:
-                mc_wgh_col = "wgh"
-            else:
-                mc_wgh_col = None
+
+            # do the trimming for top-coded values
+            t_max = min(max(true_vals), mc_data[task_spec["variables"][0]].values.max())
+            t_min = max(min(true_vals), mc_data[task_spec["variables"][0]].values.min())
+
+            # trim model values
+            mc_data = mc_data[mc_data[task_spec["variables"][0]] <= t_max - 1]
+            mc_data = mc_data[mc_data[task_spec["variables"][0]] >= t_min]
+
+            # trim true values
+            mask = [(t_min <= i <= t_max - 1) for i in true_vals]
+            if wghs is not None:
+                wghs = [i for i, keep in zip(wghs, mask) if keep]
+            true_vals = [i for i, keep in zip(true_vals, mask) if keep]
             
             if mc_wgh_col in mc_data.columns:
                 mc_wghs = mc_data[mc_wgh_col].values
                 mc_wghs = mc_wghs / mc_wghs.sum()
             else:
                 mc_wghs = None
-            
+
             model_vals = np.random.choice(mc_data[task_spec["variables"][0]].values, size=n_mc, replace=True, p=mc_wghs).tolist()
             model_texts = None
 
         results.append({
+            "condition": "All",
             "true_vals": true_vals,
             "weights": wghs,
             "model_vals": model_vals,
@@ -90,7 +98,12 @@ def evaluator(model_name, model, tokenizer, task_spec):
 
     else:
         # iterate over different levels of the conditioning variable
-        for cond in tqdm(data[task_spec["variables"][1]].unique()):
+        cond_range = data[task_spec["variables"][1]].unique()
+        if "cond_range" in task_spec:
+            lo, hi = task_spec["cond_range"]
+            cond_range = cond_range[(cond_range >= lo) & (cond_range <= hi)]
+        
+        for cond in tqdm(cond_range):
             # filter the dataset for the current level
             filtered_data = data[data[task_spec["variables"][1]] == cond]
             
@@ -105,10 +118,23 @@ def evaluator(model_name, model, tokenizer, task_spec):
             else:
                 wghs = None
 
-            model_vals, model_texts = extract_pv(
-                task_spec["prompt"].format(cond), task_spec["levels"], task_spec["mode"], 
-                model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
-            )
+            if model is None:
+                filter_mc = mc_data[mc_data[task_spec["variables"][1]] == cond]
+                if mc_wgh_col in filter_mc.columns:
+                    mc_wghs = filter_mc[mc_wgh_col].values
+                    mc_wghs = mc_wghs / mc_wghs.sum()
+                else:
+                    mc_wghs = None
+
+                model_vals = np.random.choice(filter_mc[task_spec["variables"][0]].values, size=n_mc, replace=True, p=mc_wghs).tolist()
+                if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
+                    model_vals = [level_map.get(v, None) for v in model_vals]
+                model_texts = None
+            else:
+                model_vals, model_texts = extract_pv(
+                    task_spec["prompt"].format(cond), task_spec["levels"], task_spec["mode"], 
+                    model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
+                )
 
             results.append({
                 "condition": cond.tolist() if hasattr(cond, "tolist") else cond,
@@ -123,15 +149,20 @@ def evaluator(model_name, model, tokenizer, task_spec):
         file_name += f"_{task_spec['variables'][1]}"
     file_name = file_name + ".json"
 
-    with open(os.path.join("data", "results", "benchmark", file_name), "w") as f:
+    with open(os.path.join("data", "benchmark", file_name), "w") as f:
         json.dump(results, f, indent=4)
 
-model_name = "llama3_8b_instruct"  # Example model name
-tokenizer, model, is_instruct = load_model(model_name)
+d2d = True
 
-evaluator(model_name, model, tokenizer, task_specs[0])
+if d2d:
+    task_sel = range(2)
+    models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
+else:
+    task_sel = range(len(task_specs))
+    models = ["llama3_8b_instruct", "llama3_70b_instruct"]
 
-for i in range(len(task_specs)):
-    evaluator(model_name, model, tokenizer, task_specs[i])
-
-evaluator(model_name="data/clean/nhanes.parquet", model=None, tokenizer=None, task_spec=task_specs[0])
+for model_name in models:
+    tokenizer, model, is_instruct = load_model(model_name)
+    for i in task_sel:
+        evaluator(model_name, model, tokenizer, task_specs[i])
+# evaluator(model_name, model, tokenizer, task_specs[0])

@@ -1,7 +1,6 @@
 
 task_specs = [
     ### Mariginal Distributions
-    # 
     {
         "name": "Census: Age, Q&A",
         "dataset": "data/clean/census.parquet",
@@ -12,6 +11,16 @@ task_specs = [
         "levels": None
     },
     ### Conditional Distributions
+    {
+        "name": "Census: Age, Q&A",
+        "dataset": "data/clean/census.parquet",
+        "variables": ["sex", "age"],
+        "cond_range": [18, 79],
+        "mode": "sample",
+        "wgh_col": "weight",
+        "prompt": "What is the sex of a person living in the United States who is {} years old? Answer with a single word (male or female).",
+        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+    },
     # v0 tasks: Labor Department, Education Department, FBI Statistics
     {
         "name": "Department of Labor: Sex by Occupation, Q&A",
@@ -49,7 +58,7 @@ task_specs = [
         "prompt": "What is the sex of a person working as a {}? Answer with a single word (male or female).",
         "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
     },
-    # census tasks
+    # Census tasks
     {
         "name": "Census: Sex by Age Group, Story-telling",
         "dataset": "data/clean/census.parquet",
