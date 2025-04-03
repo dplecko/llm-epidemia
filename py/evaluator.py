@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "py"))
 from model_load import load_model
-from py.evaluator_helpers import extract_pv, d2d_wgh_col
+from py.evaluator_helpers import extract_pv, d2d_wgh_col, compress_vals
 from task_spec import task_specs
 
 def evaluator(model_name, model, tokenizer, task_spec):
@@ -88,6 +88,9 @@ def evaluator(model_name, model, tokenizer, task_spec):
             model_vals = np.random.choice(mc_data[task_spec["variables"][0]].values, size=n_mc, replace=True, p=mc_wghs).tolist()
             model_texts = None
 
+        # compress the true values to save memory
+        true_vals, wghs = compress_vals(true_vals, wghs)
+
         results.append({
             "condition": "All",
             "true_vals": true_vals,
@@ -136,6 +139,7 @@ def evaluator(model_name, model, tokenizer, task_spec):
                     model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
                 )
 
+            true_vals, wghs = compress_vals(true_vals, wghs)
             results.append({
                 "condition": cond.tolist() if hasattr(cond, "tolist") else cond,
                 "true_vals": true_vals,
@@ -165,4 +169,4 @@ for model_name in models:
     tokenizer, model, is_instruct = load_model(model_name)
     for i in task_sel:
         evaluator(model_name, model, tokenizer, task_specs[i])
-# evaluator(model_name, model, tokenizer, task_specs[0])
+

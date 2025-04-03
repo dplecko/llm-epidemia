@@ -12,7 +12,7 @@ task_specs = [
     },
     ### Conditional Distributions
     {
-        "name": "Census: Age, Q&A",
+        "name": "Census: Sex by Age, Q&A",
         "dataset": "data/clean/census.parquet",
         "variables": ["sex", "age"],
         "cond_range": [18, 79],

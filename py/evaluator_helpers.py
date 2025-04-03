@@ -2,6 +2,7 @@
 import re
 import torch
 import pdb
+from collections import defaultdict
 
 def max_lvl_len(levels, tokenizer):
     """
@@ -287,3 +288,11 @@ def d2d_wgh_col(dataset):
         mc_wgh_col = None
 
     return mc_wgh_col
+
+def compress_vals(true_vals, wghs):
+    agg = defaultdict(float)
+    for v, w in zip(true_vals, wghs):
+        agg[v] += w
+    items = agg.items()
+    vals, weights = zip(*items)
+    return list(vals), list(weights)
