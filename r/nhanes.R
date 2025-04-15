@@ -1,4 +1,7 @@
 
+# packages needed: 
+# remotes, data.table, mice, ricu to be installed via remotes::install_github
+
 source(file.path("r", "zzz-deps.R"))
 source(file.path("r", "callbacks.R"))
 
@@ -69,5 +72,3 @@ dat[, age_group := factor(
 )]
 
 arrow::write_parquet(as.data.frame(dat), sink = "data/clean/nhanes.parquet")
-
-colMeans(is.na(dat))

@@ -3,3 +3,4 @@ results/
 *.log
 __pycache__/
 *.pyc
+.Rproj.user
