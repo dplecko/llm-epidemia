@@ -15,6 +15,7 @@ eval_task <- function(model_name, task) {
   dataset <- dat_name_clean(task$dataset)
   v1 <- task$variables[1]
   v2 <- task$variables[2]
+  if (is.na(v2)) v2 <- NULL
   levels <- task$levels
   
   fl <- paste(c(model_name, mode, dataset, v1, v2), collapse = "_")
@@ -47,7 +48,7 @@ eval_task <- function(model_name, task) {
 #' @return A data.frame with mean true and model values, and benchmarking score 
 #' for each level of the conditioning variable.
 eval_cts <- function(res, model_name, mode, dataset, v1, v2) {
-
+  
   df <- c()
   for (i in seq_along(res)) {
     
@@ -76,8 +77,11 @@ eval_cts <- function(res, model_name, mode, dataset, v1, v2) {
     
     bench <- (score - worst_err) / (best_err - worst_err)
     bench <- 100 * max(min(bench, 1), 0)
+    true_vals <- list(list(vals = val_true, wgh = wgh_true))
+    mod_vals <- list(list(vals = val_mod))
     df <- rbind(df, data.frame(p_true = sum(val_true * wgh_true) / sum(wgh_true), 
-                               p_mod = mean(val_mod), bench, cond = res[[i]]$condition))
+                               p_mod = mean(val_mod), bench, cond = res[[i]]$condition,
+                               true_vals = I(true_vals), mod_vals = I(mod_vals)))
   }
   
   df
@@ -161,6 +165,7 @@ eval_cat <- function(res, model_name, mode, dataset, v1, v2, levels) {
 #' and value of the conditioning variable.
 eval_bin <- function(res, model_name, mode, dataset, v1, v2) {
   
+  # if (model_name == "llama3_70b_instruct" & v2 == "occupation") browser()  
   df <- c()
   for (i in seq_along(res)) {
     
@@ -169,7 +174,21 @@ eval_bin <- function(res, model_name, mode, dataset, v1, v2) {
     wgh_true <- as.numeric(res[[i]]$weights)
     if (length(wgh_true) == 0) wgh_true <- rep(1, length(val_true))
     p_true <- sum(val_true * wgh_true) / sum(wgh_true)
-    p_mod <- if (n_mc == 2) res[[i]]$model_vals[[2]] else mean(do.call(c, res[[i]]$model_vals))
+    
+    if (n_mc == 2) {
+      
+      p_mod <-  res[[i]]$model_vals[[2]]
+    } else {
+      val_mod <- do.call(c, res[[i]]$model_vals)
+      if (is.null(val_mod)) {
+        p_mod <- 0.5
+        n_mc <- 128
+      } else {
+        
+        p_mod <- mean(val_mod)
+        n_mc <- length(val_mod)
+      }
+    }
     
     if (n_mc == 2) n_mc <- 10^6
     best_err <- 2 * sqrt(p_true * (1-p_true) / n_mc)
@@ -212,6 +231,28 @@ plt_eval <- function(df, model_name, task) {
   dataset <- dat_name_clean(task$dataset)
   v1 <- task$variables[1]
   v2 <- task$variables[2]
+  
+  marginal <- if (nrow(df) == 1)  TRUE else FALSE
+  
+  if (marginal) {
+    
+    plt_dat <- data.frame(vals = df$true_vals[[1]]$vals, 
+                          weight = df$true_vals[[1]]$wgh, 
+                          type = "Reality")
+    
+    plt_dat <- rbind(plt_dat, data.frame(vals = df$mod_vals[[1]]$vals, 
+                                          weight = 1, type = "Model"))
+    
+    return(
+      ggplot(plt_dat, aes(x = vals, weight = weight, fill = type)) +
+        geom_density(alpha = 0.5) +
+        theme_bw() +
+        scale_fill_discrete(name = "Distribution") +
+        xlab("Value") + ylab("Density") +
+        ggtitle(task[["name"]]) +
+        theme(legend.position = "right")
+    )
+  }
   
   if (length(task$levels) == 2 || is.null(task$levels)) {
     
