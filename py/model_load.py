@@ -26,10 +26,16 @@ def load_model(model_name):
     model_path, is_instruct = MODEL_PATHS[model_name]
     tokenizer = AutoTokenizer.from_pretrained(model_path)
 
+    dtype = torch.float32  # safer default
+    if "llama" in model_name or "mistral" in model_name:
+        dtype = torch.bfloat16
+    elif "gemma" in model_name:
+        dtype = torch.float32  # prevent instabilities
+
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
-        torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
+        torch_dtype=dtype,
         device_map="auto"
     )
-    
+
     return tokenizer, model, is_instruct

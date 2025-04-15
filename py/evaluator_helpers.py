@@ -40,10 +40,17 @@ def lvl_probs(model, tokenizer, inputs, levels):
     with torch.no_grad():
         outputs = model(**inputs)
         logits = outputs.logits[:, -1, :]  # Get logits for the last token
+
         probs = torch.softmax(logits, dim=-1)
 
     level_probs = [sum(probs[0, tid].item() for tid in lvl_ids) for lvl_ids in level_ids]
     total_prob = sum(level_probs)
+    
+    # TODO: why is Yes/No getting 0 probability in Phi4?
+    if total_prob == 0:
+        level_probs = [1 for lvl_ids in level_ids]
+        total_prob = sum(level_probs)
+
     return [p / total_prob for p in level_probs], None
 
 def txt_to_lvl(text, levels):
@@ -213,7 +220,7 @@ def story_sample(model, tokenizer, inputs, second_prompt, levels, n_mc, max_batc
         with torch.no_grad():
             generated_responses = model.generate(
                 **followup_inputs,
-                max_new_tokens=3,  # Short answer expected
+                max_new_tokens=5,  # Short answer expected
                 pad_token_id=tokenizer.eos_token_id,
             )
 
@@ -250,7 +257,7 @@ def extract_pv(prompt, levels, mode, model_name, model, tokenizer, second_prompt
         List[float, int, or None]: Extracted values based on mode and config.
     """
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-    if model_name == "llama3_70b_instruct":
+    if model_name == "llama3_70b_instruct" or model_name == "gemma3_27b_instruct":
         max_batch_size = 32
     else:
         max_batch_size = 128

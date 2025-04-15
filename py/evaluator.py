@@ -167,8 +167,8 @@ if d2d:
     models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
 else:
     task_sel = range(len(task_specs))
-    models = ["llama3_8b_instruct", "mistral_7b_instruct"]
-    # models = ["llama3_8b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct", "llama3_70b_instruct"]
+    # models = ["llama3_8b_instruct", "mistral_7b_instruct"]
+    models = ["llama3_70b_instruct"]
 
 
 for model_name in models:
@@ -177,4 +177,6 @@ for model_name in models:
         evaluator(model_name, model, tokenizer, task_specs[i], check_cache=True)
     
 
-
+# model_name = "mistral_7b_instruct"
+# tokenizer, model, is_instruct = load_model(model_name)
+# evaluator(model_name, model, tokenizer, task_specs[5], check_cache=False)
