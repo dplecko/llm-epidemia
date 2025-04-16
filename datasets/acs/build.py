@@ -1,4 +1,9 @@
 
+from pathlib import Path
+out_path = Path(__file__).parent / "data" / "acs.parquet"
+if out_path.exists():
+    print("Parquet exists. Skipping."); exit()
+
 import pandas as pd
 import requests
 import numpy as np
@@ -185,4 +190,4 @@ ordering = [
 cen = cen[ordering]
 
 # save to parquet
-cen.to_parquet("data/clean/census_py.parquet", index=False)
+cen.to_parquet(out_path, index=False)

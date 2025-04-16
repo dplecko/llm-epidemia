@@ -1,12 +1,18 @@
 
-# source: https://www.bls.gov/cps/cpsaat11.xlsx
+# source: 
+
+from pathlib import Path
+out_path = Path(__file__).parent / "data" / "labor.parquet"
+if out_path.exists():
+    print("Parquet exists. Skipping."); exit()
+
 import pandas as pd
 import re
 from textblob import Word
 
 # Load the XLSX file
-file_path = "data/raw/labor/cpsaat11.xlsx"  # Adjust the path as needed
-df = pd.read_excel(file_path, sheet_name="cpsaat11", skiprows=8)
+url = "https://www.bls.gov/cps/cpsaat11.xlsx"
+df = pd.read_excel(url, sheet_name="cpsaat11", skiprows=8)
 
 # Select relevant columns
 df = df.iloc[:, [0, 2, 3, 4, 5, 6]]
@@ -108,4 +114,4 @@ df = df.dropna()
 
 df = df.melt(id_vars="occupation", var_name="sex", value_name="weight")
 df["sex"] = df["sex"].str.replace("percent_", "")
-df.to_parquet("data/clean/labor.parquet", index=False)
+df.to_parquet(out_path, index=False)

@@ -1,4 +1,9 @@
 
+from pathlib import Path
+out_path = Path(__file__).parent / "data" / "fbi_arrests.parquet"
+if out_path.exists():
+    print("Parquet exists. Skipping."); exit()
+
 import pandas as pd
 
 url = "https://ucr.fbi.gov/crime-in-the-u.s/2019/crime-in-the-u.s.-2019/tables/table-42/table-42.xls"
@@ -37,4 +42,4 @@ df["crime_type"] = df["crime_type"].replace(manual_replacements)
 df = df.melt(id_vars="crime_type", var_name="sex", value_name="weight")
 df["sex"] = df["sex"].str.replace("percent_", "")
 
-df.to_parquet("data/clean/crime.parquet", index=False)
+df.to_parquet(out_path, index=False)

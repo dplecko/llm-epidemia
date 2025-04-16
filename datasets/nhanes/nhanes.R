@@ -1,9 +1,6 @@
 
-# packages needed: 
-# remotes, data.table, mice, ricu to be installed via remotes::install_github
-
-source(file.path("r", "zzz-deps.R"))
-source(file.path("r", "callbacks.R"))
+Sys.setenv(RICU_CONFIG_PATH = file.path("config"))
+Sys.setenv(RICU_SRC_LOAD = "nhanes")
 
 files <- c(
   "DEMO_L.xpt", # demographics
@@ -22,20 +19,28 @@ files <- c(
 )
 
 url_loc <- "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/"
+
 if (!dir.exists(file.path(ricu::data_dir(), "nhanes"))) {
   
   dir.create(file.path(ricu::data_dir(), "nhanes"))
 }
 
+
+cat("NHANES data folder initiated\n")
 for (fl in files) {
   
-  fl_targ <- file.path(data_dir(), "nhanes", gsub("xpt", "fst", fl))
+  fl_targ <- file.path(ricu::data_dir(), "nhanes", gsub("xpt", "fst", fl))
   if (!file.exists(fl_targ)) {
     
     dt <- haven::read_xpt(paste0(url_loc, fl))
-    write.fst(dt, fl_targ) 
+    fst::write.fst(dt, fl_targ) 
   }
 }
+
+cat("NHANES data files downloaded\n")
+
+source("zzz-deps.R")
+source("callbacks.R")
 
 dem <- c("mec_wgh", "diet_wgh", "age", "sex", "race")
 body <- c("height", "weight", "waist", "bmi")
@@ -75,4 +80,5 @@ dat[, age_group := factor(
              "50-60 years", "60-70 years", "70+ years")
 )]
 
-arrow::write_parquet(as.data.frame(dat), sink = "data/clean/nhanes.parquet")
+arrow::write_parquet(as.data.frame(dat), sink = "nhanes.parquet")
+cat("NHANES dataset created in parquet\n")

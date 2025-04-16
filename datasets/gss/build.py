@@ -1,13 +1,15 @@
 
+from pathlib import Path
+out_path = Path(__file__).parent / "data" / "gss.parquet"
+if out_path.exists():
+    print("Parquet exists. Skipping."); exit()
+
 import pandas as pd
 import numpy as np
 import zipfile
 import tempfile
 import requests
 import pyreadstat
-from sklearn.impute import SimpleImputer
-import pyarrow.parquet as pq
-import pyarrow as pa
 import os
 import miceforest as mf
 
@@ -60,4 +62,4 @@ kds.mice(5)
 gss = kds.complete_data()
 
 # Save to Parquet
-gss.to_parquet("data/clean/gss_py.parquet", index=False)
+gss.to_parquet(out_path, index=False)
