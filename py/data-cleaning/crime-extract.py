@@ -1,10 +1,8 @@
 
-# source file download: https://ucr.fbi.gov/crime-in-the-u.s/2019/crime-in-the-u.s.-2019/tables/table-42/table-42.xls
 import pandas as pd
 
-# Load the XLSX file
-file_path = "data/raw/crime/table-42.xlsx"  # Adjust as needed
-df = pd.read_excel(file_path, sheet_name="19tbl42", skiprows=4)
+url = "https://ucr.fbi.gov/crime-in-the-u.s/2019/crime-in-the-u.s.-2019/tables/table-42/table-42.xls"
+df = pd.read_excel(url, sheet_name="19tbl42", skiprows=4, engine="xlrd")
 
 # Select relevant columns
 df = df.iloc[:, [0, 4, 5]]

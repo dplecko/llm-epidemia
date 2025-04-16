@@ -35,6 +35,8 @@ cen["state"] = df["state"].astype("category")
 cen["sex"] = pd.Series(np.where(df["SEX"] == "2", "female", "male")).astype("category")
 cen["age"] = pd.to_numeric(df["AGEP"])
 
+(all(cen["sex"] == pd.read_parquet("data/clean/census.parquet")["sex"]))
+
 race_map = {
     "1": "white", "2": "black", "3": "AIAN", "4": "AIAN", "5": "AIAN",
     "6": "asian", "7": "NHOPI", "8": "other", "9": "mix"
@@ -142,7 +144,7 @@ cen["ind_name"] = ""
 cen["ind_code"] = ""
 
 for _, row in ind_tab.iterrows():
-    key = str(row[3]).strip()
+    key = str(row[2]).strip()
     if not key or key == "nan":
         continue
     match = cen["industry"] == key

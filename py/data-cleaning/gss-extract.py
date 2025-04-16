@@ -60,5 +60,4 @@ kds.mice(5)
 gss = kds.complete_data()
 
 # Save to Parquet
-table = pa.Table.from_pandas(gss)
-pq.write_table(table, "data/clean/gss.parquet")
+gss.to_parquet("data/clean/gss_py.parquet", index=False)
