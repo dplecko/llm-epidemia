@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "py"))
 from model_load import load_model
-from py.evaluator_helpers import extract_pv, d2d_wgh_col, compress_vals
+from evaluator_helpers import extract_pv, d2d_wgh_col, compress_vals
 from task_spec import task_specs
 
 def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
