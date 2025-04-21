@@ -20,7 +20,7 @@ eval_task <- function(model_name, task) {
   
   fl <- paste(c(model_name, mode, dataset, v1, v2), collapse = "_")
   fl <- paste0(fl, ".json")
-  res <- jsonlite::read_json(file.path("data", "benchmark", fl))
+  res <- jsonlite::read_json(file.path("workspace", "results", fl))
   
   if (length(task$levels) == 2) {
     
@@ -111,7 +111,15 @@ eval_cat <- function(res, model_name, mode, dataset, v1, v2, levels) {
     n_mc <- length(res[[i]]$model_vals)
     val_true <- as.numeric(res[[i]]$true_vals)
     wgh_true <- as.numeric(res[[i]]$weights)
-    if (length(wgh_true) == 0) wgh_true <- rep(1, length(val_true))
+    
+    # reorder the values
+    ord <- order(val_true)
+    val_true <- val_true[ord]
+    
+    if (length(wgh_true) == 0) {
+      
+      wgh_true <- rep(1, length(val_true))
+    } else wgh_true <- wgh_true[ord]
     
     distr_true <- cat_to_distr(x = val_true, w = wgh_true, nbins = nbins)
     distr_mod <- cat_to_distr(x = unlist(res[[i]]$model_vals), w = NULL, nbins = nbins)
@@ -133,13 +141,16 @@ eval_cat <- function(res, model_name, mode, dataset, v1, v2, levels) {
                       prob = wgh_true, replace = TRUE)
       val_true_bt <- val_true[b_idx]
       distr_true_bt <- cat_to_distr(x = val_true_bt, w = NULL, nbins = nbins)
-      best_err <- c(best_err, abs(sum(distr_true_bt - distr_true)))
+      best_err <- c(best_err, sum(abs(distr_true_bt - distr_true)))
     }
     
     best_err <- quantile(best_err, probs = 0.975)
-    worst_bt <- runif(1000, min = min(val_true), max = max(val_true))
     worst_err <- sum(abs(rep(1/nbins, nbins) - distr_true))
     score <- sum(abs(distr_true - distr_mod))
+    
+    if (worst_err < best_err) {
+      worst_err <- best_err + 0.0001
+    }
     
     bench <- (score - worst_err) / (best_err - worst_err)
     bench <- 100 * max(min(bench, 1), 0)

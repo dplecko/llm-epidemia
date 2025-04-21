@@ -75,7 +75,10 @@ def txt_to_lvl(text, levels):
     level_matches = [bool(pattern.search(text)) for pattern in level_patterns]
 
     if sum(level_matches) > 1:
-        return 0.5  # Ambiguous match
+        if len(levels) == 2:
+            return 0.5  # Ambiguous match
+        else:
+            return None
     elif any(level_matches):
         return level_matches.index(True)  # Return the index of the matched level
     else:
