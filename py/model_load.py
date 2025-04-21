@@ -1,7 +1,7 @@
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import model
+import models
 
 # Model paths and instruct flags
 MODEL_PATHS = {
@@ -19,7 +19,7 @@ MODEL_PATHS = {
     "gpt2": ("openai-community/gpt2", False),  # Regular GPT-2
 }
 
-def load_model(model_name):
+def load_hf_model(model_name):
     """Loads the specified model and tokenizer, and returns instruct flag."""
     if model_name not in MODEL_PATHS:
         return None, None, None
@@ -32,5 +32,17 @@ def load_model(model_name):
         torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
         device_map="auto"
     )
+    hf_model = models.HuggingFaceModel(model, tokenizer)
+    hf_model.is_instruct = is_instruct
+    return hf_model
+
+
+def load_api_model(model_name):
+    pass
     
-    return tokenizer, model, is_instruct
+
+def load_model(model_name):
+    if model_name in MODEL_PATHS:
+        return load_hf_model(model_name)
+    else:
+        return load_api_model(model_name)

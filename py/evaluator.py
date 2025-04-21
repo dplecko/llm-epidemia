@@ -11,7 +11,7 @@ from model_load import load_model
 from evaluator_helpers import extract_pv, d2d_wgh_col, compress_vals
 from task_spec import task_specs
 
-def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
+def evaluator(model_name, model, task_spec, check_cache=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -20,7 +20,6 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
     Args:
         model_name (str): Name of the model, used in output file naming and batch size config.
         model: Language model to evaluate.
-        tokenizer: Tokenizer for input preparation and decoding.
         task_spec (dict): Task specification containing:
             - "prompt" (str): Base prompt or prompt template.
             - "variables" (List[str]): Outcome variable, optionally with a conditioning variable.
@@ -70,7 +69,7 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
         if model is not None:
             model_vals, model_texts = extract_pv(
                 task_spec["prompt"], task_spec["levels"], task_spec["mode"], 
-                model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
+                model_name, model, second_prompt=task_spec.get("second_prompt", None)
             )
         else:
 
@@ -145,7 +144,7 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
             else:
                 model_vals, model_texts = extract_pv(
                     task_spec["prompt"].format(cond), task_spec["levels"], task_spec["mode"], 
-                    model_name, model, tokenizer, second_prompt=task_spec.get("second_prompt", None)
+                    model_name, model, second_prompt=task_spec.get("second_prompt", None)
                 )
 
             true_vals, wghs = compress_vals(true_vals, wghs)
@@ -172,9 +171,7 @@ else:
 
 
 for model_name in models:
-    tokenizer, model, is_instruct = load_model(model_name)
+    model = load_model(model_name)
     for i in task_sel:
-        evaluator(model_name, model, tokenizer, task_specs[i], check_cache=True)
+        evaluator(model_name, model, task_specs[i], check_cache=True)
     
-
-
