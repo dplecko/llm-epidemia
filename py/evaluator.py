@@ -11,6 +11,7 @@ from model_load import load_model
 from evaluator_helpers import extract_pv, d2d_wgh_col, compress_vals
 from task_spec import task_specs
 
+
 def evaluator(model_name, model, task_spec, check_cache=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
@@ -166,7 +167,8 @@ if d2d:
     models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
 else:
     task_sel = range(len(task_specs))
-    models = ["llama3_8b_instruct", "mistral_7b_instruct"]
+    models = ["gpt2"]
+    # models = ["llama3_8b_instruct", "mistral_7b_instruct"]
     # models = ["llama3_8b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct", "llama3_70b_instruct"]
 
 

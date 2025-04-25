@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import torch
 import evaluator_helpers
+from openai import OpenAI
 
 
 # Abstract base model defining the common interface
@@ -112,6 +113,7 @@ class HuggingFaceModel(AbstractModel):
         """
         self.model = hf_model
         self.tokenizer = tokenizer
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
     def __call__(self, **inputs):
@@ -126,7 +128,7 @@ class HuggingFaceModel(AbstractModel):
     
     
     def lvl_sample(self, prompt, levels, n_mc, max_batch_size):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to("cuda")
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         samples = []
         for i in range(0, n_mc, max_batch_size):
             batch_size = min(max_batch_size, n_mc - i)
@@ -152,7 +154,7 @@ class HuggingFaceModel(AbstractModel):
     
     
     def lvl_probs(self, prompt, levels):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to("cuda")
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         if levels is None:
             return None
 
@@ -170,7 +172,7 @@ class HuggingFaceModel(AbstractModel):
     
     
     def cts_sample(self, prompt, n_mc, max_batch_size, max_tokens=10):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to("cuda")
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         samples = []
         for i in range(0, n_mc, max_batch_size):
             batch_size = min(max_batch_size, n_mc - i)
@@ -197,7 +199,7 @@ class HuggingFaceModel(AbstractModel):
     
     
     def story_sample(self, prompt, second_prompt, levels, n_mc, max_batch_size, max_tokens=50):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to("cuda")
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         samples = []
         if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token  # Ensure padding token is set
@@ -225,7 +227,7 @@ class HuggingFaceModel(AbstractModel):
             ]
 
             # Tokenize follow-up prompts
-            followup_inputs = self.tokenizer(followup_prompts, return_tensors="pt", padding=True).to("cuda")
+            followup_inputs = self.tokenizer(followup_prompts, return_tensors="pt", padding=True).to(self.device)
 
             with torch.no_grad():
                 generated_responses = self.model.generate(
@@ -246,7 +248,7 @@ class HuggingFaceModel(AbstractModel):
                 else:
                     samples.append(evaluator_helpers.txt_to_num(response))
 
-        return samples, generated_texts
+        return samples, response_texts
     
     def get_type(self):
         return "HuggingFace"
@@ -255,12 +257,13 @@ class HuggingFaceModel(AbstractModel):
 
 # An adapter for an API-based model (example implementation)
 class APIModel(AbstractModel):
-    def __init__(self, api_client):
+    def __init__(self, model_name):
         """
         Initialize with an API client that communicates with the remote model.
         :param api_client: An object that knows how to interact with a remote model via API.
         """
-        self.api_client = api_client
+        self.client = OpenAI()
+        self.model_name = model_name
 
     def __call__(self, **inputs):
         # For example, send a POST request with the inputs.
@@ -274,16 +277,48 @@ class APIModel(AbstractModel):
         return response
     
     def lvl_sample(self, prompt, levels, n_mc, max_batch_size):
-        pass
+        samples = []
+        generated_text = self._sample(n_mc, prompt)
+        samples.extend(evaluator_helpers.txt_to_lvl(token, levels) for token in generated_text)
+        return samples, generated_text
     
     def lvl_probs(self, prompt, levels):
-        pass
+        raise NotImplementedError("APIModel does not support level probabilities.")
+    
+    def _sample(self, n_mc, prompt):
+        outputs = []
+        for i in range(n_mc):
+            response = self.client.responses.create(
+                model=self.model_name,
+                input=prompt,
+            )
+            outputs.append(response.output_text)
+        return outputs
     
     def cts_sample(self, prompt, n_mc, max_batch_size, max_tokens=10):
-        pass
+        samples = []
+        generated_text = self._sample(n_mc, prompt)
+        samples.extend(evaluator_helpers.txt_to_num(text) for text in generated_text)
+        return samples, generated_text      
     
     def story_sample(self, prompt, second_prompt, levels, n_mc, max_batch_size, max_tokens=50):
-        pass
+        samples = []
+        generated_texts = self._sample(n_mc, prompt)
+        
+        followup_prompts = [
+            f"Based on the following text: {text} answer the following question: {second_prompt}"
+            for text in generated_texts
+        ]
+        
+        response_texts = self._sample(n_mc, followup_prompts)
+        
+        for response in response_texts:
+            if levels is not None:
+                samples.append(evaluator_helpers.txt_to_lvl(response, levels))
+            else:
+                samples.append(evaluator_helpers.txt_to_num(response))
+        
+        return samples, response_texts
     
     def get_type(self):
         return "API"

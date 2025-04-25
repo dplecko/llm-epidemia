@@ -16,7 +16,13 @@ MODEL_PATHS = {
     # "llama3_8b": ("/local/eb/dp3144/llama3_8b", False),  # Regular LLaMA 3 8B
     # "mistral_7b": ("/local/eb/dp3144/mistral_7b", False),  # Regular Mistral
     # "deepseek_7b": ("/local/eb/dp3144/deepseek_7b", False),  # Regular DeepSeek
-    "gpt2": ("openai-community/gpt2", False),  # Regular GPT-2
+    "gpt2": ("openai-community/gpt2", False),  # Regular GPT-2,
+    
+}
+
+API_MODELS = {
+    "gpt-4.1": {"is_instruct": False},  # simplest, no reasoning
+    
 }
 
 def load_hf_model(model_name):
@@ -38,7 +44,10 @@ def load_hf_model(model_name):
 
 
 def load_api_model(model_name):
-    pass
+    kwargs = API_MODELS.get(model_name, {})
+    api_model = models.APIModel(model_name)
+    api_model.is_instruct = kwargs.get("is_instruct", False)
+    return models.APIModel(model_name)
     
 
 def load_model(model_name):
