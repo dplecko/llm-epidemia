@@ -285,7 +285,7 @@ class OpenAIAPIModel(AbstractModel):
         return samples, generated_text
     
     def lvl_probs(self, prompt, levels):
-        raise NotImplementedError("APIModel does not support level probabilities.")
+        return self.lvl_sample(prompt, levels)
     
     def _sample(self, n_mc, prompt):
         outputs = []
