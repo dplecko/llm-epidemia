@@ -36,15 +36,15 @@ API_MODELS = {
                     "is_instruct": False,
                     "tools": [{ "type": "web_search_preview" }]},  # simplest, no reasoning
     
-    "o4-mini_web":{"model_name": "o4-mini",
-                   "is_instruct": False,
-                   "reasoning": {"effort": "low"},
-                   "tools": [{ "type": "web_search_preview" }]},
+    # "o4-mini_web":{"model_name": "o4-mini",
+    #                "is_instruct": False,
+    #                "reasoning": {"effort": "low"},
+    #                "tools": [{ "type": "web_search_preview" }]},
     
-    "o3_web": {"model_name": "o3",
-               "is_instruct": False,
-               "reasoning": {"effort": "low"},
-               "tools": [{ "type": "web_search_preview" }]},
+    # "o3_web": {"model_name": "o3",
+    #            "is_instruct": False,
+    #            "reasoning": {"effort": "low"},
+    #            "tools": [{ "type": "web_search_preview" }]},
 }
 
 
