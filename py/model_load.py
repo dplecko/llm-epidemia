@@ -21,9 +21,32 @@ MODEL_PATHS = {
 }
 
 API_MODELS = {
-    "gpt-4.1": {"is_instruct": False},  # simplest, no reasoning
+    "gpt-4.1": {"model_name": "gpt-4.1",
+                "is_instruct": False},  # simplest, no reasoning
     
+    "o4-mini":{"model_name": "o4-mini",
+               "is_instruct": False,
+               "reasoning": {"effort": "low"}},
+    
+    "o3": {"model_name": "o3",
+           "is_instruct": False,
+           "reasoning": {"effort": "low"}},
+    
+    "gpt-4.1_web": {"model_name": "gpt-4.1",
+                    "is_instruct": False,
+                    "tools": [{ "type": "web_search_preview" }]},  # simplest, no reasoning
+    
+    "o4-mini_web":{"model_name": "o4-mini",
+                   "is_instruct": False,
+                   "reasoning": {"effort": "low"},
+                   "tools": [{ "type": "web_search_preview" }]},
+    
+    "o3_web": {"model_name": "o3",
+               "is_instruct": False,
+               "reasoning": {"effort": "low"},
+               "tools": [{ "type": "web_search_preview" }]},
 }
+
 
 def load_hf_model(model_name):
     """Loads the specified model and tokenizer, and returns instruct flag."""
@@ -45,9 +68,11 @@ def load_hf_model(model_name):
 
 def load_api_model(model_name):
     kwargs = API_MODELS.get(model_name, {})
-    api_model = models.APIModel(model_name)
+    reasoning = kwargs.get("reasoning", None)
+    tools = kwargs.get("tools", [])
+    api_model = models.OpenAIAPIModel(kwargs["model_name"], reasoning=reasoning, tools=tools)
     api_model.is_instruct = kwargs.get("is_instruct", False)
-    return models.APIModel(model_name)
+    return api_model
     
 
 def load_model(model_name):

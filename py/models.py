@@ -256,14 +256,16 @@ class HuggingFaceModel(AbstractModel):
     
 
 # An adapter for an API-based model (example implementation)
-class APIModel(AbstractModel):
-    def __init__(self, model_name):
+class OpenAIAPIModel(AbstractModel):
+    def __init__(self, model_name, reasoning=None, tools=[]):
         """
         Initialize with an API client that communicates with the remote model.
         :param api_client: An object that knows how to interact with a remote model via API.
         """
         self.client = OpenAI()
         self.model_name = model_name
+        self.reasoning = reasoning
+        self.tools = tools
 
     def __call__(self, **inputs):
         # For example, send a POST request with the inputs.
@@ -291,6 +293,8 @@ class APIModel(AbstractModel):
             response = self.client.responses.create(
                 model=self.model_name,
                 input=prompt,
+                reasoning=self.reasoning,
+                tools=self.tools,
             )
             outputs.append(response.output_text)
         return outputs
@@ -299,7 +303,7 @@ class APIModel(AbstractModel):
         samples = []
         generated_text = self._sample(n_mc, prompt)
         samples.extend(evaluator_helpers.txt_to_num(text) for text in generated_text)
-        return samples, generated_text      
+        return samples, generated_text
     
     def story_sample(self, prompt, second_prompt, levels, n_mc, max_batch_size, max_tokens=50):
         samples = []
