@@ -167,7 +167,7 @@ if d2d:
     models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
 else:
     task_sel = range(len(task_specs))
-    models = ["gpt2"]
+    models = ["gpt-4.1"]
     # models = ["llama3_8b_instruct", "mistral_7b_instruct"]
     # models = ["llama3_8b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct", "llama3_70b_instruct"]
 
