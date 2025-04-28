@@ -20,7 +20,7 @@ MODEL_PATHS = {
     
 }
 
-API_MODELS = {
+OPENAI_API_MODELS = {
     "gpt-4.1": {"model_name": "gpt-4.1",
                 "is_instruct": False},  # simplest, no reasoning
     
@@ -47,6 +47,15 @@ API_MODELS = {
     #            "tools": [{ "type": "web_search_preview" }]},
 }
 
+GEMINI_MODELS = {
+    "gemini-2.0-flash": {"model_name": "gemini-2.0-flash", 
+                         "is_instruct": False}, 
+    "gemini-2.5-flash": {"model_name": "gemini-2.5-flash", 
+                         "is_instruct": False}, 
+    "gemini-2.5-pro": {"model_name": "gemini-2.5-pro", 
+                         "is_instruct": False}, 
+}
+
 
 def load_hf_model(model_name):
     """Loads the specified model and tokenizer, and returns instruct flag."""
@@ -67,12 +76,18 @@ def load_hf_model(model_name):
 
 
 def load_api_model(model_name):
-    kwargs = API_MODELS.get(model_name, {})
-    reasoning = kwargs.get("reasoning", None)
-    tools = kwargs.get("tools", [])
-    api_model = models.OpenAIAPIModel(kwargs["model_name"], reasoning=reasoning, tools=tools)
-    api_model.is_instruct = kwargs.get("is_instruct", False)
-    return api_model
+    if model_name in OPENAI_API_MODELS:
+        kwargs = OPENAI_API_MODELS.get(model_name, {})
+        reasoning = kwargs.get("reasoning", None)
+        tools = kwargs.get("tools", [])
+        api_model = models.OpenAIAPIModel(kwargs["model_name"], reasoning=reasoning, tools=tools)
+        api_model.is_instruct = kwargs.get("is_instruct", False)
+        return api_model
+    elif model_name in GEMINI_MODELS:
+        kwargs = GEMINI_MODELS.get(model_name, {})
+        api_model = models.GeminiAPIModel(kwargs["model_name"])
+        api_model.is_instruct = kwargs.get("is_instruct", False)
+        return api_model
     
 
 def load_model(model_name):

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import torch
 import evaluator_helpers
 from openai import OpenAI
+from google import genai
 
 
 # Abstract base model defining the common interface
@@ -254,18 +255,16 @@ class HuggingFaceModel(AbstractModel):
         return "HuggingFace"
     
     
-
+    
 # An adapter for an API-based model (example implementation)
-class OpenAIAPIModel(AbstractModel):
-    def __init__(self, model_name, reasoning=None, tools=[]):
+class APIModel(AbstractModel):
+    def __init__(self,):
         """
         Initialize with an API client that communicates with the remote model.
         :param api_client: An object that knows how to interact with a remote model via API.
         """
-        self.client = OpenAI()
-        self.model_name = model_name
-        self.reasoning = reasoning
-        self.tools = tools
+        super().__init__()
+
 
     def __call__(self, **inputs):
         # For example, send a POST request with the inputs.
@@ -287,17 +286,9 @@ class OpenAIAPIModel(AbstractModel):
     def lvl_probs(self, prompt, levels):
         return self.lvl_sample(prompt, levels)
     
+    @abstractmethod
     def _sample(self, n_mc, prompt):
-        outputs = []
-        for i in range(n_mc):
-            response = self.client.responses.create(
-                model=self.model_name,
-                input=prompt,
-                reasoning=self.reasoning,
-                tools=self.tools,
-            )
-            outputs.append(response.output_text)
-        return outputs
+        pass
     
     def cts_sample(self, prompt, n_mc, max_batch_size, max_tokens=10):
         samples = []
@@ -326,3 +317,48 @@ class OpenAIAPIModel(AbstractModel):
     
     def get_type(self):
         return "API"
+    
+    
+
+# An adapter for an API-based model (example implementation)
+class OpenAIAPIModel(APIModel):
+    def __init__(self, model_name, reasoning=None, tools=[]):
+        """
+        Initialize with an API client that communicates with the remote model.
+        :param api_client: An object that knows how to interact with a remote model via API.
+        """
+        super().__init__()
+        self.client = OpenAI()
+        self.model_name = model_name
+        self.reasoning = reasoning
+        self.tools = tools
+    
+    def _sample(self, n_mc, prompt):
+        outputs = []
+        for i in range(n_mc):
+            response = self.client.responses.create(
+                model=self.model_name,
+                input=prompt,
+                reasoning=self.reasoning,
+                tools=self.tools,
+            )
+            outputs.append(response.output_text)
+        return outputs
+    
+    
+# An adapter for an API-based model (example implementation)
+class GeminiAPIModel(APIModel):
+    def __init__(self, model_name, ):
+        super().__init__()
+        self.client = genai.Client()
+        self.model_name = model_name
+    
+    def _sample(self, n_mc, prompt):
+        outputs = []
+        for i in range(n_mc):
+            response = self.client.models.generate_content(
+                model=self.model_name, 
+                contents=prompt,
+                )
+            outputs.append(response.text)
+        return outputs
