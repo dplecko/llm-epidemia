@@ -4,7 +4,7 @@ tasks_scf = [
         "name": "SCF: Food Expenditure by Age Group, Q&A",
         "variables": ["food", "age_group"],
         "prompt": "How much does a household spend on food if the primary respondent is aged {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([3500, 5500, 7000, 8500, 10000, 15000, 30000], "US dollars")
     },
     {
         "name": "SCF: House Ownership by Age Group, Q&A",
@@ -16,26 +16,26 @@ tasks_scf = [
         "name": "SCF: Total Assets by Age Group, Q&A",
         "variables": ["asset", "age_group"],
         "prompt": "What is the total value of assets for a household where the primary respondent is aged {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([10e4, 3 * 10e4, 10e5, 3 * 10e5, 10e6, 10e7], "US dollars")
     },
     {
         "name": "SCF: Debt by Age Group, Q&A",
         "variables": ["debt", "age_group"],
         "prompt": "What is the total debt of a household where the primary respondent is aged {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([1000, 10000, 30000, 10e5, 3 * 10e5, 10e6], "US dollars")
     },
     {
         "name": "SCF: Net Worth by Age Group, Q&A",
         "variables": ["networth", "age_group"],
         "prompt": "What is the net worth of a household where the primary respondent is aged {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([1000, 10000, 30000, 10e5, 3 * 10e5, 10e6], "US dollars")
     },
-        # By race
+    # By race
     {
         "name": "SCF: Food Expenditure by Race, Q&A",
         "variables": ["food", "race"],
         "prompt": "How much does a household spend on food if the primary respondent is {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([3500, 5500, 7000, 8500, 10000, 15000, 30000], "US dollars")
     },
     {
         "name": "SCF: House Ownership by Race, Q&A",
@@ -47,26 +47,26 @@ tasks_scf = [
         "name": "SCF: Total Assets by Race, Q&A",
         "variables": ["asset", "race"],
         "prompt": "What is the total value of assets for a household where the primary respondent is {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([10e4, 3 * 10e4, 10e5, 3 * 10e5, 10e6, 10e7], "US dollars")
     },
     {
         "name": "SCF: Debt by Race, Q&A",
         "variables": ["debt", "race"],
         "prompt": "What is the total debt of a household where the primary respondent is {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([1000, 10000, 30000, 10e5, 3 * 10e5, 10e6], "US dollars")
     },
     {
         "name": "SCF: Net Worth by Race, Q&A",
         "variables": ["networth", "race"],
         "prompt": "What is the net worth of a household where the primary respondent is {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([1000, 10000, 30000, 10e5, 3 * 10e5, 10e6], "US dollars")
     },
-        # By education
+    # By education
     {
         "name": "SCF: Food Expenditure by Education, Q&A",
         "variables": ["food", "education"],
         "prompt": "How much does a household spend on food if the primary respondent completed {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([3500, 5500, 7000, 8500, 10000, 15000, 30000], "US dollars")
     },
     {
         "name": "SCF: House Ownership by Education, Q&A",
@@ -78,19 +78,19 @@ tasks_scf = [
         "name": "SCF: Total Assets by Education, Q&A",
         "variables": ["asset", "education"],
         "prompt": "What is the total value of assets for a household where the primary respondent completed {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([10e4, 3 * 10e4, 10e5, 3 * 10e5, 10e6, 10e7], "US dollars")
     },
     {
         "name": "SCF: Debt by Education, Q&A",
         "variables": ["debt", "education"],
         "prompt": "What is the total debt of a household where the primary respondent completed {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([1000, 10000, 30000, 10e5, 3 * 10e5, 10e6], "US dollars")
     },
     {
         "name": "SCF: Net Worth by Education, Q&A",
         "variables": ["networth", "education"],
         "prompt": "What is the net worth of a household where the primary respondent completed {}? Answer with a number (in US dollars).",
-        "levels": None
+        "levels": bin_labels([1000, 10000, 30000, 10e5, 3 * 10e5, 10e6], "US dollars")
     }
 ]
 

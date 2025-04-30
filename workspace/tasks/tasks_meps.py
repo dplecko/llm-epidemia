@@ -1,27 +1,33 @@
+
+import sys
+import os
+sys.path.append(os.path.abspath("datasets"))
+from helpers import bin_labels
+
 tasks_meps = [
     {
         "name": "MEPS: Expenditure by Age Group, Q&A",
         "variables": ["expenditure", "age_group"],
-        "prompt": "What is the annual healthcare expenditure for a person aged {} in the US? Answer with a number (in US dollars).",
-        "levels": None,
+        "prompt": "What is the annual healthcare expenditure for a person aged {} in the US?",
+        "levels": bin_labels([200, 1000, 1500, 5000, 10000, 30000], "US dollars"),
     },
     {
         "name": "MEPS: Office-based Visits by Age Group, Q&A",
         "variables": ["office_visits", "age_group"],
-        "prompt": "How many office-based medical visits does a person aged {} have per year? Answer with a number.",
-        "levels": None,
+        "prompt": "How many office-based medical visits does a person aged {} have per year?",
+        "levels": bin_labels(list(range(0, 11, 1)), "visits", True, True),
     },
     {
         "name": "MEPS: Inpatient Visits by Age Group, Q&A",
         "variables": ["inpatient_visits", "age_group"],
         "prompt": "How many inpatient hospital visits does a person aged {} have per year? Answer with a number.",
-        "levels": None,
+        "levels": bin_labels(list(range(0, 11, 1)), "visits", True, True),
     },
     {
         "name": "MEPS: Dental Visits by Age Group, Q&A",
         "variables": ["dental_visits", "age_group"],
         "prompt": "How many dental visits does a person aged {} have per year? Answer with a number.",
-        "levels": None,
+        "levels": bin_labels(list(range(0, 11, 1)), "visits", True, True),
     },
     {
         "name": "MEPS: Has Insurance by Age Group, Q&A",
@@ -33,25 +39,25 @@ tasks_meps = [
         "name": "MEPS: Expenditure by Race, Q&A",
         "variables": ["expenditure", "race"],
         "prompt": "What is the annual healthcare expenditure for a {} person in the US? Answer with a number (in US dollars).",
-        "levels": None,
+        "levels": bin_labels([200, 1000, 1500, 5000, 10000, 30000], "US dollars"),
     },
     {
         "name": "MEPS: Office-based Visits by Race, Q&A",
         "variables": ["office_visits", "race"],
         "prompt": "How many office-based medical visits does a {} person have per year? Answer with a number.",
-        "levels": None,
+        "levels": bin_labels(list(range(0, 11, 1)), "visits", True, True),
     },
     {
         "name": "MEPS: Inpatient Visits by Race, Q&A",
         "variables": ["inpatient_visits", "race"],
         "prompt": "How many inpatient hospital visits does a {} person have per year? Answer with a number.",
-        "levels": None,
+        "levels": bin_labels(list(range(0, 11, 1)), "visits", True, True),
     },
     {
         "name": "MEPS: Dental Visits by Race, Q&A",
         "variables": ["dental_visits", "race"],
         "prompt": "How many dental visits does a {} person have per year? Answer with a number.",
-        "levels": None,
+        "levels": bin_labels(list(range(0, 11, 1)), "visits", True, True),
     },
     {
         "name": "MEPS: Has Insurance by Race, Q&A",

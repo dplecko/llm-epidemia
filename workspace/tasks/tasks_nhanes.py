@@ -4,7 +4,7 @@ tasks_nhanes = [
         "name": "NHANES: Age by BMI Group, Q&A",
         "variables": ["age", "bmi_bin"],
         "prompt": "What is the age of a person with body mass index (BMI) in the {} range? Answer with a single number only (in years).",
-        "levels": None
+        "levels": bin_labels(list(range(18, 85, 3)), "years")
     },
     {
         "name": "NHANES: Diabetes by BMI Group, Q&A",

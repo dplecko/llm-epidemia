@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 out_path = Path(__file__).parent / "data" / "labor.parquet"
 if out_path.exists():
