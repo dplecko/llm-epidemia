@@ -1,12 +1,17 @@
 
 tasks_fbi = [
     {
-        "name": "FBI Crime Statistics: Sex by Crime Type, Q&A",
-        "dataset": "data/clean/crime.parquet",
+        "name": "FBI Crime Statistics: Sex by Crime Type",
+        "dataset": "data/clean/fbi_arrests.parquet",
         "variables": ["sex", "crime_type"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "What is the sex of a person arrested for {}? Answer with a single word (male or female).",
-        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+        "prompt": "What is the sex of a person arrested for {}?",
+        "levels": ["male", "female"]
+    },
+    {
+        "name": "FBI Crime Statistics: Race by Crime Type",
+        "dataset": "data/clean/fbi_arrests.parquet",
+        "variables": ["race", "crime_type"],
+        "prompt": "What is the race of a person arrested for {}?",
+        "levels": ["White", "Black", "AIAN", "NHOPI", "Asian"]
     },
 ]

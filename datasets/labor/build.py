@@ -1,5 +1,4 @@
 
-# source: 
 
 from pathlib import Path
 out_path = Path(__file__).parent / "data" / "labor.parquet"
@@ -9,14 +8,38 @@ if out_path.exists():
 import pandas as pd
 import re
 from textblob import Word
+import sys, os
+sys.path.append(os.path.abspath("datasets"))
+from helpers import split_counts
+import requests
+from io import BytesIO
 
-# Load the XLSX file
+# direct download no longer works
 url = "https://www.bls.gov/cps/cpsaat11.xlsx"
 df = pd.read_excel(url, sheet_name="cpsaat11", skiprows=8)
 
+# direct download no longer works
+in_path = Path(__file__).parent / "data" / "cpsaat11.xlsx"
+in_path = "datasets/labor/data/cpsaat11.xlsx"
+df = pd.read_excel(in_path, skiprows=8, engine="openpyxl")
+
 # Select relevant columns
-df = df.iloc[:, [0, 2, 3, 4, 5, 6]]
-df.columns = ["occupation", "women", "white", "black_or_aa", "asian", "hispanic_or_latino"]
+df = df.iloc[:, 0:6]
+
+df.columns = ["occupation", "total", "female", "white", "black", "asian"]
+
+# Replace en-dash and encoding
+df.replace({"\u2013": "-", "‚Äì": "-"}, inplace=True)
+df = df.map(lambda x: x if x not in ["-", "–", "‚Äì"] else None)  # Convert to NaN
+
+df["other"] = 100 - df["white"] - df["black"] - df["asian"]
+df["female"] = df["female"] / 100
+df["male"] = 1 - df["female"]
+
+for col in ["white", "black", "asian", "other"]:
+    df[col] = df[col] * df["total"] / 100
+
+df = split_counts(df, "occupation", ["female", "male"], ["white", "black", "asian", "other"])
 
 # Drop rows where occupation is NaN
 df = df.dropna(subset=["occupation"])
@@ -59,7 +82,7 @@ df = df[~df["occupation"].isin(rm_headings)]
 df = df[~df["occupation"].str.contains(r"\ball other\b", case=False, na=False)]
 
 # Remove numbers and unwanted characters from occupation names
-df["occupation"] = df["occupation"].apply(lambda x: re.sub(r"[\d\-]+", "", str(x)).strip())
+df.loc[:, "occupation"] = df["occupation"].apply(lambda x: re.sub(r"[\d\-]+", "", str(x)).strip())
 
 # Convert to lowercase
 df["occupation"] = df["occupation"].str.lower()
@@ -94,24 +117,7 @@ df["occupation"] = df["occupation"].replace(manual_replacements)
 df = df.dropna(subset=["occupation"])
 
 # Remove plural forms from occupation names
-df["occupation"] = df["occupation"].apply(lambda x: " ".join([Word(word).singularize() for word in x.split()]))
-
-# Removes the last row which contains a note
-df = df.iloc[:-1]  
-
-# Replace en-dash and encoding
-df.replace({"\u2013": "-", "‚Äì": "-"}, inplace=True)
-df = df.applymap(lambda x: x if x not in ["-", "–", "‚Äì"] else None)  # Convert to NaN
-
-# Fix the columns
-df['percent_male'] = 100 - df['women']
-df['percent_female'] = df['women']
-
-# Subset the columns
-df = df[['occupation', 'percent_male', 'percent_female']]
+df.loc[:, "occupation"] = df["occupation"].apply(lambda x: " ".join([Word(word).singularize() for word in x.split()]))
 
 df = df.dropna()
-
-df = df.melt(id_vars="occupation", var_name="sex", value_name="weight")
-df["sex"] = df["sex"].str.replace("percent_", "")
 df.to_parquet(out_path, index=False)

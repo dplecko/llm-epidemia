@@ -10,7 +10,6 @@ if out_path.exists():
 import pandas as pd
 
 in_path = Path(__file__).parent / "data" / "education.xlsx"
-
 df = pd.read_excel(in_path, skiprows=4)
 
 df['Men'] = pd.to_numeric(df['Men'].str.replace(',', ''), errors='coerce')

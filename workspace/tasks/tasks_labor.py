@@ -1,12 +1,17 @@
 
 tasks_labor = [
     {
-        "name": "Department of Labor: Sex by Occupation, Q&A",
+        "name": "Department of Labor: Sex by Occupation",
         "dataset": "data/clean/labor.parquet",
         "variables": ["sex", "occupation"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "What is the sex of a person working as a {}? Answer with a single word (male or female).",
-        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+        "prompt": "What is the sex of a person working as a {}?",
+        "levels": ["male", "female"]
+    },
+    {
+        "name": "Department of Labor: Race by Occupation",
+        "dataset": "data/clean/labor.parquet",
+        "variables": ["sex", "occupation"],
+        "prompt": "What is the race of a person working as a {}?",
+        "levels": ["white", "black", "asian", "other"]
     },
 ]

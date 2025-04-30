@@ -1,84 +1,60 @@
 
 tasks_brfss = [
     {
-        "name": "BRFSS: Exercise by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Exercise by State",
         "variables": ["exercise_monthly", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Does a person living in {} exercise every month? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Does a person living in {} exercise every month?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Diabetes by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Diabetes by State",
         "variables": ["diabetes", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Has a person living in {} ever been told they have diabetes? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Has a person living in {} ever been told they have diabetes?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: High BP by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: High BP by State",
         "variables": ["high_bp", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Does a person living in {} have high blood pressure? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Does a person living in {} have high blood pressure?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Asthma by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Asthma by State",
         "variables": ["asthma", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Does a person living in {} have asthma? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Does a person living in {} have asthma?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Cholesterol by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Cholesterol by State",
         "variables": ["cholesterol", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Does a person living in {} have high cholesterol? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Does a person living in {} have high cholesterol?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Visual Impairments by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Visual Impairments by State",
         "variables": ["blind", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Does a person living in {} have significant visual impairments/blindness? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Does a person living in {} have significant visual impairments/blindness?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Hearing Impairments by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Hearing Impairments by State",
         "variables": ["blind", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Does a person living in {} have significant hearing impairments/deafness? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Does a person living in {} have significant hearing impairments/deafness?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Heart Attack by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Heart Attack by State",
         "variables": ["heart_attack", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Has a person living in {} ever suffered a heart attack? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Has a person living in {} ever suffered a heart attack?",
+        "levels": ["no", "yes"]
     },
     {
-        "name": "BRFSS: Stroke by State, Q&A",
-        "dataset": "data/clean/brfss.parquet",
+        "name": "BRFSS: Stroke by State",
         "variables": ["stroke", "state"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "Has a person living in {} ever suffered a stroke? Answer with a single word (yes/no).",
-        "levels": [["No", "no"], ["Yes", "yes"]]
+        "prompt": "Has a person living in {} ever suffered a stroke?",
+        "levels": ["no", "yes"]
     },
 ]
+
+for t in tasks_brfss:
+    t["dataset"] = "data/clean/brfss.parquet"

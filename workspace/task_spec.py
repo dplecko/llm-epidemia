@@ -19,9 +19,9 @@ task_specs = (
     tasks_fbi +
     tasks_edu +
     tasks_nhanes +
-    tasks_gss +
-    tasks_meps +
-    tasks_scf +
-    tasks_brfss +
-    tasks_nsduh
+    tasks_gss #+
+    # tasks_meps +
+    # tasks_scf +
+    # tasks_brfss +
+    # tasks_nsduh
 )

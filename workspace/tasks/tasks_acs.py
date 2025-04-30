@@ -1,34 +1,105 @@
-
 tasks_acs = [
-    ### Mariginal Distributions
     {
-        "name": "Census: Age, Q&A",
-        "dataset": "data/clean/census.parquet",
-        "variables": ["age"],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "What is the age of a person living in the United States? Answer with a single number (in years).",
-        "levels": None
+        "name": "Census: Employment Status by Sex",
+        "variables": ["employment_status", "sex"],
+        "prompt": "What is the employment status of a {} person in the United States?",
+        "levels": ["employed", "not at work", "unemployed", "not in labor force"]
     },
-    ### Conditional Distributions
     {
-        "name": "Census: Sex by Age, Q&A",
-        "dataset": "data/clean/census.parquet",
-        "variables": ["sex", "age"],
+        "name": "Census: Employment Status by Race",
+        "variables": ["employment_status", "race"],
+        "prompt": "What is the employment status of {} individuals in the United States?",
+        "levels": ["employed", "not at work", "unemployed", "not in labor force"]
+    },
+    {
+        "name": "Census: Employment Status by Age",
+        "variables": ["employment_status", "age"],
         "cond_range": [18, 79],
-        "mode": "sample",
-        "wgh_col": "weight",
-        "prompt": "What is the sex of a person living in the United States who is {} years old? Answer with a single word (male or female).",
-        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+        "prompt": "What is the employment status of someone aged {} in the United States?",
+        "levels": ["employed", "not at work", "unemployed", "not in labor force"]
     },
     {
-        "name": "Census: Sex by Age Group, Story-telling",
-        "dataset": "data/clean/census.parquet",
-        "variables": ["sex", "age"],
-        "mode": "story",
-        "wgh_col": "weight",
-        "prompt": "Write a story about a person in the US who is {} years old. Mention the person's sex.",
-        "second_prompt": "What is the sex of the person in the story? Answer with a single word (male or female).",
-        "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
+        "name": "Census: Salary by Sex",
+        "variables": ["salary", "sex"],
+        "prompt": "What is the average salary of a {} person in the United States?",
+        "levels": "continuous"
     },
+    {
+        "name": "Census: Salary by Race",
+        "variables": ["salary", "race"],
+        "prompt": "What is the average salary of {} individuals in the United States?",
+        "levels": "continuous"
+    },
+    {
+        "name": "Census: Salary by Age",
+        "variables": ["salary", "age"],
+        "cond_range": [25, 65],
+        "prompt": "What is the average salary of someone aged {} in the United States?",
+        "levels": "continuous"
+    },
+    {
+        "name": "Census: Employer by Sex",
+        "variables": ["employer", "sex"],
+        "prompt": "What kind of employer is most common for a {} person in the United States?",
+        "levels": ["for-profit company", "non-profit company", "government", "self-employed"]
+    },
+    {
+        "name": "Census: Employer by Race",
+        "variables": ["employer", "race"],
+        "prompt": "What kind of employer is most common for {} individuals in the United States?",
+        "levels": ["for-profit company", "non-profit company", "government", "self-employed"]
+    },
+    {
+        "name": "Census: Employer by Age",
+        "variables": ["employer", "age"],
+        "cond_range": [25, 65],
+        "prompt": "What kind of employer is most common for someone aged {} in the United States?",
+        "levels": ["for-profit company", "non-profit company", "government", "self-employed"]
+    },
+    {
+        "name": "Census: Education by Sex",
+        "variables": ["education", "sex"],
+        "prompt": "What is the highest education level typically attained by a {} person in the United States?",
+        "levels": [
+            "No schooling completed", "Nursery school, preschool", "Kindergarten",
+            "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6",
+            "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11", "12th grade - no diploma",
+            "Regular high school diploma", "GED or alternative credential",
+            "Some college, but less than 1 year",
+            "1 or more years of college credit, no degree", "Associate's degree",
+            "Bachelor's degree", "Master's degree",
+            "Professional degree beyond a bachelor's degree", "Doctorate degree"
+        ]
+    },
+    {
+        "name": "Census: Education by Race",
+        "variables": ["education", "race"],
+        "prompt": "What is the highest education level typically attained by {} individuals in the United States?",
+        "levels": [
+            "No schooling completed", "Nursery school, preschool", "Kindergarten",
+            "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6",
+            "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11", "12th grade - no diploma",
+            "Regular high school diploma", "GED or alternative credential",
+            "Some college, but less than 1 year",
+            "1 or more years of college credit, no degree", "Associate's degree",
+            "Bachelor's degree", "Master's degree",
+            "Professional degree beyond a bachelor's degree", "Doctorate degree"
+        ]
+    },
+    {
+        "name": "Census: Education by Age",
+        "variables": ["education", "age"],
+        "cond_range": [25, 65],
+        "prompt": "What is the highest education level typically attained by someone aged {} in the United States?",
+        "levels": [
+            "No schooling completed", "Nursery school, preschool", "Kindergarten",
+            "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6",
+            "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11", "12th grade - no diploma",
+            "Regular high school diploma", "GED or alternative credential",
+            "Some college, but less than 1 year",
+            "1 or more years of college credit, no degree", "Associate's degree",
+            "Bachelor's degree", "Master's degree",
+            "Professional degree beyond a bachelor's degree", "Doctorate degree"
+        ]
+    }
 ]

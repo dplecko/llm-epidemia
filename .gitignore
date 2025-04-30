@@ -1,5 +1,6 @@
 data/
 results/
+paper/
 *.log
 __pycache__/
 *.pyc
