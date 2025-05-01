@@ -72,25 +72,12 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
         true_vals = get_ground_truth(data, task_spec)
 
         # model values
-        if model is not None:
-            model_vals, model_texts = extract_pv(
-                task_spec["prompt"],
-                task_spec["levels"],
-                model_name,
-                model,
-            )
-        else:
-            # TODO: do we need this?
-            # make sure synthetic sample respects the observed range
-            t_max = min(max(true_vals), mc_data[task_spec["variables"][0]].values.max())
-            t_min = max(min(true_vals), mc_data[task_spec["variables"][0]].values.min())
-            mc_data = mc_data.query(f"{task_spec['variables'][0]} >= @t_min & {task_spec['variables'][0]} <= @t_max - 1")
-            model_vals = np.random.choice(
-                mc_data[task_spec["variables"][0]].values,
-                size=n_mc,
-                replace=True
-            ).tolist()
-            model_texts = None
+        model_vals, model_texts = extract_pv(
+            task_spec["prompt"],
+            task_spec["levels"],
+            model_name,
+            model,
+        )
 
         # compress to save memory (weights argument is now always None)
         true_vals, _ = compress_vals(true_vals, None)
@@ -115,25 +102,12 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
             true_vals = get_ground_truth(filtered_data, task_spec)
             
             # model values
-            if model is None:
-                # TODO: do we need this?
-                filter_mc = mc_data[mc_data[task_spec["variables"][1]] == cond]
-                model_vals = np.random.choice(
-                    filter_mc[task_spec["variables"][0]].values,
-                    size=n_mc,
-                    replace=True
-                ).tolist()
-                if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
-                    level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
-                    model_vals = [level_map.get(v, None) for v in model_vals]
-                model_texts = None
-            else:
-                model_vals, model_texts = extract_pv(
-                    task_spec["prompt"].format(cond),
-                    task_spec["levels"],
-                    model_name,
-                    model,
-                )
+            model_vals, model_texts = extract_pv(
+                task_spec["prompt"].format(cond),
+                task_spec["levels"],
+                model_name,
+                model,
+            )
 
             true_vals, _ = compress_vals(true_vals, None)
 
