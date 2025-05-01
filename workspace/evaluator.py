@@ -10,17 +10,19 @@ from model_load import load_model
 from evaluator_helpers import extract_pv, compress_vals  # removed d2d_wgh_col
 from task_spec import task_specs
 
-
 def get_ground_truth(data, task_spec):
-    if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
-        level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
-        true_vals = data[task_spec["variables"][0]].map(level_map).tolist()
-    else:
-        true_vals = data[task_spec["variables"][0]].tolist()
-    return true_vals
+    
+    return data[task_spec["variables"][0]].tolist()
+    # if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
+    #     pdb.set_trace()
+    #     level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
+    #     true_vals = data[task_spec["variables"][0]].map(level_map).tolist()
+    # else:
+    #     true_vals = data[task_spec["variables"][0]].tolist()
+    # return true_vals
         
 
-def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
+def evaluator(model_name, model, task_spec, check_cache=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -48,7 +50,7 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
     -------
     Saves a JSON file under `data/results/benchmark/` with the model predictions and true values.
     """
-    file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['mode']}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
+    file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
     if len(task_spec["variables"]) > 1:
         file_name += f"_{task_spec['variables'][1]}"
     file_name = file_name + ".json"
@@ -66,6 +68,8 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
         mc_data = pd.read_parquet(model_name)
         n_mc = 128
 
+    levels = data[task_spec["variables"][0]].unique().tolist()
+
     results = []
     if marginal:
         # ground‑truth values
@@ -74,7 +78,7 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
         # model values
         model_vals, model_texts = extract_pv(
             task_spec["prompt"],
-            task_spec["levels"],
+            levels,
             model_name,
             model,
         )
@@ -104,16 +108,22 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
             # model values
             model_vals, model_texts = extract_pv(
                 task_spec["prompt"].format(cond),
-                task_spec["levels"],
+                levels,
                 model_name,
                 model,
             )
 
-            true_vals, _ = compress_vals(true_vals, None)
+            if "weight" in filtered_data.columns:
+                weights = filtered_data["weight"].tolist()
+            else:
+                weights = [1] * len(true_vals)
+            
+            true_vals, weights = compress_vals(true_vals, weights)
 
             results.append({
                 "condition": cond.tolist() if hasattr(cond, "tolist") else cond,
                 "true_vals": true_vals,
+                "weights": weights,
                 "model_vals": model_vals,
                 "model_texts": model_texts
             })
@@ -131,10 +141,10 @@ if __name__ == "__main__":
         task_sel = range(2)
         models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
     else:
-        task_sel = range(len(task_specs))
+        task_sel = [56] # range(1) # range(len(task_specs))
         models = ["llama3_8b_instruct"]
 
     for model_name in models:
-        tokenizer, model, is_instruct = load_model(model_name)
+        model = load_model(model_name)
         for i in task_sel:
-            evaluator(model_name, model, tokenizer, task_specs[i], check_cache=True)
+            evaluator(model_name, model, task_specs[i], check_cache=True)

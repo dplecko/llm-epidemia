@@ -1,3 +1,4 @@
+
 tasks_acs = [
     {
         "name": "Census: Employment Status by Sex",
@@ -103,3 +104,6 @@ tasks_acs = [
         ]
     }
 ]
+
+for task in tasks_acs:
+    task["dataset"] = "data/clean/acs.parquet"
