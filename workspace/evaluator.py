@@ -10,6 +10,16 @@ from model_load import load_model
 from py.evaluator_helpers import extract_pv, compress_vals  # removed d2d_wgh_col
 from task_spec import task_specs
 
+
+def get_ground_truth(data, task_spec):
+    if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
+        level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
+        true_vals = data[task_spec["variables"][0]].map(level_map).tolist()
+    else:
+        true_vals = data[task_spec["variables"][0]].tolist()
+    return true_vals
+        
+
 def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
@@ -31,7 +41,6 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
         - "variables" (List[str]): Outcome variable, optionally with a conditioning variable.
         - "dataset" (str): Path to the dataset parquet file.
         - "levels" (List[List[str]] | None): Discrete level groupings for classification.
-        - "mode" (str): One of {"logits", "sample", "story"}.
         - "second_prompt" (str, optional): Follow‑up question (for "story" mode).
     check_cache (bool): If *True* and the task was already solved for the model, skip the run.
 
@@ -60,24 +69,18 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
     results = []
     if marginal:
         # ground‑truth values
-        if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
-            level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
-            true_vals = data[task_spec["variables"][0]].map(level_map).tolist()
-        else:
-            true_vals = data[task_spec["variables"][0]].tolist()
+        true_vals = get_ground_truth(data, task_spec)
 
         # model values
         if model is not None:
             model_vals, model_texts = extract_pv(
                 task_spec["prompt"],
                 task_spec["levels"],
-                task_spec["mode"],
                 model_name,
                 model,
-                tokenizer,
-                second_prompt=task_spec.get("second_prompt")
             )
         else:
+            # TODO: do we need this?
             # make sure synthetic sample respects the observed range
             t_max = min(max(true_vals), mc_data[task_spec["variables"][0]].values.max())
             t_min = max(min(true_vals), mc_data[task_spec["variables"][0]].values.min())
@@ -109,14 +112,11 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
         for cond in tqdm(cond_range):
             filtered_data = data[data[task_spec["variables"][1]] == cond]
             
-            if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
-                level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
-                true_vals = filtered_data[task_spec["variables"][0]].map(level_map).tolist()
-            else:
-                true_vals = filtered_data[task_spec["variables"][0]].tolist()
+            true_vals = get_ground_truth(filtered_data, task_spec)
             
             # model values
             if model is None:
+                # TODO: do we need this?
                 filter_mc = mc_data[mc_data[task_spec["variables"][1]] == cond]
                 model_vals = np.random.choice(
                     filter_mc[task_spec["variables"][0]].values,
@@ -124,17 +124,15 @@ def evaluator(model_name, model, tokenizer, task_spec, check_cache=False):
                     replace=True
                 ).tolist()
                 if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
+                    level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
                     model_vals = [level_map.get(v, None) for v in model_vals]
                 model_texts = None
             else:
                 model_vals, model_texts = extract_pv(
                     task_spec["prompt"].format(cond),
                     task_spec["levels"],
-                    task_spec["mode"],
                     model_name,
                     model,
-                    tokenizer,
-                    second_prompt=task_spec.get("second_prompt")
                 )
 
             true_vals, _ = compress_vals(true_vals, None)
