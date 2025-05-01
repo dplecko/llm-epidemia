@@ -27,3 +27,17 @@ def model_unname(mod):
     elif isinstance(mod, list):
         return [model_display_map.get(m, m) for m in mod]
     return model_display_map.get(mod, mod)
+
+def bin_labels(breaks, unit="$", exact=False, last_plus = False):
+    if exact:
+        if last_plus:
+            labels = [f"{b} {unit}" for b in breaks[:-1]]
+            labels.append(f"{breaks[-1]}+ {unit}")
+        else:
+            labels = [f"{b} {unit}" for b in breaks]
+    else:
+        labels = [f"< {breaks[0]} {unit}"]
+        for i in range(1, len(breaks)):
+            labels.append(f"{breaks[i-1]}–{breaks[i]} {unit}")
+        labels.append(f"{breaks[-1]}+ {unit}")
+    return labels

@@ -1,4 +1,9 @@
 
+import sys
+import os
+sys.path.append(os.path.abspath("datasets"))
+from helpers import bin_labels
+
 tasks_nhanes = [
     {
         "name": "NHANES: Age by BMI Group, Q&A",
@@ -25,7 +30,6 @@ tasks_nhanes = [
         "levels": ["no", "yes"]
     },
 ]
-
 
 for t in tasks_nhanes:
     t["dataset"] = "data/clean/nhanes.parquet"

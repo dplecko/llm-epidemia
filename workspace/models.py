@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import torch
 import evaluator_helpers
 from openai import OpenAI
-from google import genai
+from google import generativeai as genai
 import string
 import random
 

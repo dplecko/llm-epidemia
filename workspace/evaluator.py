@@ -5,9 +5,9 @@ import json
 import pdb
 from tqdm import tqdm
 
-sys.path.append(os.path.join(os.getcwd(), "py"))
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from model_load import load_model
-from py.evaluator_helpers import extract_pv, compress_vals  # removed d2d_wgh_col
+from evaluator_helpers import extract_pv, compress_vals  # removed d2d_wgh_col
 from task_spec import task_specs
 
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
     else:
         task_sel = range(len(task_specs))
-        models = ["llama3_70b_instruct"]
+        models = ["llama3_8b_instruct"]
 
     for model_name in models:
         tokenizer, model, is_instruct = load_model(model_name)
