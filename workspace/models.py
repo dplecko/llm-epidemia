@@ -5,6 +5,8 @@ from openai import OpenAI
 from google import generativeai as genai
 import string
 import random
+import math
+import itertools
 
 
 def shuffled_copy(items):
@@ -43,14 +45,14 @@ class AbstractModel(ABC):
         pass
     
     @abstractmethod
-    def predict(self, prompt, levels, n_mc, max_batch_size):
+    def predict(self, prompt, levels, num_permutations, max_batch_size):
         """
         Generate model predictions based on the prompt and levels.
 
         Args:
             model: Language model for generation.
             levels List[str]: Possible answers.
-            n_mc (int): Total number of samples to generate. That is, permutations of the possible answers.
+            num_permutations (int): Total number of samples to generate. That is, permutations of the possible answers.
             max_batch_size (int): Max samples per batch.
 
         Returns:
@@ -93,16 +95,20 @@ class AbstractModel(ABC):
         # TODO
         pass
     
-    def prepare_prompt(self, prompt, levels):
+    def prepare_prompt(self, prompt, levels, given_permutation=None):
         """
         Prepare the prompt for the model.
         :param prompt: The initial prompt.
         :param levels: A list of possible answers.
+        :param given_permutation: A a provided permutation.
         :return: The prepared prompt.
         """
         if levels is None:
             levels = self.genereate_levels()
-        permuted_levels = shuffled_copy(levels)
+        if given_permutation is None:
+            permuted_levels = shuffled_copy(levels)
+        else:
+            permuted_levels = given_permutation
         prompt = prompt + "\n" + "Begin your answer with the capital letter that corresponds to your chosen option, followed by a dot and a justification:\n"
         answers, answer_mapping = self.prepare_answers(permuted_levels)
         prompt += answers
@@ -132,27 +138,65 @@ class HuggingFaceModel(AbstractModel):
         return self.model.generate(**kwargs)
     
     
-    def predict(self, prompt, levels, n_mc, max_batch_size):
-        average_probs = {level: [] for level in levels}
-        for i in range(n_mc):
-            processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels)
-            inputs = self.tokenizer(processed_prompt, return_tensors="pt").to(self.device)
+    def predict(self, prompt, levels, num_permutations, max_batch_size):
+        """
+        Compute average probabilities for every `level` in `levels`
+        using either a fixed number of random permutations
+        or the full factorial set if it fits into memory.
+        """
+        # ------------------------------------------------------------------ #
+        # Small helper ‑‑ keeps all model / tokenizer calls in one place.
+        # ------------------------------------------------------------------ #
+        def _evaluate_once(proc_prompt, answer_mapping, avg_probs):
+            """
+            Run the model on a single prompt and accumulate
+            the resulting probability mass into `avg_probs`.
+            """
+            inputs = self.tokenizer(proc_prompt, return_tensors="pt").to(self.device)
 
-            # Convert words in levels to token IDs
-            level_ids = [[self.tokenizer.convert_tokens_to_ids(t) for t in lvl] for lvl in answer_mapping.keys()]
+            # Map each answer string (or tuple of tokens) to token IDs
+            level_ids = [
+                [self.tokenizer.convert_tokens_to_ids(tok) for tok in ans]
+                for ans in answer_mapping.keys()
+            ]
 
             with torch.no_grad():
-                outputs = self.model(**inputs)
-                logits = outputs.logits[:, 0, :]  # Get logits for the first token
-                probs = torch.softmax(logits, dim=-1)
+                logits = self.model(**inputs).logits[:, 0, :]        # first token only
+                probs  = torch.softmax(logits, dim=-1)
 
-            level_probs = [sum(probs[0, tid].item() for tid in lvl_ids) for lvl_ids in level_ids]
+            # Normalise probability mass over the provided answers
+            level_probs = [
+                sum(probs[0, tid].item() for tid in ids) for ids in level_ids
+            ]
             total_prob = sum(level_probs)
-            prob_distr = [p / total_prob for p in level_probs]
-            for i, answer in enumerate(answer_mapping.keys()):
+            prob_dist  = [p / total_prob for p in level_probs]
+
+            # Accumulate
+            for p, answer in zip(prob_dist, answer_mapping.keys()):
                 level = answer_mapping[answer]
-                average_probs[level].append(prob_distr[i])
-                
+                avg_probs[level].append(p)
+
+        # ------------------------------------------------------------------ #
+        # Main body
+        # ------------------------------------------------------------------ #
+        average_probs = {lvl: [] for lvl in levels}
+        n_fact        = math.factorial(len(levels))
+
+        # Decide which permutations to iterate over
+        if n_fact > num_permutations:           # sample `num_permutations` times
+            permutation_iter = (None for _ in range(num_permutations))
+        else:                                   # exhaustively iterate all permutations
+            permutation_iter = itertools.permutations(levels)
+
+        for perm in permutation_iter:
+            if perm is None:
+                processed_prompt, answer_map = self.prepare_prompt(prompt, levels)
+            else:
+                processed_prompt, answer_map = self.prepare_prompt(prompt, levels, perm)
+
+            _evaluate_once(processed_prompt, answer_map, average_probs)
+
+        # Average accumulated probabilities and return
         return [sum(vals) / len(vals) for vals in average_probs.values()], None
     
     
@@ -186,9 +230,9 @@ class APIModel(AbstractModel):
     def _sample(self, prompt):
         pass
     
-    def predict(self, prompt, levels, n_mc, max_batch_size):
+    def predict(self, prompt, levels, num_permutations, max_batch_size):
         samples = []
-        for i in range(n_mc):
+        for i in range(num_permutations):
             processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels)
             generated_text = self._sample(processed_prompt).strip()
             models_answer = generated_text[0]  # model has to start with A, B, C, D,...
