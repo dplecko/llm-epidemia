@@ -1,5 +1,5 @@
 
-Sys.setenv(RICU_CONFIG_PATH = file.path("config"))
+Sys.setenv(RICU_CONFIG_PATH = file.path("datasets/nhanes/config"))
 Sys.setenv(RICU_SRC_LOAD = "nhanes")
 
 load_difftime.nhanes_tbl <- function(x, rows, cols = colnames(x),
@@ -20,3 +20,4 @@ library(ggrepel)
 library(DT)
 library(shinythemes)
 library(reticulate)
+library(mice)

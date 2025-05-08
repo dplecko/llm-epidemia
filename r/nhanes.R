@@ -75,4 +75,7 @@ dat[, age_group := factor(
              "50-60 years", "60-70 years", "70+ years")
 )]
 
+dat[, weight := mec_wgh]
+dat[, c("mec_wgh") := NULL]
+
 arrow::write_parquet(as.data.frame(dat), sink = "data/clean/nhanes.parquet")
