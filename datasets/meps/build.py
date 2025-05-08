@@ -5,8 +5,26 @@ if out_path.exists():
     print("Parquet exists. Skipping."); exit()
 
 import pandas as pd
+import requests
+import sys, os
+sys.path.append(os.path.join(os.getcwd(), "datasets"))
+from helpers import discrete_col
+from io import BytesIO
+from zipfile import ZipFile
+import miceforest as mf
 
-df_full = pd.read_excel("~/Desktop/h243.xlsx") #, sheet_name="19tbl42", skiprows=4)
+# Download the zip file from the URL
+url = "https://meps.ahrq.gov/mepsweb/data_files/pufs/h243/h243xlsx.zip"
+response = requests.get(url)
+response.raise_for_status()
+
+# Extract the xlsx file from the zip
+with ZipFile(BytesIO(response.content)) as z:
+    xlsx_filename = [name for name in z.namelist() if name.endswith(".xlsx")][0]
+    with z.open(xlsx_filename) as xlsx_file:
+        df_full = pd.read_excel(xlsx_file)
+
+#, sheet_name="19tbl42", skiprows=4)
 
 # get a subset of columns
 vars_meps = [
@@ -130,5 +148,33 @@ df["age_group"] = pd.cut(
     right=True
 )
 
+df = discrete_col(
+    df, col="expenditure", breaks=[200, 1000, 1500, 5000, 10000, 30000], 
+    unit="US dollars",
+    last_plus=True
+)
+
+def visits_discrete(df, col="office_visits"):
+    new_col=col+"_group"
+    # Define the bins and labels directly
+    bins = list(range(0, 11)) + [float("inf")]
+    labels = [str(i) for i in range(0, 10)] + ["10+"]
+
+    # Add the grouped column
+    df[new_col] = pd.cut(df[col], bins=bins, labels=labels, right=True, include_lowest=True)
+    return df
+
+for col in ["office_visits", "inpatient_visits", "dental_visits"]:
+    df = visits_discrete(df, col=col)
+
+print(df.drop(columns=vars_meps).isna().mean().sort_values() * 100)
+
 df = df.drop(columns=vars_meps)
+
+# imputation for 195 missing values in the age_group column
+df = df.reset_index(drop=True)
+kds = mf.ImputationKernel(df, save_all_iterations_data=True, random_state=0)
+kds.mice(5)
+df = kds.complete_data()
+
 df.to_parquet(out_path, index=False)
