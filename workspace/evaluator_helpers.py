@@ -4,8 +4,6 @@ import torch
 import pdb
 from collections import defaultdict
 
-
-
 def max_lvl_len(levels, tokenizer):
     """
     Compute the maximum tokenized word length across all levels.

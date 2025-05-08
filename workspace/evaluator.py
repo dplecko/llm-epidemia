@@ -11,15 +11,10 @@ from evaluator_helpers import extract_pv, compress_vals  # removed d2d_wgh_col
 from task_spec import task_specs
 
 def get_ground_truth(data, task_spec):
-    
     return data[task_spec["variables"][0]].tolist()
-    # if task_spec["levels"] is not None and not pd.api.types.is_numeric_dtype(data[task_spec["variables"][0]]):
-    #     pdb.set_trace()
-    #     level_map = {v: i for i, group in enumerate(task_spec["levels"]) for v in group}
-    #     true_vals = data[task_spec["variables"][0]].map(level_map).tolist()
-    # else:
-    #     true_vals = data[task_spec["variables"][0]].tolist()
-    # return true_vals
+
+def load_dataset(dataset):
+    return pd.read_parquet(f"data/clean/{dataset}.parquet")
         
 
 def evaluator(model_name, model, task_spec, check_cache=False):
@@ -27,11 +22,6 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
     and model's values (obtained from either Monte Carlo sampling, or from probabilities of next token).
-
-    Note
-    ----
-    Weight columns (`wgh_col`) have been completely removed for simplicity; every sample
-    now carries equal importance.
 
     Args
     ----
@@ -48,7 +38,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 
     Outputs
     -------
-    Saves a JSON file under `data/results/benchmark/` with the model predictions and true values.
+    Saves a JSON file under `data/benchmark/` with the model predictions and true values.
     """
     file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
     if len(task_spec["variables"]) > 1:
@@ -134,17 +124,27 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         json.dump(results, f, indent=4)
 
 
-if __name__ == "__main__":
-    d2d = False
+# if __name__ == "__main__":
+#     d2d = False
 
-    if d2d:
-        task_sel = range(2)
-        models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
-    else:
-        task_sel = [56] # range(1) # range(len(task_specs))
-        models = ["llama3_8b_instruct"]
+#     if d2d:
+#         task_sel = range(2)
+#         models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
+#     else:
+#         task_sel = [0] # range(1) # range(len(task_specs))
+#         models = ["llama3_8b_instruct"]
 
-    for model_name in models:
-        model = load_model(model_name)
-        for i in task_sel:
-            evaluator(model_name, model, task_specs[i], check_cache=True)
+#     for model_name in models:
+#         model = load_model(model_name)
+#         for i in task_sel:
+#             evaluator(model_name, model, task_specs[i], check_cache=True)
+
+model_name = "llama3_8b_instruct"
+model = load_model(model_name)
+for i in np.arange(24, 35):
+    evaluator(model_name, model, task_specs[i], check_cache=True)
+
+# labor: 35, 37
+# 
+df.loc[df["employment_status"].isna(), "age"].value_counts()
+df.loc[df["employer"].isna(), "employment_status"].value_counts()

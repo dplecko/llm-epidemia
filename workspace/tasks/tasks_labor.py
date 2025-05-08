@@ -5,13 +5,11 @@ tasks_labor = [
         "dataset": "data/clean/labor.parquet",
         "variables": ["sex", "occupation"],
         "prompt": "What is the sex of a person working as a {}?",
-        "levels": ["male", "female"]
     },
     {
         "name": "Department of Labor: Race by Occupation",
         "dataset": "data/clean/labor.parquet",
         "variables": ["sex", "occupation"],
         "prompt": "What is the race of a person working as a {}?",
-        "levels": ["white", "black", "asian", "other"]
     },
 ]

@@ -15,13 +15,13 @@ from tasks_nsduh import tasks_nsduh
 
 task_specs = (
     tasks_acs +
-    tasks_labor +
-    tasks_fbi +
-    tasks_edu +
-    tasks_nhanes +
-    tasks_gss +
-    tasks_meps +
-    tasks_scf +
     tasks_brfss +
-    tasks_nsduh
+    tasks_edu +
+    tasks_fbi +
+    tasks_gss +
+    tasks_labor +
+    tasks_meps +
+    tasks_nhanes +
+    tasks_nsduh +
+    tasks_scf
 )

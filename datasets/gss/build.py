@@ -28,7 +28,7 @@ with zipfile.ZipFile(tmp_zip.name, "r") as zip_ref:
 df, meta = pyreadstat.read_dta(os.path.join(tmp_dir, "2022", "GSS2022.dta"))
 
 # Select columns
-keep = ["sex", "age", "race", "educ", "degree", "income", 
+keep = ["sex", "age", "race", "educ", "degree", "income16", 
         "polviews", "partyid", "wtssps", "wtssnrps"]
 
 df = df[keep]
@@ -46,6 +46,36 @@ gss["degree"] = df["degree"].map({
 }).astype("category")
 gss["edu"] = pd.to_numeric(df["educ"], errors="coerce")
 
+income16_map_reduced = {
+    1: "<$10k",
+    2: "<$10k",
+    3: "<$10k",
+    4: "<$10k",
+    5: "<$10k",
+    6: "<$10k",
+    7: "<$10k",
+    8: "<$10k",
+    9: "$10k-$30k",
+    10: "$10k-$30k",
+    11: "$10k-$30k",
+    12: "$10k-$30k",
+    13: "$10k-$30k",
+    14: "$10k-$30k",
+    15: "$10k-$30k",
+    16: "$30k-$50k",
+    17: "$30k-$50k",
+    18: "$30k-$50k",
+    19: "$50k-$75k",
+    20: "$50k-$75k",
+    21: "$75k-$90k",
+    22: "$90k-$130k",
+    23: "$90k-$130k",
+    24: "$130k-$170k",
+    25: "$130k-$170k",
+    26: "$170k+"
+}
+gss["house_income"] = df["income16"].map(income16_map_reduced).astype("category")
+
 gss["view"] = df["polviews"].map({
     1: "liberal", 2: "liberal", 3: "liberal", 4: "moderate",
     5: "conservative", 6: "conservative", 7: "conservative"
@@ -61,5 +91,5 @@ kds = mf.ImputationKernel(gss, save_all_iterations_data=True, random_state=0)
 kds.mice(5)
 gss = kds.complete_data()
 
-# Save to Parquet
+# Save-Parquet
 gss.to_parquet(out_path, index=False)

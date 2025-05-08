@@ -8,6 +8,9 @@ import pandas as pd
 import requests
 import numpy as np
 from io import BytesIO
+import sys, os
+sys.path.append(os.path.join(os.getcwd(), "datasets"))
+from helpers import discrete_col
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -93,6 +96,13 @@ cen["education"] = cen["education_level"].apply(lambda x: edu_map[int(x) - 1] if
 
 cen["earnings"] = pd.to_numeric(df["PERNP"], errors="coerce")
 cen["salary"] = pd.to_numeric(df["WAGP"], errors="coerce").replace(-1, np.nan)
+
+cen = discrete_col(
+    cen, col="salary", breaks=[12000, 25000, 50000, 75000, 100000, 150000, 200000], 
+    unit="$",
+    last_plus=True
+)
+
 cen["hours_worked"] = pd.to_numeric(df["WKHP"], errors="coerce")
 
 esr_map = {
@@ -191,3 +201,5 @@ cen = cen[ordering]
 
 # save to parquet
 cen.to_parquet(out_path, index=False)
+
+print("Parquet saved to:", out_path)
