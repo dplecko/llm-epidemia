@@ -108,6 +108,8 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             else:
                 weights = [1] * len(true_vals)
             
+            if not true_vals or not weights:
+                pdb.set_trace()
             true_vals, weights = compress_vals(true_vals, weights)
 
             results.append({
@@ -122,7 +124,6 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     with open(os.path.join("data", "benchmark", file_name), "w") as f:
         json.dump(results, f, indent=4)
-
 
 # if __name__ == "__main__":
 #     d2d = False
@@ -141,10 +142,18 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 
 model_name = "llama3_8b_instruct"
 model = load_model(model_name)
-for i in np.arange(24, 35):
-    evaluator(model_name, model, task_specs[i], check_cache=True)
+for i in np.arange(60, 75):
+    evaluator(model_name, model, task_specs[i], check_cache=False)
 
-# labor: 35, 37
-# 
-df.loc[df["employment_status"].isna(), "age"].value_counts()
-df.loc[df["employer"].isna(), "employment_status"].value_counts()
+# meps: 37, 47
+# nhanes: 46, 50
+# nsduh: ..., ...
+# scf: ..., ...
+# df.loc[df["employment_status"].isna(), "age"].value_counts()
+# df.loc[df["employer"].isna(), "employment_status"].value_counts()
+
+from helpers import model_name, model_unname
+from build_eval_df import build_eval_df
+
+
+eval_df = build_eval_df(["llama3_8b_instruct"], task_specs[0:1])

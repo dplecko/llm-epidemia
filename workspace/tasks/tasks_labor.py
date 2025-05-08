@@ -9,7 +9,7 @@ tasks_labor = [
     {
         "name": "Department of Labor: Race by Occupation",
         "dataset": "data/clean/labor.parquet",
-        "variables": ["sex", "occupation"],
+        "variables": ["race", "occupation"],
         "prompt": "What is the race of a person working as a {}?",
     },
 ]
