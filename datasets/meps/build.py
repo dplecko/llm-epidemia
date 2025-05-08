@@ -173,7 +173,14 @@ df = df.drop(columns=vars_meps)
 
 # imputation for 195 missing values in the age_group column
 df = df.reset_index(drop=True)
-kds = mf.ImputationKernel(df, save_all_iterations_data=True, random_state=0)
+exclude_cols = ["age"]
+cols = df.columns.tolist()
+variable_schema = {
+    col: [c for c in cols if c != col and c not in exclude_cols]
+    for col in cols
+    if col not in exclude_cols
+}
+kds = mf.ImputationKernel(df, save_all_iterations_data=True, random_state=0, variable_schema=variable_schema)
 kds.mice(5)
 df = kds.complete_data()
 
