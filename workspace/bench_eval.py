@@ -89,12 +89,13 @@ def eval_bin(res, model_name, mode, dataset, v1, v2):
 
 def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     nbins = len(levels)
-    lvl_names = [lvl[0] for lvl in levels]
+    lvl_names = levels
     rows = []
     distr_rows = []
 
     for r in res:
         n_mc = len(r["model_vals"])
+        pdb.set_trace()
         val_true = np.array(r["true_vals"], dtype=int)
         wgh_true = np.array(r.get("weights", [1.0] * len(val_true)))
         mod_vals = np.array([m for m in r["model_vals"] if m is not None])
@@ -157,24 +158,24 @@ def dat_name_clean(path):
 
 def eval_task(model_name, task):
 
-    mode = task["mode"]
+    mode = "logits"
     dataset = dat_name_clean(task["dataset"])
     
     v1 = task["variables"][0]
     v2 = task["variables"][1] if len(task["variables"]) > 1 else None
-    levels = task.get("levels", None)
+    levels = pd.read_parquet(task["dataset"])[v1].unique().tolist()
 
-    parts = [model_name, mode, dataset, v1]
+    parts = [model_name, dataset, v1]
     if v2: parts.append(v2)
     fname = "_".join(parts) + ".json"
-    path = os.path.join("workspace", "results", fname)
+    path = os.path.join("data", "benchmark", fname)
 
     with open(path, "r") as f:
         res = json.load(f)
 
     if levels is not None and len(levels) == 2:
         return eval_bin(res, model_name, mode, dataset, v1, v2)
-    elif levels is not None:
-        return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
     else:
-        return eval_cts(res, model_name, mode, dataset, v1, v2)
+        return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
+    # else:
+    #     return eval_cts(res, model_name, mode, dataset, v1, v2)
