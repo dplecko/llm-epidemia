@@ -191,7 +191,7 @@ ordering = [
     'race', 'hispanic_origin', 'citizenship', 'nativity',
     'marital', 'family_size', 'children', 'state',
     'education', 'education_level', 'english_level',
-    'salary', 'hours_worked', 'employment_status',
+    'salary', "salary_group", 'hours_worked', 'employment_status',
     'occp_name', 'occp_code', 'ind_name', 'ind_code',
     'employer', 'place_of_work', 'economic_region',
     'weight'

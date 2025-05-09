@@ -9,6 +9,7 @@ from bench_eval import eval_task, eval_to_score
 
 def build_eval_df(models, tasks):
     rows = []
+    eval_map = {}
     for model in models:
         for i, task in enumerate(tasks):
             try:
@@ -19,10 +20,11 @@ def build_eval_df(models, tasks):
                 traceback.print_exc()
                 df_eval, score = None, None
             
+            eval_map[i] = df_eval
             rows.append({
                 "model": model,
                 "task_id": i,
                 "score": score,
-                "eval": df_eval,
             })
-    return pd.DataFrame(rows)
+
+    return pd.DataFrame(rows), eval_map

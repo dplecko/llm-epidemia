@@ -90,13 +90,22 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             lo, hi = task_spec["cond_range"]
             cond_range = cond_range[(cond_range >= lo) & (cond_range <= hi)]
         
+        if "subset" in task_spec:
+            v_sub = task_spec["subset"][0]
+            sub_type = task_spec["subset"][1]
+            target_val = task_spec["subset"][2]
+            if sub_type == "lwr":
+                data = data[data[v_sub] >= target_val]
+            elif sub_type == "levels":
+                data = data[data[v_sub].isin(target_val)]
+        
         for cond in tqdm(cond_range):
             filtered_data = data[data[task_spec["variables"][1]] == cond]
             
             true_vals = get_ground_truth(filtered_data, task_spec)
             
             # model values
-            model_vals, model_texts = extract_pv(
+            model_vals, model_weights, model_texts = extract_pv(
                 task_spec["prompt"].format(cond),
                 levels,
                 model_name,
@@ -115,8 +124,10 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             results.append({
                 "condition": cond.tolist() if hasattr(cond, "tolist") else cond,
                 "true_vals": true_vals,
-                "weights": weights,
+                "true_weights": weights,
+                "n_data": len(filtered_data),
                 "model_vals": model_vals,
+                "model_weights": model_weights,
                 "model_texts": model_texts
             })
 
@@ -142,7 +153,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 
 model_name = "llama3_8b_instruct"
 model = load_model(model_name)
-for i in np.arange(60, 75):
+for i in np.arange(0, 12):
     evaluator(model_name, model, task_specs[i], check_cache=False)
 
 # meps: 37, 47
@@ -154,6 +165,5 @@ for i in np.arange(60, 75):
 
 from helpers import model_name, model_unname
 from build_eval_df import build_eval_df
-
 
 eval_df = build_eval_df(["llama3_8b_instruct"], task_specs[0:1])

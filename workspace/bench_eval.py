@@ -94,14 +94,19 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     distr_rows = []
 
     for r in res:
-        n_mc = len(r["model_vals"])
-        pdb.set_trace()
-        val_true = np.array(r["true_vals"], dtype=int)
-        wgh_true = np.array(r.get("weights", [1.0] * len(val_true)))
-        mod_vals = np.array([m for m in r["model_vals"] if m is not None])
+        
+        if len(r["model_vals"]) == len(levels):
+            n_mc = r["n_data"]
+        else:
+            n_mc = len(r["model_vals"]) 
+        val_true = np.array([levels.index(v) for v in r["true_vals"]], dtype=int)
+        wgh_true = np.array(r.get("true_weights", [1.0] * len(val_true)))
+        
+        val_mod = np.array([levels.index(m) for m in r["model_vals"]])
+        wgh_mod = np.array(r.get("model_weights", [1.0] * len(val_true)))
 
         distr_true = cat_to_distr(val_true, wgh_true, nbins)
-        distr_mod = cat_to_distr(mod_vals, None, nbins)
+        distr_mod = cat_to_distr(val_mod, wgh_mod, nbins)
 
         for i in range(nbins):
             distr_rows.append({
@@ -173,9 +178,10 @@ def eval_task(model_name, task):
     with open(path, "r") as f:
         res = json.load(f)
 
-    if levels is not None and len(levels) == 2:
-        return eval_bin(res, model_name, mode, dataset, v1, v2)
-    else:
-        return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
+    return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
+    # if levels is not None and len(levels) == 2:
+    #     return eval_bin(res, model_name, mode, dataset, v1, v2)
+    # else:
+    #     return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
     # else:
     #     return eval_cts(res, model_name, mode, dataset, v1, v2)

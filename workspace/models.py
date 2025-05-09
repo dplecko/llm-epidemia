@@ -197,7 +197,7 @@ class HuggingFaceModel(AbstractModel):
             _evaluate_once(processed_prompt, answer_map, average_probs)
 
         # Average accumulated probabilities and return
-        return [sum(vals) / len(vals) for vals in average_probs.values()], None
+        return levels, [sum(vals) / len(vals) for vals in average_probs.values()], None
     
     
     def get_type(self):
@@ -238,7 +238,7 @@ class APIModel(AbstractModel):
             models_answer = generated_text[0]  # model has to start with A, B, C, D,...
             samples.append(answer_mapping.get(models_answer, None))  # None if not in mapping
             
-        return samples, generated_text
+        return samples, [1] * len(samples), generated_text
     
     def get_type(self):
         return "API"
