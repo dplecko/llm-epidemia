@@ -8,6 +8,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("workspace"))
 from metrics import ks_w, cat_to_distr
+from helpers import task_to_filename, weighted_corr
 
 def eval_cts(res, model_name, mode, dataset, v1, v2):
     rows = []
@@ -153,6 +154,12 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     df.attrs["distr"] = pd.DataFrame(distr_rows)
     return df
 
+def eval_hd(res, model_name):
+    res['llm_pred'] += np.random.uniform(-0.001, 0.001, size=len(res))
+    #res['lgbm_pred'] += np.random.uniform(-0.001, 0.001, size=len(res))
+    return weighted_corr(res["llm_pred"], res["lgbm_pred"], res["weight"])
+     
+
 def eval_to_score(df):
     return df["bench"].mean()
 
@@ -165,23 +172,18 @@ def eval_task(model_name, task):
 
     mode = "logits"
     dataset = dat_name_clean(task["dataset"])
-    
-    v1 = task["variables"][0]
-    v2 = task["variables"][1] if len(task["variables"]) > 1 else None
-    levels = pd.read_parquet(task["dataset"])[v1].unique().tolist()
 
-    parts = [model_name, dataset, v1]
-    if v2: parts.append(v2)
-    fname = "_".join(parts) + ".json"
+    fname = task_to_filename(model_name, task)
     path = os.path.join("data", "benchmark", fname)
 
-    with open(path, "r") as f:
-        res = json.load(f)
+    if "json" in path:
+        with open(path, "r") as f:
+            res = json.load(f)
 
-    return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
-    # if levels is not None and len(levels) == 2:
-    #     return eval_bin(res, model_name, mode, dataset, v1, v2)
-    # else:
-    #     return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
-    # else:
-    #     return eval_cts(res, model_name, mode, dataset, v1, v2)
+        v1 = task["variables"][0]
+        v2 = task["variables"][1] if len(task["variables"]) > 1 else None
+        levels = pd.read_parquet(task["dataset"])[v1].unique().tolist()
+        return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
+    elif "parquet" in path:
+        res = pd.read_parquet(path)
+        return eval_hd(res, model_name)

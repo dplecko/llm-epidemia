@@ -115,7 +115,6 @@ medicare_map = {
     1: "yes",
     2: "no"
 }
-df
 
 insure_type_map = {
     1: "private",

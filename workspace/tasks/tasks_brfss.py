@@ -49,3 +49,51 @@ tasks_brfss = [
 
 for t in tasks_brfss:
     t["dataset"] = "data/clean/brfss.parquet"
+
+# high-dimensional
+brfss_cond = {
+    "age": "who is {} years of age",
+    "education": "who completed {}",
+    "sex": "who is {}",
+    "race": "who is {}",
+    "state": "who lives in {}",
+    "income": "who has an income of {}",
+}
+
+brfss_out = {
+    "diabetes": "do they have diabetes?",
+    "high_bp": "do they have high blood pressure?",
+    "asthma": "do they have asthma?",
+    "exercise_monthly": "do they exercise every month?",
+    "smoker": "are they a smoker?",
+    "cholesterol": "do they have high cholesterol?",
+    "heart_attack": "have they ever had a heart attack?",
+    "stroke": "have they ever had a stroke?",
+    "depression": "do they have depression?",
+    "blind": "do they have significant visual impairments/blindness?",
+    "deaf": "do they have significant hearing impairments/deafness?",
+}
+
+tasks_brfss_hd = [
+    {
+        "v_out": "diabetes",
+        "v_cond": ["age", "education", "sex", "race"]
+    }
+]
+
+from itertools import combinations
+
+# Generate high-dimensional tasks with conditioning sets of size >= d
+# d = 2  # Set the minimum size of the conditioning set here
+# task_brfss_hd = []
+
+# for v_out in brfss_out.keys():
+#     for r in range(d, len(brfss_cond) + 1):
+#         for v_cond in combinations(brfss_cond.keys(), r):
+#             task_brfss_hd.append({
+#                 "v_out": v_out,
+#                 "v_cond": list(v_cond)
+#             })
+
+for task in tasks_brfss_hd:
+    task["dataset"] = "data/clean/brfss.parquet"

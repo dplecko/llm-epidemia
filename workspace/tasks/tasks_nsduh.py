@@ -54,3 +54,43 @@ tasks_nsduh = [
 
 for task in tasks_nsduh:
     task["dataset"] = "data/clean/nsduh.parquet"
+
+# high-dimensional
+nsduh_cond = {
+    "age": "who is {} years of age",
+    "edu": "who completed {}",
+    "sex": "who is {}",
+    "race": "who is {}",
+}
+
+nsduh_out = {
+    "cig_monthly": "have they smoked in the past 30 days?",
+    "alc_monthly": "have they drank alcohol in the past 30 days?",
+    "mj_ever": "have they ever used marijuana?",
+    "coc_ever": "have they ever used cocaine?",
+    "her_ever": "have they ever used heroin?",
+}
+
+tasks_nsduh_hd = [
+    {
+        "v_out": "mj_ever",
+        "v_cond": ["age", "edu", "sex", "race"]
+    }
+]
+
+from itertools import combinations
+
+# Generate high-dimensional tasks with conditioning sets of size >= d
+# d = 2  # Set the minimum size of the conditioning set here
+# task_nsduh_hd = []
+
+# for v_out in nsduh_out.keys():
+#     for r in range(d, len(nsduh_cond) + 1):
+#         for v_cond in combinations(nsduh_cond.keys(), r):
+#             task_nsduh_hd.append({
+#                 "v_out": v_out,
+#                 "v_cond": list(v_cond)
+#             })
+
+for task in tasks_nsduh_hd:
+    task["dataset"] = "data/clean/nsduh.parquet"

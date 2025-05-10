@@ -71,7 +71,6 @@ edu_map = {
 }
 df["edu"] = df["IREDUHIGHST2"].map(edu_map).astype("category")
 
-
 # ever variables
 df["alc_ever"] = df["alcever"].map(lambda x: "yes" if x == "1 - Yes" else "no").astype("category")
 df["cig_ever"] = df["cigever"].map(lambda x: "yes" if x == "1 - Yes" else "no").astype("category")

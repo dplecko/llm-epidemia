@@ -7,8 +7,10 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from model_load import load_model
-from evaluator_helpers import extract_pv, compress_vals, xgb_conditional_prob  # removed d2d_wgh_col
-from task_spec import task_specs
+from evaluator_helpers import extract_pv, compress_vals
+from task_spec import task_specs, task_specs_hd
+from helpers import task_to_filename
+from hd_helpers import fit_lgbm, promptify
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
@@ -40,16 +42,19 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     -------
     Saves a JSON file under `data/benchmark/` with the model predictions and true values.
     """
-    file_name = f"{model_name.split('/')[-1].split('.')[0]}_{task_spec['dataset'].split('/')[-1].split('.')[0]}_{task_spec['variables'][0]}"
-    if len(task_spec["variables"]) > 1:
-        file_name += f"_{task_spec['variables'][1]}"
-    file_name = file_name + ".json"
     
+    dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
+    file_name = task_to_filename(model_name, task_spec)
     if check_cache and os.path.exists(os.path.join("data", "benchmark", file_name)):
         return None
     
     # Step 1: determine if query is marginal or conditional
-    marginal = len(task_spec["variables"]) == 1
+    if "v_cond" in task_spec:
+        ttyp = "hd"
+    elif len(task_spec["variables"]) == 1:
+        ttyp = "marginal"
+    elif len(task_spec["variables"]) == 2:
+        ttyp = "conditional"
     
     data = pd.read_parquet(task_spec["dataset"])
     
@@ -58,10 +63,13 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         mc_data = pd.read_parquet(model_name)
         n_mc = 128
 
-    levels = data[task_spec["variables"][0]].unique().tolist()
+    if ttyp == "hd":
+        levels = sorted(data[task_spec["v_out"]].unique().tolist())
+    else:
+        levels = data[task_spec["variables"][0]].unique().tolist()
 
     results = []
-    if marginal:
+    if ttyp == "marginal":
         # ground‑truth values
         true_vals = get_ground_truth(data, task_spec)
 
@@ -84,7 +92,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             "model_texts": model_texts
         })
 
-    elif len(task_spec["variables"]) == 2:
+    elif ttyp == "conditional":
         # conditional query – iterate over levels of the conditioning variable
         cond_range = data[task_spec["variables"][1]].unique()
         if "cond_range" in task_spec:
@@ -135,66 +143,42 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 "model_weights": model_weights,
                 "model_texts": model_texts
             })
-    else:
+    elif ttyp == "hd":
         # TODO create a single promopt:
         # task_spec["prompt"] = generate_promt()  # use the nsduh_con and nsduh_out
         # multi variable conditioning
         # assume varibles are ordered according to the generated prompt
-        cond_vars = task_spec["variables"][1:] 
-        # get all combinations
-        cond_range = (
-            data[cond_vars]                # keep only the conditioning columns
-            .drop_duplicates()             # keep one row per unique combo
-            .itertuples(index=False, name=None)  # → iterator of plain tuples
-        )
-        cond_range = list(cond_range)      # materialise as list of tuples
-        # e.g. [(x1, y1), (x1, y2), (x2, y1), ...]
+
+        cond_vars = task_spec["v_cond"]
+        out_var = task_spec["v_out"]
         
-        for cond in tqdm(cond_range):
-            # Build a boolean mask for rows matching *all* fields in cond
-            mask = True
-            for col, val in zip(cond_vars, cond):
-                mask &= (data[col] == val)
-            filtered_data = data[mask]
+        # fit lightgbm model to get conditional probabilities (ground truth)
+        preds = fit_lgbm(data, out_var, cond_vars, wgh_col="weight")
+        data["lgbm_pred"] = preds
+        
+        # get all combinations
+        cond_df = data[cond_vars].drop_duplicates().reset_index(drop=True)
+        cond_df["llm_pred"] = np.nan
+        for i, cond_row in tqdm(cond_df.iterrows(), total=len(cond_df)):
             
-            # code repetition, move it to a separate function?
-            
-            # do xgboost here
-            # TODO test this
-            true_vals = xgb_conditional_prob(target=task_spec["variables"][0], df=filtered_data,)
-            
+            # get the natural language prompt for the row
+            row_prompt = promptify(out_var, cond_vars, cond_row, dataset_name)
+
             # model values
-            model_vals, model_weights, model_texts = extract_pv(
-                task_spec["prompt"].format(cond),
-                levels,
-                model_name,
-                model,
-                task_spec
-            )
+            model_vals, model_weights, model_texts = extract_pv(row_prompt, levels, model_name, model, task_spec)
+            cond_df.at[i, "llm_pred"] = model_weights[1] # get the P(Y = 1 | X = x)
 
-            if "weight" in filtered_data.columns:
-                weights = filtered_data["weight"].tolist()
-            else:
-                weights = [1] * len(true_vals)
-            
-            if not true_vals or not weights:
-                pdb.set_trace()
-            true_vals, weights = compress_vals(true_vals, weights)
-
-            results.append({
-                "condition": cond.tolist() if hasattr(cond, "tolist") else cond,
-                "true_vals": true_vals,
-                "true_weights": weights,
-                "n_data": len(filtered_data),
-                "model_vals": model_vals,
-                "model_weights": model_weights,
-                "model_texts": model_texts
-            })
+        data = data.merge(cond_df, on=cond_vars, how="left")
 
     # save to disk
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
-    with open(os.path.join("data", "benchmark", file_name), "w") as f:
-        json.dump(results, f, indent=4)
+    
+    if ttyp == "hd":
+        # save the full dataset with predictions
+        data.to_parquet(os.path.join("data", "benchmark", file_name))
+    else:
+        with open(os.path.join("data", "benchmark", file_name), "w") as f:
+            json.dump(results, f, indent=4)
 
 # if __name__ == "__main__":
 #     d2d = False
@@ -213,17 +197,14 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 
 model_name = "llama3_8b_instruct"
 model = load_model(model_name)
-for i in np.arange(0, 12):
-    evaluator(model_name, model, task_specs[i], check_cache=False)
+# for i in np.arange(0, 12):
+#     evaluator(model_name, model, task_specs[i], check_cache=False)
 
-# meps: 37, 47
-# nhanes: 46, 50
-# nsduh: ..., ...
-# scf: ..., ...
-# df.loc[df["employment_status"].isna(), "age"].value_counts()
-# df.loc[df["employer"].isna(), "employment_status"].value_counts()
+evaluator(model_name, model, task_specs_hd[0], check_cache=False)
 
-from helpers import model_name, model_unname
-from build_eval_df import build_eval_df
+# from build_eval_df import hd_corr_plot, hd_corr_df
+# hd_corr_df([model_name], task_specs_hd)
 
-eval_df = build_eval_df(["llama3_8b_instruct"], task_specs[0:1])
+# import plotnine as p9
+# plot = hd_corr_plot([model_name], task_specs_hd)
+# plot.save("hd_corr_plot.png", dpi=300, width=8, height=6)

@@ -87,3 +87,38 @@ tasks_scf = [
 
 for task in tasks_scf:
     task["dataset"] = "data/clean/scf.parquet"
+
+# high-dimensional
+scf_cond = {
+    "age_group": "who is {} years of age",
+    "education": "who completed {}",
+    "sex": "who is {}",
+    "race": "who is {}",
+}
+
+scf_out = {
+    "house_own": "do they own the home they live in?",
+}
+
+tasks_scf_hd = [
+    {
+        "v_out": "house_own",
+        "v_cond": ["age_group", "education", "sex", "race"]
+    }
+]
+
+from itertools import combinations
+# Generate high-dimensional tasks with conditioning sets of size >= d
+# d = 2  # Set the minimum size of the conditioning set here
+# task_scf_hd = []
+
+# for v_out in scf_out.keys():
+#     for r in range(d, len(scf_cond) + 1):
+#         for v_cond in combinations(scf_cond.keys(), r):
+#             task_scf_hd.append({
+#                 "v_out": v_out,
+#                 "v_cond": list(v_cond)
+#             })
+
+for task in tasks_scf_hd:
+    task["dataset"] = "data/clean/scf.parquet"

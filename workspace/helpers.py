@@ -1,5 +1,6 @@
 
 import pandas as pd
+import numpy as np
 
 model_name_map = {
     "llama3_8b_instruct": "LLama3 8B",
@@ -13,6 +14,33 @@ model_name_map = {
 }
 
 model_display_map = {v: k for k, v in model_name_map.items()}
+
+def task_to_filename(model_name, task_spec):
+    dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
+    if "v_cond" in task_spec:
+        cond_vars_str = "_".join(task_spec["v_cond"])
+        file_name = f"{model_name}_{dataset_name}_{task_spec['v_out']}_{cond_vars_str}.parquet"
+    else:
+        file_name = f"{model_name}_{dataset_name}_{task_spec['variables'][0]}"
+        if len(task_spec["variables"]) > 1:
+            file_name += f"_{task_spec['variables'][1]}"
+        file_name = file_name + ".json"
+    return file_name
+
+def weighted_corr(x, y, w):
+    # Weighted means
+    mx = np.average(x, weights=w)
+    my = np.average(y, weights=w)
+    
+    # Weighted covariance
+    cov = np.sum(w * (x - mx) * (y - my))
+    
+    # Weighted variances
+    vx = np.sum(w * (x - mx) ** 2)
+    vy = np.sum(w * (y - my) ** 2)
+    
+    # Weighted correlation
+    return cov / np.sqrt(vx * vy)
 
 def model_name(mod):
     if isinstance(mod, pd.Series):

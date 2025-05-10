@@ -1,27 +1,33 @@
-
 import sys
 import os
+import importlib
 sys.path.append(os.path.abspath("workspace/tasks"))
-from tasks_acs import tasks_acs
-from tasks_labor import tasks_labor
-from tasks_fbi import tasks_fbi
-from tasks_edu import tasks_edu
-from tasks_nhanes import tasks_nhanes
-from tasks_gss import tasks_gss
-from tasks_meps import tasks_meps
-from tasks_scf import tasks_scf
-from tasks_brfss import tasks_brfss
-from tasks_nsduh import tasks_nsduh
 
-task_specs = (
-    tasks_acs +
-    tasks_brfss +
-    tasks_edu +
-    tasks_fbi +
-    tasks_gss +
-    tasks_labor +
-    tasks_meps +
-    tasks_nhanes +
-    tasks_nsduh +
-    tasks_scf
-)
+def load_tasks(module_name):
+    try:
+        module = importlib.import_module(module_name)
+        return module
+    except ModuleNotFoundError:
+        return []
+
+task_specs = []
+task_specs_hd = []
+
+# task files without the "task_" prefix
+task_files = [
+    "acs", "labor", "fbi", "edu", 
+    "nhanes", "gss", "meps", "scf", 
+    "brfss", "nsduh"
+]
+
+for task_file in task_files:
+    # Load the module
+    module = load_tasks(f"tasks_{task_file}")
+    
+    # Extract standard tasks
+    if module and hasattr(module, f"tasks_{task_file}"):
+        task_specs.extend(getattr(module, f"tasks_{task_file}"))
+    
+    # Extract high-dimensional tasks
+    if module and hasattr(module, f"tasks_{task_file}_hd"):
+        task_specs_hd.extend(getattr(module, f"tasks_{task_file}_hd"))
