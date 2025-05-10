@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from model_load import load_model
-from evaluator_helpers import extract_pv, compress_vals  # removed d2d_wgh_col
+from evaluator_helpers import extract_pv, compress_vals, xgb_conditional_prob  # removed d2d_wgh_col
 from task_spec import task_specs
 
 def get_ground_truth(data, task_spec):
@@ -71,6 +71,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             levels,
             model_name,
             model,
+            task_spec
         )
 
         # compress to save memory (weights argument is now always None)
@@ -83,7 +84,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             "model_texts": model_texts
         })
 
-    else:
+    elif len(task_spec["variables"]) == 2:
         # conditional query – iterate over levels of the conditioning variable
         cond_range = data[task_spec["variables"][1]].unique()
         if "cond_range" in task_spec:
@@ -110,6 +111,62 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 levels,
                 model_name,
                 model,
+                task_spec
+            )
+
+            if "weight" in filtered_data.columns:
+                weights = filtered_data["weight"].tolist()
+            else:
+                weights = [1] * len(true_vals)
+            
+            if not true_vals or not weights:
+                pdb.set_trace()
+            true_vals, weights = compress_vals(true_vals, weights)
+
+            results.append({
+                "condition": cond.tolist() if hasattr(cond, "tolist") else cond,
+                "true_vals": true_vals,
+                "true_weights": weights,
+                "n_data": len(filtered_data),
+                "model_vals": model_vals,
+                "model_weights": model_weights,
+                "model_texts": model_texts
+            })
+    else:
+        # TODO create a single promopt:
+        # task_spec["prompt"] = generate_promt()  # use the nsduh_con and nsduh_out
+        # multi variable conditioning
+        # assume varibles are ordered according to the generated prompt
+        cond_vars = task_spec["variables"][1:] 
+        # get all combinations
+        cond_range = (
+            data[cond_vars]                # keep only the conditioning columns
+            .drop_duplicates()             # keep one row per unique combo
+            .itertuples(index=False, name=None)  # → iterator of plain tuples
+        )
+        cond_range = list(cond_range)      # materialise as list of tuples
+        # e.g. [(x1, y1), (x1, y2), (x2, y1), ...]
+        
+        for cond in tqdm(cond_range):
+            # Build a boolean mask for rows matching *all* fields in cond
+            mask = True
+            for col, val in zip(cond_vars, cond):
+                mask &= (data[col] == val)
+            filtered_data = data[mask]
+            
+            # code repetition, move it to a separate function?
+            
+            # do xgboost here
+            # TODO test this
+            true_vals = xgb_conditional_prob(target=task_spec["variables"][0], df=filtered_data,)
+            
+            # model values
+            model_vals, model_weights, model_texts = extract_pv(
+                task_spec["prompt"].format(cond),
+                levels,
+                model_name,
+                model,
+                task_spec
             )
 
             if "weight" in filtered_data.columns:
