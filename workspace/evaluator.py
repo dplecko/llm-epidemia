@@ -98,6 +98,9 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 data = data[data[v_sub] >= target_val]
             elif sub_type == "levels":
                 data = data[data[v_sub].isin(target_val)]
+            
+            # update levels after subsetting
+            levels = data[task_spec["variables"][0]].unique().tolist()
         
         for cond in tqdm(cond_range):
             filtered_data = data[data[task_spec["variables"][1]] == cond]

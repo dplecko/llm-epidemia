@@ -24,6 +24,7 @@ def build_eval_df(models, tasks):
             rows.append({
                 "model": model,
                 "task_id": i,
+                "task_name": task.get("name", i),
                 "score": score,
             })
 

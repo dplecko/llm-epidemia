@@ -41,16 +41,19 @@ tasks_acs = [
     {
         "name": "Census: Salary by Sex",
         "variables": ["salary_group", "sex"],
+        "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "prompt": "What is the yearly salary of a {} person in the United States?",
     },
     {
         "name": "Census: Salary by Race",
         "variables": ["salary_group", "race"],
+        "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "prompt": "What is the yearly salary of a {} person  in the United States?",
     },
     {
         "name": "Census: Salary by Age",
         "variables": ["salary_group", "age"],
+        "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "cond_range": [25, 65],
         "prompt": "What is the yearly salary of a person aged {} in the United States?",
     },

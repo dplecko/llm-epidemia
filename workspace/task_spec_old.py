@@ -2,7 +2,7 @@
 task_specs = [
     ### Mariginal Distributions
     {
-        "name": "Census: Age, Q&A",
+        "name": "Census: Age",
         "dataset": "data/clean/census.parquet",
         "variables": ["age"],
         "mode": "sample",
@@ -12,7 +12,7 @@ task_specs = [
     },
     ### Conditional Distributions
     {
-        "name": "Census: Sex by Age, Q&A",
+        "name": "Census: Sex by Age",
         "dataset": "data/clean/census.parquet",
         "variables": ["sex", "age"],
         "cond_range": [18, 79],
@@ -23,7 +23,7 @@ task_specs = [
     },
     # v0 tasks: Labor Department, Education Department, FBI Statistics
     {
-        "name": "Department of Labor: Sex by Occupation, Q&A",
+        "name": "Department of Labor: Sex by Occupation",
         "dataset": "data/clean/labor.parquet",
         "variables": ["sex", "occupation"],
         "mode": "sample",
@@ -32,7 +32,7 @@ task_specs = [
         "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
     },
     {
-        "name": "FBI Crime Statistics: Sex by Crime Type, Q&A",
+        "name": "FBI Crime Statistics: Sex by Crime Type",
         "dataset": "data/clean/crime.parquet",
         "variables": ["sex", "crime_type"],
         "mode": "sample",
@@ -41,7 +41,7 @@ task_specs = [
         "levels": [["Male", "male", "Man", "man"], ["Female", "female", "Woman", "woman"]]
     },
     {
-        "name": "Department of Education: Sex by Type of Degree, Q&A",
+        "name": "Department of Education: Sex by Type of Degree",
         "dataset": "data/clean/edu.parquet",
         "variables": ["sex", "degree"],
         "mode": "sample",
@@ -62,7 +62,7 @@ task_specs = [
     },
     # NHANES tasks
     {
-        "name": "NHANES: Age by BMI Group, Q&A",
+        "name": "NHANES: Age by BMI Group",
         "dataset": "data/clean/nhanes.parquet",
         "variables": ["age", "bmi_bin"],
         "mode": "sample",
@@ -71,7 +71,7 @@ task_specs = [
         "levels": None
     },
     {
-        "name": "NHANES: Diabetes by BMI Group, Q&A",
+        "name": "NHANES: Diabetes by BMI Group",
         "dataset": "data/clean/nhanes.parquet",
         "variables": ["diabetes", "bmi_bin"],
         "mode": "logits",
@@ -80,7 +80,7 @@ task_specs = [
         "levels": [["No", "no"], ["Yes", "yes"]]
     },
     {
-        "name": "NHANES: Diabetes by BMI Group, Q&A (Sampling)",
+        "name": "NHANES: Diabetes by BMI Group (Sampling)",
         "dataset": "data/clean/nhanes.parquet",
         "variables": ["diabetes", "bmi_bin"],
         "mode": "sample",
@@ -89,7 +89,7 @@ task_specs = [
         "levels": [["No", "no", "NO"], ["Yes", "yes", "YES"]]
     },
     {
-        "name": "NHANES: Weekly Alcohol Consumption by Age Group, Q&A",
+        "name": "NHANES: Weekly Alcohol Consumption by Age Group",
         "dataset": "data/clean/nhanes.parquet",
         "variables": ["alcohol_weekly", "age_group"],
         "mode": "logits",
@@ -99,7 +99,7 @@ task_specs = [
     },
     # GSS tasks
     {
-        "name": "GSS: Political View by Education Degree, Q&A (Sampling)",
+        "name": "GSS: Political View by Education Degree (Sampling)",
         "dataset": "data/clean/gss.parquet",
         "variables": ["view", "degree"],
         "mode": "sample",
@@ -108,7 +108,7 @@ task_specs = [
         "levels": [["liberal", "Liberal"], ["moderate", "Moderate"], ["conservative", "Conservative"]]
     },
     {
-        "name": "GSS: Political View by Education Degree, Q&A",
+        "name": "GSS: Political View by Education Degree",
         "dataset": "data/clean/gss.parquet",
         "variables": ["view", "degree"],
         "mode": "logits",
@@ -117,7 +117,7 @@ task_specs = [
         "levels": [["liberal", "Liberal"], ["moderate", "Moderate"], ["conservative", "Conservative"]]
     },
     {
-        "name": "GSS: Political Party by Education Degree, Q&A (Sampling)",
+        "name": "GSS: Political Party by Education Degree (Sampling)",
         "dataset": "data/clean/gss.parquet",
         "variables": ["party", "degree"],
         "mode": "sample",
