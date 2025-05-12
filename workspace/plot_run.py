@@ -3,10 +3,8 @@ import pandas as pd
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from helpers import model_name
-from build_eval_df import build_eval_df
-from bench_eval import eval_task, eval_to_score
+from bench_eval import eval_task, eval_to_score, hd_corr_plot, hd_corr_df, build_eval_df
 from task_spec import task_specs, task_specs_hd
-from build_eval_df import hd_corr_plot, hd_corr_df
 from plotnine import *
 
 # high-dimensional tasks: correlation
@@ -46,24 +44,7 @@ plt_bydim.save("data/plots/hd_bydim.png", dpi=300, width=8, height=6)
 
 # pd.read_parquet('data/benchmark/llama3_8b_instruct_brfss_diabetes_sex_race.parquet')
 
+# eval_hd with new lgbm boostrap
+eval_task("llama3_8b_instruct", task_specs_hd[0])
 
-# size = []
-# dim = []
-# for task in task_specs_hd:
-#     tsize, tdim = hd_tasksize(task)
-#     size.append(tsize)
-#     dim.append(tdim)
-
-# Counter(dim).most_common()
-
-# max_index = size.index(max(size))
-# sum([t == max(size) for t in size])
-# eval_df, eval_map = build_eval_df(["llama3_8b_instruct"], task_specs_hd)
-
-# eval_task("llama3_8b_instruct", task_specs[23])
-
-# for col in brfss_out.keys():
-#     print(col, "mean", (df[col]=="Yes").mean(), "\n")
-
-
-
+eval_task("llama3_8b_instruct", task_specs[20])
