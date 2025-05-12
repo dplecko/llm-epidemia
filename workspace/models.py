@@ -109,9 +109,10 @@ class AbstractModel(ABC):
             permuted_levels = shuffled_copy(levels)
         else:
             permuted_levels = given_permutation
-        prompt = prompt + "\n" + "Begin your answer with the capital letter that corresponds to your chosen option, followed by a dot and a justification:\n"
+        prompt = "Input: " + prompt + "\nBegin your answer with the capital letter corresponding to your chosen option below, followed by a dot and a justification."
         answers, answer_mapping = self.prepare_answers(permuted_levels)
         prompt += answers
+        prompt += "\nOutput: "
         return prompt, answer_mapping
 
 

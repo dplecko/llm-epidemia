@@ -137,6 +137,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 "true_vals": true_vals,
                 "true_weights": weights,
                 "n_data": len(filtered_data),
+                "total_weight": sum(weights),
                 "model_vals": model_vals,
                 "model_weights": model_weights,
                 "model_texts": model_texts
