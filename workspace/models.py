@@ -208,7 +208,8 @@ class HuggingFaceModel(AbstractModel):
         average_probs = [defaultdict(list) for _ in prompts]
         n_fact        = math.factorial(len(levels))
         self.tokenizer.pad_token = self.tokenizer.eos_token
-        
+        # because of batch padding
+        self.tokenizer.padding_side = "left" 
         if n_fact > num_permutations:           # sample `num_permutations` times
             permutation_iter = (None for _ in range(num_permutations))
         else:                                   # exhaustively iterate all permutations
