@@ -61,6 +61,13 @@ df["race"] = df["_IMPRACE"].map({
 
 df["age"] = df["_AGE80"]
 
+age_bins = [18, 25, 35, 45, 55, 65, 75, 80, 81]
+age_labels = ["18-24 years", "25-34 years", "35-44 years", "45-54 years", "55-64 years", "65-74 years", "75-79 years", "80+ years"]
+df["age_group"] = pd.Categorical(
+    pd.cut(df["age"], bins=age_bins, labels=age_labels, right=False),
+    ordered=True
+)
+
 df["education"] = df["_EDUCAG"].map({
     1.0: "no high school",
     2.0: "high school",
@@ -164,7 +171,7 @@ df["blind"] = df["BLIND"].map({
 df["weight"] = df["_LLCPWT"]
 
 df = df[[
-    "state", "sex", "race", "age", "education", "income",
+    "state", "sex", "race", "age", "age_group", "education", "income",
     "smoker", "bmi", "exercise_monthly", "poor_mental_health", "diabetes",
     "high_bp", "asthma", "cholesterol", "heart_attack", "stroke",
     "depression", "deaf", "blind", "weight"

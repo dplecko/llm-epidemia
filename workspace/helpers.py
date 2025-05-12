@@ -97,3 +97,11 @@ def bin_labels(breaks, unit="$", exact=False, last_plus = False):
             labels.append(f"{breaks[i-1]}–{breaks[i]} {unit}")
         labels.append(f"{breaks[-1]}+ {unit}")
     return labels
+
+def hd_tasksize(task_spec):
+    df = pd.read_parquet(task_spec["dataset"])
+    cond_vars = task_spec["v_cond"]
+    df_sub = df[cond_vars]
+    df_sub = df_sub.drop_duplicates()
+    return len(df_sub), len(cond_vars)
+

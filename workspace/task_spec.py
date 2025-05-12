@@ -13,12 +13,7 @@ def load_tasks(module_name):
 task_specs = []
 task_specs_hd = []
 
-# task files without the "task_" prefix
-task_files = [
-    "acs", "labor", "fbi", "edu", 
-    "nhanes", "gss", "meps", "scf", 
-    "brfss", "nsduh"
-]
+task_files = ["acs", "brfss", "edu", "fbi", "gss", "labor", "meps", "nhanes", "nsduh", "scf"]
 
 for task_file in task_files:
     # Load the module

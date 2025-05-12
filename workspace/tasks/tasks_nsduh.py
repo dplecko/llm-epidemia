@@ -65,10 +65,10 @@ nsduh_cond = {
 
 nsduh_out = {
     "cig_monthly": "have they smoked in the past 30 days?",
-    "alc_monthly": "have they drank alcohol in the past 30 days?",
+    # "alc_monthly": "have they drank alcohol in the past 30 days?",
     "mj_ever": "have they ever used marijuana?",
     "coc_ever": "have they ever used cocaine?",
-    "her_ever": "have they ever used heroin?",
+    # "her_ever": "have they ever used heroin?",
 }
 
 # tasks_nsduh_hd = [
