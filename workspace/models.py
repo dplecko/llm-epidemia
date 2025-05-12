@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 import torch
 import evaluator_helpers
 from openai import OpenAI
-from google import generativeai as genai
+# from google import generativeai as genai
 import string
 import random
 import math
 import itertools
+from collections import defaultdict
 
 
 def shuffled_copy(items):
@@ -201,6 +202,89 @@ class HuggingFaceModel(AbstractModel):
         # Average accumulated probabilities and return
         return levels, [sum(vals) / len(vals) for vals in average_probs.values()], None
     
+    
+    def predict_batch(self, prompts, levels, num_permutations, max_batch_size):
+        average_probs = [defaultdict(list) for _ in prompts]
+        n_fact        = math.factorial(len(levels))
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        if n_fact > num_permutations:           # sample `num_permutations` times
+            permutation_iter = (None for _ in range(num_permutations))
+        else:                                   # exhaustively iterate all permutations
+            permutation_iter = itertools.permutations(levels)
+            
+        for perm in permutation_iter:
+            processed_prompts, answer_maps = [], []
+            for pr in prompts:
+                if perm is None:
+                    p_prompt, a_map = self.prepare_prompt(pr, levels)  # type: ignore[attr‑defined]
+                else:
+                    p_prompt, a_map = self.prepare_prompt(pr, levels, perm)  # type: ignore[attr‑defined]
+                processed_prompts.append(p_prompt)
+                answer_maps.append(a_map)
+            
+            for start in range(0, len(processed_prompts), max_batch_size):
+                batch_prompts = processed_prompts[start : start + max_batch_size]
+                batch_answer_maps = answer_maps[start : start + max_batch_size]
+                
+                max_length_in_batch = max(len(p) for p in batch_prompts)
+
+                # 2.1 Tokenise
+                inputs = self.tokenizer(batch_prompts, return_tensors="pt", padding=True, truncation=True, max_length=max_length_in_batch).to(self.device)
+                # 2.2 Forward → (B, seq, vocab)
+                with torch.no_grad():
+                    logits = self.model(**inputs).logits  # type: ignore[attr‑defined]
+                next_token_logits = logits[:, -1, :]  # (B, vocab)
+                probs = torch.softmax(next_token_logits, dim=-1)
+
+                # 2.3 Map answers → token ids (once per batch)
+                batch_level_ids = [
+                    [
+                        [self.tokenizer.convert_tokens_to_ids(tok) for tok in ans]  # type: ignore[attr‑defined]
+                        for ans in amap.keys()
+                    ]
+                    for amap in batch_answer_maps
+                ]
+
+                # 2.4 Accumulate probabilities
+                for idx_b, (prob_row, lvl_ids, amap) in enumerate(
+                    zip(probs, batch_level_ids, batch_answer_maps)
+                ):
+                    level_probs = [sum(prob_row[tid].item() for tid in ids) for ids in lvl_ids]
+                    total = sum(level_probs)
+                    prob_dist = [p / total for p in level_probs]
+
+                    global_idx = start + idx_b
+                    for p, answer in zip(prob_dist, amap.keys()):
+                        level_idx = amap[answer]  # **expected to be an int index**
+                        average_probs[global_idx][level_idx].append(p)
+
+        # Final averaging – keep output order identical to ``levels``
+        # averaged_distributions = []
+        # for avg_dict in average_probs:
+        #     for i in range(len(levels)):
+        #         if not avg_dict[i]:
+        #             raise RuntimeError(
+        #                 f"No probability mass collected for level index {i}. "
+        #                 "This should not happen – please check `prepare_prompt`."
+        #             )
+        #     averaged_distributions.append([
+        #         sum(avg_dict[i]) / len(avg_dict[i]) for i in range(len(levels))
+        #     ])
+        
+        averaged_distributions = []
+        for item_dict in average_probs:
+            current_dict_averages = []
+            for key in item_dict.keys():
+                value_list = item_dict[key]  # Get the list for the current key
+
+                # Calculate average, handling the case where the list might be empty
+                avg = sum(value_list) / len(value_list) if value_list else 0
+                current_dict_averages.append(avg)
+
+            averaged_distributions.append(current_dict_averages)
+        return levels, averaged_distributions, None
+        
     
     def get_type(self):
         return "HuggingFace"

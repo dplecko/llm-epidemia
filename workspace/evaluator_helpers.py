@@ -89,6 +89,15 @@ def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
     return model.predict(prompt, levels, n_mc, max_batch_size,)
 
 
+def extract_pv_batch(prompts, levels, model_name, model, task_spec, n_mc=128):
+    max_batch = 32 if model_name == "llama3_70b_instruct" else 128
+    return model.predict_batch(  # type: ignore[attr‑defined]
+        prompts=prompts,
+        levels=levels,
+        num_permutations=n_mc,
+        max_batch_size=max_batch,
+    )
+
 
 def d2d_wgh_col(dataset):
 

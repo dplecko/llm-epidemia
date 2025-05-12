@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from model_load import load_model
-from evaluator_helpers import extract_pv, compress_vals
+from evaluator_helpers import extract_pv, compress_vals, extract_pv_batch
 from task_spec import task_specs, task_specs_hd
 from helpers import task_to_filename
 from hd_helpers import fit_lgbm, promptify
@@ -141,7 +141,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 "model_weights": model_weights,
                 "model_texts": model_texts
             })
-    elif ttyp == "hd":
+    elif ttyp == "hd_old":
         # TODO create a single promopt:
         # task_spec["prompt"] = generate_promt()  # use the nsduh_con and nsduh_out
         # multi variable conditioning
@@ -161,11 +161,38 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             
             # get the natural language prompt for the row
             row_prompt = promptify(out_var, cond_vars, cond_row, dataset_name)
-
             # model values
             model_vals, model_weights, model_texts = extract_pv(row_prompt, levels, model_name, model, task_spec)
             cond_df.at[i, "llm_pred"] = model_weights[1] # get the P(Y = 1 | X = x)
 
+        data = data.merge(cond_df, on=cond_vars, how="left")
+    elif ttyp == "hd":
+        cond_vars = task_spec["v_cond"]
+        out_var = task_spec["v_out"]
+        
+        # fit lightgbm model to get conditional probabilities (ground truth)
+        preds = fit_lgbm(data, out_var, cond_vars, wgh_col="weight")
+        data["lgbm_pred"] = preds
+        
+        # get all combinations
+        cond_df = data[cond_vars].drop_duplicates().reset_index(drop=True)
+        cond_df["llm_pred"] = np.nan
+        
+        prompts = [
+            promptify(out_var, cond_vars, row, dataset_name)  # type: ignore[name‑defined]
+            for _, row in cond_df.iterrows()
+        ]
+        
+        model_vals, model_weights, model_texts = extract_pv_batch(
+            prompts=prompts,
+            levels=levels,
+            model_name=model_name,
+            model=model,
+            task_spec=task_spec,
+        )
+        
+        llm_probabilities = [x[1] for x in model_weights]
+        cond_df['llm_pred'] = llm_probabilities  # get the P(Y = 1 | X = x)
         data = data.merge(cond_df, on=cond_vars, how="left")
 
     # save to disk
