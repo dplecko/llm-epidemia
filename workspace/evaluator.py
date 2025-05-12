@@ -2,7 +2,6 @@ import pandas as pd
 import sys, os
 import numpy as np
 import json
-import pdb
 from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
@@ -18,7 +17,6 @@ def get_ground_truth(data, task_spec):
 def load_dataset(dataset):
     return pd.read_parquet(f"data/clean/{dataset}.parquet")
         
-
 def evaluator(model_name, model, task_spec, check_cache=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
@@ -131,7 +129,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 weights = [1] * len(true_vals)
             
             if not true_vals or not weights:
-                pdb.set_trace()
+                breakpoint()
             true_vals, weights = compress_vals(true_vals, weights)
 
             results.append({
@@ -200,11 +198,14 @@ model = load_model(model_name)
 # for i in np.arange(0, 12):
 #     evaluator(model_name, model, task_specs[i], check_cache=False)
 
-evaluator(model_name, model, task_specs_hd[0], check_cache=False)
+for i in range(len(task_specs_hd)):
+    evaluator(model_name, model, task_specs_hd[i], check_cache=False)
 
 # from build_eval_df import hd_corr_plot, hd_corr_df
-# hd_corr_df([model_name], task_specs_hd)
+# cdf = hd_corr_df([model_name], task_specs_hd)
 
+
+# dat = pd.read_parquet('data/benchmark/llama3_8b_instruct_nsduh_mj_ever_age_edu_sex_race.parquet')
 # import plotnine as p9
 # plot = hd_corr_plot([model_name], task_specs_hd)
 # plot.save("hd_corr_plot.png", dpi=300, width=8, height=6)

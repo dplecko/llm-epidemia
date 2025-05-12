@@ -72,25 +72,17 @@ meps_out = {
     "insured": "do they have health insurance?",
 }
 
-tasks_meps_hd = [
-    {
-        "v_out": "insured",
-        "v_cond": ["age", "education_years", "sex", "race"]
-    }
-]
+# tasks_meps_hd = [
+#     {
+#         "v_out": "insured",
+#         "v_cond": ["age", "education_years", "sex", "race"]
+#     }
+# ]
 
-# from itertools import combinations
-# Generate high-dimensional tasks with conditioning sets of size >= d
-# d = 2  # Set the minimum size of the conditioning set here
-# task_meps_hd = []
-
-# for v_out in meps_out.keys():
-#     for r in range(d, len(meps_cond) + 1):
-#         for v_cond in combinations(meps_cond.keys(), r):
-#             task_meps_hd.append({
-#                 "v_out": v_out,
-#                 "v_cond": list(v_cond)
-#             })
+import sys, os
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+from helpers import hd_taskgen
+tasks_meps_hd = hd_taskgen(meps_out, meps_cond)
 
 for task in tasks_meps_hd:
     task["dataset"] = "data/clean/meps.parquet"

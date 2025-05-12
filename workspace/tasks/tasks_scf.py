@@ -107,18 +107,10 @@ tasks_scf_hd = [
     }
 ]
 
-from itertools import combinations
-# Generate high-dimensional tasks with conditioning sets of size >= d
-# d = 2  # Set the minimum size of the conditioning set here
-# task_scf_hd = []
-
-# for v_out in scf_out.keys():
-#     for r in range(d, len(scf_cond) + 1):
-#         for v_cond in combinations(scf_cond.keys(), r):
-#             task_scf_hd.append({
-#                 "v_out": v_out,
-#                 "v_cond": list(v_cond)
-#             })
+import sys, os
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+from helpers import hd_taskgen
+tasks_scf_hd = hd_taskgen(scf_out, scf_cond)
 
 for task in tasks_scf_hd:
     task["dataset"] = "data/clean/scf.parquet"

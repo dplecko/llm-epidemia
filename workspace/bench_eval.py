@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("workspace"))
 from metrics import ks_w, cat_to_distr
-from helpers import task_to_filename, weighted_corr
+from helpers import task_to_filename, weighted_corr, weighted_L1
 
 def eval_cts(res, model_name, mode, dataset, v1, v2):
     rows = []
@@ -134,7 +134,7 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
             best_err.append(np.abs(distr_bt - distr_true).sum())
         best_err = np.quantile(best_err, 0.975)
 
-        worst_bt = np.ones(nbins) / nbins
+        worst_bt = np.ones(nbins) / nbins # uniform distribution baseline
         worst_err = np.abs(worst_bt - distr_true).sum()
         score = np.abs(distr_true - distr_mod).sum()
         
@@ -155,11 +155,23 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     return df
 
 def eval_hd(res, model_name):
-    res['llm_pred'] += np.random.uniform(-0.001, 0.001, size=len(res))
-    #res['lgbm_pred'] += np.random.uniform(-0.001, 0.001, size=len(res))
-    return weighted_corr(res["llm_pred"], res["lgbm_pred"], res["weight"])
+    
+    score = weighted_L1(res["llm_pred"], res["lgbm_pred"], res["weight"])
+    b1 = weighted_L1(np.zeros(len(res)), res["lgbm_pred"], res["weight"])
+    b2 = weighted_L1(np.ones(len(res)), res["lgbm_pred"], res["weight"])
+    b3 = weighted_L1(np.ones(len(res)) * 0.5, res["lgbm_pred"], res["weight"])
+    best_err = 0
+    worst_err = min(b1, b2, b3)
+    bench = (score - worst_err) / (best_err - worst_err)
+    bench = 100 * max(min(bench, 1), 0)
+    df_eval = pd.DataFrame({
+        "bench": [bench],
+        "llm_pred": [res["llm_pred"].tolist()],
+        "lgbm_pred": [res["lgbm_pred"].tolist()],
+        "weight": [res["weight"].tolist()],
+    })
+    return df_eval
      
-
 def eval_to_score(df):
     return df["bench"].mean()
 

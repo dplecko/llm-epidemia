@@ -65,7 +65,6 @@ brfss_out = {
     "high_bp": "do they have high blood pressure?",
     "asthma": "do they have asthma?",
     "exercise_monthly": "do they exercise every month?",
-    "smoker": "are they a smoker?",
     "cholesterol": "do they have high cholesterol?",
     "heart_attack": "have they ever had a heart attack?",
     "stroke": "have they ever had a stroke?",
@@ -74,26 +73,18 @@ brfss_out = {
     "deaf": "do they have significant hearing impairments/deafness?",
 }
 
-tasks_brfss_hd = [
-    {
-        "v_out": "diabetes",
-        "v_cond": ["age", "education", "sex", "race"]
-    }
-]
+# manual task specification for high-dimensional tasks
+# tasks_brfss_hd = [
+#     {
+#         "v_out": "diabetes",
+#         "v_cond": ["age", "education", "sex", "race"]
+#     }
+# ]
 
-from itertools import combinations
-
-# Generate high-dimensional tasks with conditioning sets of size >= d
-# d = 2  # Set the minimum size of the conditioning set here
-# task_brfss_hd = []
-
-# for v_out in brfss_out.keys():
-#     for r in range(d, len(brfss_cond) + 1):
-#         for v_cond in combinations(brfss_cond.keys(), r):
-#             task_brfss_hd.append({
-#                 "v_out": v_out,
-#                 "v_cond": list(v_cond)
-#             })
+import sys, os
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+from helpers import hd_taskgen
+tasks_brfss_hd = hd_taskgen(brfss_out, brfss_cond, max_per_dim=5)
 
 for task in tasks_brfss_hd:
     task["dataset"] = "data/clean/brfss.parquet"

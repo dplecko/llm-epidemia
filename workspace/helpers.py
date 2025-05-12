@@ -1,6 +1,8 @@
 
 import pandas as pd
 import numpy as np
+from itertools import combinations
+import random
 
 model_name_map = {
     "llama3_8b_instruct": "LLama3 8B",
@@ -15,6 +17,25 @@ model_name_map = {
 
 model_display_map = {v: k for k, v in model_name_map.items()}
 
+def hd_taskgen(out_spec, cond_spec, d_min=2, d_max=5, max_per_dim=100):
+    random.seed(42)
+    tasks_hd = []
+    for v_out in out_spec.keys():
+        for r in range(d_min, min(d_max, len(cond_spec)) + 1):
+            cnt = 0
+            all_combinations = list(combinations(cond_spec.keys(), r))
+            random.shuffle(all_combinations)
+            for v_cond in all_combinations:
+                if cnt > max_per_dim:
+                    break
+                else:
+                    cnt += 1
+                tasks_hd.append({
+                    "v_out": v_out,
+                    "v_cond": list(v_cond)
+                })
+    return tasks_hd
+
 def task_to_filename(model_name, task_spec):
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     if "v_cond" in task_spec:
@@ -28,6 +49,10 @@ def task_to_filename(model_name, task_spec):
     return file_name
 
 def weighted_corr(x, y, w):
+    
+    if np.all(x == x[0]) or np.all(y == y[0]):
+        return 0
+    
     # Weighted means
     mx = np.average(x, weights=w)
     my = np.average(y, weights=w)
@@ -41,6 +66,9 @@ def weighted_corr(x, y, w):
     
     # Weighted correlation
     return cov / np.sqrt(vx * vy)
+
+def weighted_L1(x, y, w):
+    return np.sum(np.abs(x - y) * w) / np.sum(w)
 
 def model_name(mod):
     if isinstance(mod, pd.Series):

@@ -71,26 +71,17 @@ nsduh_out = {
     "her_ever": "have they ever used heroin?",
 }
 
-tasks_nsduh_hd = [
-    {
-        "v_out": "mj_ever",
-        "v_cond": ["age", "edu", "sex", "race"]
-    }
-]
+# tasks_nsduh_hd = [
+#     {
+#         "v_out": "mj_ever",
+#         "v_cond": ["age", "edu", "sex", "race"]
+#     }
+# ]
 
-from itertools import combinations
-
-# Generate high-dimensional tasks with conditioning sets of size >= d
-# d = 2  # Set the minimum size of the conditioning set here
-# task_nsduh_hd = []
-
-# for v_out in nsduh_out.keys():
-#     for r in range(d, len(nsduh_cond) + 1):
-#         for v_cond in combinations(nsduh_cond.keys(), r):
-#             task_nsduh_hd.append({
-#                 "v_out": v_out,
-#                 "v_cond": list(v_cond)
-#             })
+import sys, os
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+from helpers import hd_taskgen
+tasks_nsduh_hd = hd_taskgen(nsduh_out, nsduh_cond)
 
 for task in tasks_nsduh_hd:
     task["dataset"] = "data/clean/nsduh.parquet"

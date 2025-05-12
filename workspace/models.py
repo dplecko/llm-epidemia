@@ -161,13 +161,15 @@ class HuggingFaceModel(AbstractModel):
             ]
 
             with torch.no_grad():
-                logits = self.model(**inputs).logits[:, 0, :]        # first token only
-                probs  = torch.softmax(logits, dim=-1)
+                outputs = self.model(**inputs).logits
+                next_token_logits = outputs[:, -1, :]  # Last token in the input sequence
+                probs = torch.softmax(next_token_logits, dim=-1)
 
             # Normalise probability mass over the provided answers
             level_probs = [
                 sum(probs[0, tid].item() for tid in ids) for ids in level_ids
             ]
+
             total_prob = sum(level_probs)
             prob_dist  = [p / total_prob for p in level_probs]
 
