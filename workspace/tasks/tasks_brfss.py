@@ -52,25 +52,25 @@ for t in tasks_brfss:
 
 # high-dimensional
 brfss_cond = {
-    "age": "who is {} years of age",
+    "age_group": "who is aged {}",
     "education": "who completed {}",
     "sex": "who is {}",
     "race": "who is {}",
-    "state": "who lives in {}",
+    # "state": "who lives in {}",
     "income": "who has an income of {}",
 }
 
 brfss_out = {
     "diabetes": "do they have diabetes?",
     "high_bp": "do they have high blood pressure?",
-    "asthma": "do they have asthma?",
-    "exercise_monthly": "do they exercise every month?",
-    "cholesterol": "do they have high cholesterol?",
-    "heart_attack": "have they ever had a heart attack?",
-    "stroke": "have they ever had a stroke?",
+    # "asthma": "do they have asthma?",
+    # "exercise_monthly": "do they exercise every month?",
+    # "cholesterol": "do they have high cholesterol?",
+    # "heart_attack": "have they ever had a heart attack?",
+    # "stroke": "have they ever had a stroke?",
     "depression": "do they have depression?",
-    "blind": "do they have significant visual impairments/blindness?",
-    "deaf": "do they have significant hearing impairments/deafness?",
+    # "blind": "do they have significant visual impairments/blindness?",
+    # "deaf": "do they have significant hearing impairments/deafness?",
 }
 
 # manual task specification for high-dimensional tasks
@@ -84,7 +84,7 @@ brfss_out = {
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from helpers import hd_taskgen
-tasks_brfss_hd = hd_taskgen(brfss_out, brfss_cond, max_per_dim=5)
+tasks_brfss_hd = hd_taskgen(brfss_out, brfss_cond, max_per_dim=3)
 
 for task in tasks_brfss_hd:
     task["dataset"] = "data/clean/brfss.parquet"

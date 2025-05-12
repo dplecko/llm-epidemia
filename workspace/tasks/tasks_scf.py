@@ -100,12 +100,12 @@ scf_out = {
     "house_own": "do they own the home they live in?",
 }
 
-tasks_scf_hd = [
-    {
-        "v_out": "house_own",
-        "v_cond": ["age_group", "education", "sex", "race"]
-    }
-]
+# tasks_scf_hd = [
+#     {
+#         "v_out": "house_own",
+#         "v_cond": ["age_group", "education", "sex", "race"]
+#     }
+# ]
 
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))

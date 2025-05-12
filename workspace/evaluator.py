@@ -137,6 +137,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 "true_vals": true_vals,
                 "true_weights": weights,
                 "n_data": len(filtered_data),
+                "total_weight": sum(weights),
                 "model_vals": model_vals,
                 "model_weights": model_weights,
                 "model_texts": model_texts
@@ -220,19 +221,15 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 #         for i in task_sel:
 #             evaluator(model_name, model, task_specs[i], check_cache=True)
 
+# models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct"]
+# for model_name in models:
+#     print("\nEntering model: ", model_name, "\n")
+#     model = load_model(model_name)
+#     for i in range(len(task_specs)):
+#         evaluator(model_name, model, task_specs[i], check_cache=False)
+
 model_name = "llama3_8b_instruct"
 model = load_model(model_name)
-# for i in np.arange(0, 12):
-#     evaluator(model_name, model, task_specs[i], check_cache=False)
-
 for i in range(len(task_specs_hd)):
     evaluator(model_name, model, task_specs_hd[i], check_cache=False)
 
-# from build_eval_df import hd_corr_plot, hd_corr_df
-# cdf = hd_corr_df([model_name], task_specs_hd)
-
-
-# dat = pd.read_parquet('data/benchmark/llama3_8b_instruct_nsduh_mj_ever_age_edu_sex_race.parquet')
-# import plotnine as p9
-# plot = hd_corr_plot([model_name], task_specs_hd)
-# plot.save("hd_corr_plot.png", dpi=300, width=8, height=6)
