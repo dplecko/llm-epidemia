@@ -94,7 +94,6 @@ def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     
     return oob_preds
 
-
 def bootstrap_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, n_bootstraps=100, seed=42):
     np.random.seed(seed)
     y = data[out_var].astype("category").cat.codes

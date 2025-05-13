@@ -91,16 +91,31 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     df.attrs["distr"] = pd.DataFrame(distr_rows)
     return df
 
-def eval_hd(res, task):
-    
+def hd_best_err(res, task):
+
+    return 0
     cond_vars = task["v_cond"]
     out_var = task["v_out"]
+    cond_vars_str = "_".join(task_spec["v_cond"])
+    dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
+    file_name = f"best_err_{dataset_name}_{task_spec['v_out']}_{cond_vars_str}.txt"
+    if os.path.exists(os.path.join("data", "benchmark", file_name)):
+        with open(os.path.join("data", "benchmark", file_name), "r") as f:
+            best_err = float(f.read())
+        return best_err
+    else:
+        boot_mat = bootstrap_lgbm(res[cond_vars + [out_var] + ["weight"]], out_var, cond_vars, wgh_col="weight")
+        for i in range(boot_mat.shape[1]):
+            best_err.append(weighted_L1(boot_mat[:, i], res["lgbm_pred"], res["weight"]))
+        best_err = np.quantile(best_err, 0.975)
+        with open(os.path.join("data", "benchmark", file_name), "w") as f:
+            f.write(str(best_err))
+        return best_err
+
+def eval_hd(res, task):
 
     # get the best error
-    boot_mat = bootstrap_lgbm(res[cond_vars + [out_var] + ["weight"]], out_var, cond_vars, wgh_col="weight")
-    for i in range(boot_mat.shape[1]):
-        best_err.append(weighted_L1(boot_mat[:, i], res["lgbm_pred"], res["weight"]))
-    best_err = np.quantile(best_err, 0.975)
+    best_err = hd_best_err(res, task)
 
     # get the true score
     score = weighted_L1(res["llm_pred"], res["lgbm_pred"], res["weight"])
