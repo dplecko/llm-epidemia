@@ -11,7 +11,7 @@ MODEL_PATHS = {
     "llama3_70b_instruct": ("/local/eb/dp3144/llama3_70b_instruct", True),  # LLaMA 3.3 70B-Instruct
     "mistral_7b_instruct": ("/local/eb/dp3144/mistral_7b_instruct", True),  # Instruct Mistral
     "phi4": ("/local/eb/dp3144/phi4", True),  # Microsoft Phi-4
-    "gemma3_27b_instruct": ("/local/eb/dp3144/gemma3_27b_instruct", True),  # Gemma 27B-Instruct
+    "gemma3_27b_instruct": ("google/gemma-3-27b-it", True),  # Gemma 27B-Instruct
     "deepseek_7b_chat": ("/local/eb/dp3144/deepseek_7b_chat", True),  # Instruct DeepSeek
     ### non-instruct versions
     "llama3_8b": ("/local/eb/dp3144/llama3_8b", False),  # Regular LLaMA 3 8B
@@ -54,12 +54,27 @@ def load_hf_model(model_name):
 
     model_path, is_instruct = MODEL_PATHS[model_name]
     tokenizer = AutoTokenizer.from_pretrained(model_path)
+    
+    if model_name == "gemma3_27b_instruct":
+        # due to NaN overflow of the attention behind Gemma
+        import torch.backends.cuda as bk
+        bk.enable_flash_sdp(False) # disable flash & mem‑efficient kernels globally
+        bk.enable_mem_efficient_sdp(False)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.bfloat16, # keep bf16
+            device_map="auto",
+            cache_dir="/capstor/scratch/cscs/pokanovi/hf_cache",
+            attn_implementation="eager" # key line
+        )
+    else:
 
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path,
-        torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
-        device_map="auto"
-    )
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
+            device_map="auto",
+            cache_dir="/capstor/scratch/cscs/pokanovi/hf_cache"
+        )
     hf_model = models.HuggingFaceModel(model, tokenizer)
     hf_model.is_instruct = is_instruct
     return hf_model
