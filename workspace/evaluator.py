@@ -191,7 +191,6 @@ def evaluator(model_name, model, task_spec, check_cache=False):
             model=model,
             task_spec=task_spec,
         )
-        
         llm_probabilities = [x[1] for x in model_weights]
         cond_df['llm_pred'] = llm_probabilities  # get the P(Y = 1 | X = x)
         data = data.merge(cond_df, on=cond_vars, how="left")
@@ -228,7 +227,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 #     for i in range(len(task_specs)):
 #         evaluator(model_name, model, task_specs[i], check_cache=False)
 
-model_name = "llama3_8b_instruct"
+model_name = "gemma3_27b_instruct"
 model = load_model(model_name)
 for i in range(len(task_specs_hd)):
     evaluator(model_name, model, task_specs_hd[i], check_cache=False)
