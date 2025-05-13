@@ -11,8 +11,6 @@ model_name_map = {
     "deepseek_7b_chat": "DeepSeek 7B",
     "phi4": "Phi4",
     "gemma3_27b_instruct": "Gemma3 27B",
-    "nhanes": "NHANES",
-    "gss": "GSS"
 }
 
 model_display_map = {v: k for k, v in model_name_map.items()}

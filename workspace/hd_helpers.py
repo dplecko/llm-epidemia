@@ -94,6 +94,70 @@ def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     
     return oob_preds
 
+def bootstrap_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, n_bootstraps=100, seed=42):
+    np.random.seed(seed)
+    y = data[out_var].astype("category").cat.codes
+    weights = data[wgh_col].values if wgh_col else np.ones(len(y))
+    n_samples = len(data)
+
+    # Prepare storage for OOB predictions
+    oob_preds_matrix = np.zeros((n_samples, n_bootstraps))
+
+    for b in range(n_bootstraps):
+        # Create bootstrap sample
+        idx = np.arange(n_samples)
+        boot_idx = np.random.choice(idx, size=n_samples, replace=True)
+
+        # Create folds
+        n_folds = n_splits
+        folds = np.tile(np.arange(n_folds), int(np.ceil(len(boot_idx) / n_folds)))[:len(boot_idx)]
+        np.random.shuffle(folds)
+
+        # Prepare LightGBM dataset
+        X_boot = data.iloc[boot_idx][cond_vars].copy()
+        y_boot = y.iloc[boot_idx]
+        weights_boot = weights[boot_idx]
+        lgb_data = lgb.Dataset(X_boot, label=y_boot, weight=weights_boot, categorical_feature=list(range(len(cond_vars))))
+
+        # LightGBM parameters
+        params = {
+            "objective": "binary",
+            "metric": "binary_logloss",
+            "boosting_type": "gbdt",
+            "verbosity": -1,
+            "seed": seed + b,
+        }
+
+        # Train model with manual folds
+        cv_results = lgb.cv(
+            params,
+            lgb_data,
+            folds=[(np.flatnonzero(folds != f), np.flatnonzero(folds == f)) for f in range(n_folds)],
+            return_cvbooster=True,
+            callbacks=[lgb.early_stopping(10)]
+        )
+
+        # Collect OOB predictions in the order of the original dataset
+        oob_preds = np.zeros(n_samples)
+        seen_idx = np.unique(boot_idx)  # All indices used in training
+
+        # Populate OOB for seen points
+        for f, booster in enumerate(cv_results['cvbooster'].boosters):
+            test_idx = boot_idx[folds == f]
+            oob_preds[test_idx] = booster.predict(data.iloc[test_idx][cond_vars], num_iteration=booster.best_iteration)
+
+        # Predict for unseen points (using the first booster as a default)
+        unseen_idx = np.setdiff1d(idx, seen_idx, assume_unique=True)
+        if len(unseen_idx) > 0:
+            oob_preds[unseen_idx] = cv_results['cvbooster'].boosters[0].predict(data.iloc[unseen_idx][cond_vars], num_iteration=cv_results['cvbooster'].boosters[0].best_iteration)
+
+        # Store the predictions for this bootstrap run
+        oob_preds_matrix[:, b] = oob_preds
+
+    return oob_preds_matrix
+
+
+
 def xgb_conditional_prob(
     df: pd.DataFrame,
     target: str = "v1",

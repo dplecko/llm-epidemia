@@ -43,12 +43,12 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     file_name = task_to_filename(model_name, task_spec)
-    if check_cache and os.path.exists(os.path.join("data", "benchmark", file_name)):
+    if check_cache and os.path.exists(os.path.join("data", "benchmark-hdold", file_name)):
         return None
     
     # Step 1: determine if query is marginal or conditional
     if "v_cond" in task_spec:
-        ttyp = "hd"
+        ttyp = "hd_old"
     elif len(task_spec["variables"]) == 1:
         ttyp = "marginal"
     elif len(task_spec["variables"]) == 2:
@@ -61,7 +61,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         mc_data = pd.read_parquet(model_name)
         n_mc = 128
 
-    if ttyp == "hd":
+    if ttyp in ["hd_old", "hd"]:
         levels = sorted(data[task_spec["v_out"]].unique().tolist())
     else:
         levels = data[task_spec["variables"][0]].unique().tolist()
@@ -198,9 +198,9 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     # save to disk
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     
-    if ttyp == "hd":
+    if ttyp == "hd_old":
         # save the full dataset with predictions
-        data.to_parquet(os.path.join("data", "benchmark", file_name))
+        data.to_parquet(os.path.join("data", "benchmark-hdold", file_name))
     else:
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
             json.dump(results, f, indent=4)
@@ -220,15 +220,35 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 #         for i in task_sel:
 #             evaluator(model_name, model, task_specs[i], check_cache=True)
 
+models = ["mistral_7b_instruct"]
 # models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct"]
-# for model_name in models:
-#     print("\nEntering model: ", model_name, "\n")
-#     model = load_model(model_name)
-#     for i in range(len(task_specs)):
-#         evaluator(model_name, model, task_specs[i], check_cache=False)
+for model_name in models:
+    print("\nEntering model: ", model_name, "\n")
+    model = load_model(model_name)
+    for i in [10]: #tqdm(range(len(task_specs_hd))):
+        evaluator(model_name, model, task_specs_hd[i], check_cache=True)
 
 model_name = "gemma3_27b_instruct"
 model = load_model(model_name)
 for i in range(len(task_specs_hd)):
     evaluator(model_name, model, task_specs_hd[i], check_cache=False)
+# model_name = "llama3_8b_instruct"
+# model = load_model(model_name)
 
+# import time
+# start = time.time()
+# evaluator(model_name, model, task_specs_hd[10], check_cache=False)
+
+# end = time.time()
+# print(f"Elapsed time: {end - start:.2f} seconds")
+
+# for i in range(len(task_specs_hd)):
+#     evaluator(model_name, model, task_specs_hd[i], check_cache=False)
+
+# 
+df1 = pd.read_parquet('data/benchmark/mistral_7b_instruct_brfss_diabetes_age_group_education_race_income.parquet')
+df2 = pd.read_parquet('data/benchmark-hdold/mistral_7b_instruct_brfss_diabetes_age_group_education_race_income.parquet')
+df3 = pd.read_parquet('data/benchmark-hdold/mistral2_7b_instruct_brfss_diabetes_age_group_education_race_income.parquet')
+
+
+df3["llm_pred"].corr(df2["llm_pred"])

@@ -5,99 +5,25 @@ import plotnine as p9
 import re
 import sys
 import os
+import json
 sys.path.append(os.path.abspath("workspace"))
 from metrics import ks_w, cat_to_distr
 from helpers import task_to_filename, weighted_corr, weighted_L1
-from bench_eval import eval_task, eval_to_score
-from helpers import task_to_filename, weighted_corr
-
-
-def eval_cts(res, model_name, mode, dataset, v1, v2):
-    rows = []
-
-    for r in res:
-        n_mc = len(r["model_vals"])
-        val_true = np.array(r["true_vals"], dtype=float)
-        wgh_true = np.array(r.get("weights", [1.0] * len(val_true)))
-        val_mod = np.array([m for m in r["model_vals"] if m is not None])
-
-        # Bootstrap best error
-        best_err = []
-        for _ in range(100):
-            idx = np.random.choice(len(val_true), size=n_mc, p=wgh_true / wgh_true.sum(), replace=True)
-            val_true_bt = val_true[idx]
-            test_bt = ks_w(val_true_bt, val_true, w_x=None, w_y=wgh_true)
-            best_err.append(test_bt)
-        best_err = np.quantile(best_err, 0.975)
-
-        # Worst-case (random uniform)
-        worst_bt = np.random.uniform(val_true.min(), val_true.max(), size=1000)
-        worst_err = ks_w(val_true, worst_bt, w_x=wgh_true, w_y=None)
-
-        # Actual model error
-        score = ks_w(val_true, val_mod, w_x=wgh_true, w_y=None)
-        bench = (score - worst_err) / (best_err - worst_err)
-        bench = 100 * max(min(bench, 1), 0)
-
-        rows.append({
-            "p_true": float(np.average(val_true, weights=wgh_true)),
-            "p_mod": float(np.mean(val_mod)),
-            "bench": bench,
-            "cond": r["condition"],
-            "true_vals": {"vals": val_true.tolist(), "wgh": wgh_true.tolist()},
-            "mod_vals": {"vals": val_mod.tolist()},
-        })
-
-    return pd.DataFrame(rows)
-
-def eval_bin(res, model_name, mode, dataset, v1, v2):
-    rows = []
-
-    for r in res:
-        n_mc = len(r["model_vals"])
-        val_true = np.array(r["true_vals"], dtype=float)
-        wgh_true = np.array(r.get("weights", [1.0] * len(val_true)))
-        p_true = float(np.average(val_true, weights=wgh_true))
-
-        if n_mc == 2:
-            p_mod = r["model_vals"][1]
-        else:
-            val_mod = np.array([m for m in r["model_vals"] if m is not None])
-            if val_mod is None or len(val_mod) == 0:
-                print("No good answers found for model:", model_name, "v1:", v1, "v2:", v2, "condition:", r["condition"])
-                p_mod = 0.5
-                n_mc = 128
-            else:
-                p_mod = np.mean(val_mod)
-                n_mc = len(val_mod)
-        
-        if n_mc == 2:
-            n_mc = 10**6  # inflate for stability
-
-        best_err = 2 * np.sqrt(p_true * (1 - p_true) / n_mc)
-        worst_err = 0.5 * (p_true**2 + (1 - p_true)**2)
-        score = abs(p_true - p_mod)
-
-        bench = (score - worst_err) / (best_err - worst_err)
-        bench = 100 * max(min(bench, 1.0), 0.0)
-
-        rows.append({
-            "p_true": p_true,
-            "p_mod": p_mod,
-            "bench": bench,
-            "cond": r["condition"]
-        })
-
-    return pd.DataFrame(rows)
+from hd_helpers import bootstrap_lgbm
 
 def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     nbins = len(levels)
     lvl_names = levels
     rows = []
     distr_rows = []
+    cond_wghs = []
+    score_c = []
+    worst_c = []
+    best_c = []
 
     for r in res:
         
+        cond_wghs.append(r["total_weight"])
         if len(r["model_vals"]) == len(levels):
             n_mc = r["n_data"]
         else:
@@ -128,42 +54,83 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
             })
 
         # Bootstrap best error
-        best_err = []
+        best_cboot = []
         for _ in range(100):
             idx = np.random.choice(len(val_true), size=n_mc, p=wgh_true / wgh_true.sum(), replace=True)
             val_bt = val_true[idx]
             distr_bt = cat_to_distr(val_bt, None, nbins)
-            best_err.append(np.abs(distr_bt - distr_true).sum())
-        best_err = np.quantile(best_err, 0.975)
+            best_cboot.append(np.abs(distr_bt - distr_true).sum())
+        best_c.append(best_cboot)
 
-        worst_bt = np.ones(nbins) / nbins # uniform distribution baseline
-        worst_err = np.abs(worst_bt - distr_true).sum()
-        score = np.abs(distr_true - distr_mod).sum()
+        # worst error for this conditioning set
+        worst_c.append(np.abs(np.ones(nbins) / nbins - distr_true).sum())
         
-        # only scores are essentially 0 and 100!
-        if worst_err < best_err :
-            worst_err = best_err + 0.0001
-
-        bench = (score - worst_err) / (best_err - worst_err)
-        bench = 100 * max(min(bench, 1), 0)
+        # score for the conditioning set
+        score_c.append(np.abs(distr_true - distr_mod).sum()) 
 
         rows.append({
-            "bench": bench,
             "cond": r["condition"]
         })
 
+    worst_err = np.sum(np.array(worst_c) * np.array(cond_wghs)) / np.sum(cond_wghs)
+    score = np.sum(np.array(score_c) * np.array(cond_wghs)) / np.sum(cond_wghs)
+
+    best_cx = np.array(best_c)
+    best_cx = np.average(best_cx, axis=0, weights=np.array(cond_wghs))
+    best_err = np.quantile(best_cx, 0.975)
+
+    # only scores are essentially 0 and 100!
+    if worst_err < best_err :
+        worst_err = best_err + 0.0001
+
+    bench = (score - worst_err) / (best_err - worst_err)
+    bench = 100 * max(min(bench, 1), 0)
+
     df = pd.DataFrame(rows)
+    df["bench"] = bench
     df.attrs["distr"] = pd.DataFrame(distr_rows)
     return df
 
-def eval_hd(res, model_name):
-    
+def hd_best_err(res, task):
+
+    return 0
+    cond_vars = task["v_cond"]
+    out_var = task["v_out"]
+    cond_vars_str = "_".join(task_spec["v_cond"])
+    dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
+    file_name = f"best_err_{dataset_name}_{task_spec['v_out']}_{cond_vars_str}.txt"
+    if os.path.exists(os.path.join("data", "benchmark", file_name)):
+        with open(os.path.join("data", "benchmark", file_name), "r") as f:
+            best_err = float(f.read())
+        return best_err
+    else:
+        boot_mat = bootstrap_lgbm(res[cond_vars + [out_var] + ["weight"]], out_var, cond_vars, wgh_col="weight")
+        for i in range(boot_mat.shape[1]):
+            best_err.append(weighted_L1(boot_mat[:, i], res["lgbm_pred"], res["weight"]))
+        best_err = np.quantile(best_err, 0.975)
+        with open(os.path.join("data", "benchmark", file_name), "w") as f:
+            f.write(str(best_err))
+        return best_err
+
+def eval_hd(res, task):
+
+    # get the best error
+    best_err = hd_best_err(res, task)
+
+    # get the true score
     score = weighted_L1(res["llm_pred"], res["lgbm_pred"], res["weight"])
+    
+    # get the worst error
     b1 = weighted_L1(np.zeros(len(res)), res["lgbm_pred"], res["weight"])
     b2 = weighted_L1(np.ones(len(res)), res["lgbm_pred"], res["weight"])
     b3 = weighted_L1(np.ones(len(res)) * 0.5, res["lgbm_pred"], res["weight"])
-    best_err = 0
     worst_err = min(b1, b2, b3)
+
+    # only scores are essentially 0 and 100!
+    if worst_err < best_err :
+        worst_err = best_err + 0.0001
+
+    # compute the benchmark normalized score
     bench = (score - worst_err) / (best_err - worst_err)
     bench = 100 * max(min(bench, 1), 0)
     df_eval = pd.DataFrame({
@@ -199,8 +166,7 @@ def eval_task(model_name, task):
         return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
     elif "parquet" in path:
         res = pd.read_parquet(path)
-        return eval_hd(res, model_name)
-
+        return eval_hd(res, task)
 
 def build_eval_df(models, tasks):
     rows = []
@@ -226,7 +192,7 @@ def build_eval_df(models, tasks):
 
     return pd.DataFrame(rows), eval_map
 
-# high-dimensional correlation plot (how well do the models agree?)
+# high-dimensional correlation plots functionality
 def hd_corr_df(models, tasks):
 
     rows = []
