@@ -73,6 +73,12 @@ brfss_out = {
     # "deaf": "do they have significant hearing impairments/deafness?",
 }
 
+brfss_pout = {
+    "diabetes": "what is the probability that they have diabetes?",
+    "high_bp": "what is the probability that they have high blood pressure?",
+    "depression": "what is the probability that they have depression?",
+}
+
 # manual task specification for high-dimensional tasks
 # tasks_brfss_hd = [
 #     {

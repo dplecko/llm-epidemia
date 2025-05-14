@@ -100,6 +100,10 @@ scf_out = {
     "house_own": "do they own the home they live in?",
 }
 
+scf_pout = {
+    "house_own": "what is the probability that they own the home they live in?",
+}
+
 # tasks_scf_hd = [
 #     {
 #         "v_out": "house_own",

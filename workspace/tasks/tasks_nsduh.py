@@ -71,6 +71,12 @@ nsduh_out = {
     # "her_ever": "have they ever used heroin?",
 }
 
+nsduh_pout = {
+    "cig_monthly": "what is the probability that they smoked in the past 30 days?",
+    "mj_ever": "what is the probability that they ever used marijuana?",
+    "coc_ever": "what is the probability that they ever used cocaine?",
+}
+
 # tasks_nsduh_hd = [
 #     {
 #         "v_out": "mj_ever",

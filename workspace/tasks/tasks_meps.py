@@ -72,6 +72,10 @@ meps_out = {
     "insured": "do they have health insurance?",
 }
 
+meps_pout = {
+    "insured": "what is the probability that they have health insurance?",
+}
+
 # tasks_meps_hd = [
 #     {
 #         "v_out": "insured",
