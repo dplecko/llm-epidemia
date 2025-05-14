@@ -220,18 +220,18 @@ def evaluator(model_name, model, task_spec, check_cache=False):
 #         for i in task_sel:
 #             evaluator(model_name, model, task_specs[i], check_cache=True)
 
-models = ["mistral_7b_instruct"]
+models = ["gemma3_27b_instruct"]
 # models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct"]
 for model_name in models:
     print("\nEntering model: ", model_name, "\n")
     model = load_model(model_name)
-    for i in [10]: #tqdm(range(len(task_specs_hd))):
-        evaluator(model_name, model, task_specs_hd[i], check_cache=True)
+    for i in tqdm(range(len(task_specs))):
+        evaluator(model_name, model, task_specs[i], check_cache=True)
 
-model_name = "gemma3_27b_instruct"
-model = load_model(model_name)
-for i in range(len(task_specs_hd)):
-    evaluator(model_name, model, task_specs_hd[i], check_cache=False)
+# model_name = "gemma3_27b_instruct"
+# model = load_model(model_name)
+# for i in range(len(task_specs)):
+#     evaluator(model_name, model, task_specs[i], check_cache=False)
 # model_name = "llama3_8b_instruct"
 # model = load_model(model_name)
 
