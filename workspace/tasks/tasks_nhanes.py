@@ -11,9 +11,9 @@ tasks_nhanes = [
         "prompt": "Does a person with a body mass index (BMI) in the {} range have diabetes?",
     },
     {
-        "name": "NHANES: Diabetes by BMI Group",
-        "variables": ["diabetes", "bmi_bin"],
-        "prompt": "Does a person with a body mass index (BMI) in the {} range have diabetes?",
+        "name": "NHANES: Diabetes by Age Group",
+        "variables": ["diabetes", "age_group"],
+        "prompt": "Does a person aged {} have diabetes?",
     },
     {
         "name": "NHANES: Weekly Alcohol Consumption by Age Group",

@@ -32,7 +32,7 @@ tasks_brfss = [
     },
     {
         "name": "BRFSS: Hearing Impairments by State",
-        "variables": ["blind", "state"],
+        "variables": ["deaf", "state"],
         "prompt": "Does a person living in {} have significant hearing impairments/deafness?",
     },
     {
