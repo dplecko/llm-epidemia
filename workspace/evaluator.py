@@ -48,7 +48,7 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
     
     # Step 1: determine if query is marginal or conditional
     if "v_cond" in task_spec:
-        ttyp = "hd_old"
+        ttyp = "hd"
     elif len(task_spec["variables"]) == 1:
         ttyp = "marginal"
     elif len(task_spec["variables"]) == 2:
@@ -201,9 +201,11 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
     # save to disk
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     
-    if ttyp == "hd_old":
+    if ttyp == "hd":
         # save the full dataset with predictions
-        data.to_parquet(os.path.join("data", "benchmark-hdold", file_name))
+        if prob:
+            file_name = "PROB_" + file_name
+        data.to_parquet(os.path.join("data", "benchmark-hd", file_name))
     else:
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
             json.dump(results, f, indent=4)
@@ -223,13 +225,17 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
 #         for i in task_sel:
 #             evaluator(model_name, model, task_specs[i], check_cache=True)
 
-models = ["gemma3_27b_instruct"]
+models = ["llama3_8b_instruct"]
 # models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct"]
 for model_name in models:
     print("\nEntering model: ", model_name, "\n")
     model = load_model(model_name)
-    for i in tqdm(range(len(task_specs))):
-        evaluator(model_name, model, task_specs[i], check_cache=True)
+    # for i in tqdm(range(len(task_specs))):
+    #     evaluator(model_name, model, task_specs[i], check_cache=True)
+        
+    print("HD TASKS")
+    for i in tqdm(range(len(task_specs_hd))):
+        evaluator(model_name, model, task_specs_hd[i], check_cache=True, prob=True)
 
 # model_name = "gemma3_27b_instruct"
 # model = load_model(model_name)

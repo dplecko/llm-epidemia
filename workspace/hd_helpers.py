@@ -51,10 +51,11 @@ def promptify(out_var, cond_vars, cond_row, dataset_name, prob=False):
 
 
 def generate_probability_levels():
-    levels = []
+    levels = ['0%']
     for i in range(20):
         level = f"{i * 5}% - {(i + 1) * 5}%"
         levels.append(level)
+    levels.append('100%')
     return levels
 
 def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
