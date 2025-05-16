@@ -13,7 +13,7 @@ import numpy as np
 # ────────────────────────────────────────────────────────────────────
 #  Paths  (put task_specs.json next to this file; adjust BASE if needed)
 # ────────────────────────────────────────────────────────────────────
-BASE = Path("/Users/patrik/Documents/PhD/repos/llm-epidemia") #Path(__file__).resolve().parent
+BASE = Path(__file__).resolve().parent
 TASK_SPECS_PATH = BASE / "task_specs.json"
 
 
