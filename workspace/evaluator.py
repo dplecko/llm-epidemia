@@ -43,7 +43,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     file_name = task_to_filename(model_name, task_spec)
-    if check_cache and os.path.exists(os.path.join("data", "benchmark-hdold", file_name)):
+    if check_cache and os.path.exists(os.path.join("data", "benchmark", file_name)):
         return None
     
     # Step 1: determine if query is marginal or conditional
@@ -198,9 +198,9 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     # save to disk
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     
-    if ttyp == "hd_old":
+    if ttyp == "hd":
         # save the full dataset with predictions
-        data.to_parquet(os.path.join("data", "benchmark-hdold", file_name))
+        data.to_parquet(os.path.join("data", "benchmark", file_name))
     else:
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
             json.dump(results, f, indent=4)

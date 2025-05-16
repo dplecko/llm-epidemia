@@ -2,10 +2,12 @@
 import pandas as pd
 import numpy as np
 import plotnine as p9
+from tqdm import tqdm
 import re
 import sys
 import os
 import json
+import traceback
 sys.path.append(os.path.abspath("workspace"))
 from metrics import ks_w, cat_to_distr
 from helpers import task_to_filename, weighted_corr, weighted_L1
@@ -21,6 +23,15 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     worst_c = []
     best_c = []
 
+    # get the best error if cached
+    file_name = f"best_err_{dataset}_{v1}_{v2}.txt"
+    if os.path.exists(os.path.join("data", "benchmark", file_name)):
+        with open(os.path.join("data", "benchmark", file_name), "r") as f:
+            best_err = float(f.read())
+        cmp_best = False
+    else:
+        cmp_best = True
+    
     for r in res:
         
         cond_wghs.append(r["total_weight"])
@@ -54,13 +65,17 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
             })
 
         # Bootstrap best error
-        best_cboot = []
-        for _ in range(100):
-            idx = np.random.choice(len(val_true), size=n_mc, p=wgh_true / wgh_true.sum(), replace=True)
-            val_bt = val_true[idx]
-            distr_bt = cat_to_distr(val_bt, None, nbins)
-            best_cboot.append(np.abs(distr_bt - distr_true).sum())
-        best_c.append(best_cboot)
+        if cmp_best:
+            best_cboot = []
+            for _ in range(100):
+                if dataset in ["edu", "fbi_arrests", "labor"]:
+                    best_cboot.append(0)
+                else:
+                    idx = np.random.choice(len(val_true), size=n_mc, p=wgh_true / wgh_true.sum(), replace=True)
+                    val_bt = val_true[idx]
+                    distr_bt = cat_to_distr(val_bt, None, nbins)
+                    best_cboot.append(np.abs(distr_bt - distr_true).sum())
+            best_c.append(best_cboot)
 
         # worst error for this conditioning set
         worst_c.append(np.abs(np.ones(nbins) / nbins - distr_true).sum())
@@ -75,9 +90,12 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     worst_err = np.sum(np.array(worst_c) * np.array(cond_wghs)) / np.sum(cond_wghs)
     score = np.sum(np.array(score_c) * np.array(cond_wghs)) / np.sum(cond_wghs)
 
-    best_cx = np.array(best_c)
-    best_cx = np.average(best_cx, axis=0, weights=np.array(cond_wghs))
-    best_err = np.quantile(best_cx, 0.975)
+    if cmp_best:
+        best_cx = np.array(best_c)
+        best_cx = np.average(best_cx, axis=0, weights=np.array(cond_wghs))
+        best_err = np.quantile(best_cx, 0.975)
+        with open(os.path.join("data", "benchmark", file_name), "w") as f:
+            f.write(str(best_err))
 
     # only scores are essentially 0 and 100!
     if worst_err < best_err :
@@ -93,22 +111,27 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
 
 def hd_best_err(res, task):
 
-    return 0
+    # return 0
     cond_vars = task["v_cond"]
     out_var = task["v_out"]
-    cond_vars_str = "_".join(task_spec["v_cond"])
-    dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
-    file_name = f"best_err_{dataset_name}_{task_spec['v_out']}_{cond_vars_str}.txt"
+    cond_vars_str = "_".join(task["v_cond"])
+    dataset_name = task['dataset'].split('/')[-1].split('.')[0]
+    file_name = f"best_err_{dataset_name}_{task['v_out']}_{cond_vars_str}.txt"
     if os.path.exists(os.path.join("data", "benchmark", file_name)):
         with open(os.path.join("data", "benchmark", file_name), "r") as f:
             best_err = float(f.read())
         return best_err
     else:
-        boot_mat = bootstrap_lgbm(res[cond_vars + [out_var] + ["weight"]], out_var, cond_vars, wgh_col="weight")
+        best_err = []
+        boot_mat = bootstrap_lgbm(res[cond_vars + [out_var] + ["weight"]], 
+                                  out_var, cond_vars, wgh_col="weight",
+                                  n_bootstraps=10)
         for i in range(boot_mat.shape[1]):
             best_err.append(weighted_L1(boot_mat[:, i], res["lgbm_pred"], res["weight"]))
         best_err = np.quantile(best_err, 0.975)
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
+            # if not isinstance(best_err, float):
+            #     breakpoint()
             f.write(str(best_err))
         return best_err
 
@@ -172,7 +195,7 @@ def build_eval_df(models, tasks):
     rows = []
     eval_map = {}
     for model in models:
-        for i, task in enumerate(tasks):
+        for i, task in enumerate(tqdm(tasks, desc="Processing Tasks")):
             try:
                 df_eval = eval_task(model, task)
                 score = eval_to_score(df_eval)
@@ -182,10 +205,12 @@ def build_eval_df(models, tasks):
                 df_eval, score = None, None
             
             eval_map[i] = df_eval
+            dataset = task["dataset"].split("/")[-1].split(".")[0]
             rows.append({
                 "model": model,
                 "task_id": i,
                 "task_name": task.get("name", i),
+                "dataset": dataset,
                 "dim": len(task["v_cond"]) if "v_cond" in task else 1,
                 "score": score,
             })
