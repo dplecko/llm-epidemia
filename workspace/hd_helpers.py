@@ -10,7 +10,7 @@ import importlib.util
 import os
 from sklearn.model_selection import StratifiedKFold
 
-def load_specs(dataset_name):
+def load_specs(dataset_name, prob=False):
     """
     Load cond_spec and out_spec for a given dataset from the corresponding Python file.
     
@@ -32,11 +32,14 @@ def load_specs(dataset_name):
     cond_spec = getattr(task_module, f"{dataset_name}_cond", {})
     out_spec = getattr(task_module, f"{dataset_name}_out", {})
     
+    if prob:
+        out_spec = getattr(task_module, f"{dataset_name}_pout", {})
+    
     return cond_spec, out_spec
 
-def promptify(out_var, cond_vars, cond_row, dataset_name):
+def promptify(out_var, cond_vars, cond_row, dataset_name, prob=False):
     # Load specs from the dataset file
-    cond_spec, out_spec = load_specs(dataset_name)
+    cond_spec, out_spec = load_specs(dataset_name, prob=prob)
     
     # Build the prompt
     prompt = "For a person"
@@ -45,6 +48,15 @@ def promptify(out_var, cond_vars, cond_row, dataset_name):
     prompt += ", " + out_spec[out_var]
     
     return prompt
+
+
+def generate_probability_levels():
+    levels = ['0%']
+    for i in range(20):
+        level = f"{i * 5}% - {(i + 1) * 5}%"
+        levels.append(level)
+    levels.append('100%')
+    return levels
 
 def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     """

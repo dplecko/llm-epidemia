@@ -9,7 +9,7 @@ from model_load import load_model, MODEL_PATHS
 from evaluator_helpers import extract_pv, compress_vals, extract_pv_batch
 from task_spec import task_specs, task_specs_hd
 from helpers import task_to_filename
-from hd_helpers import fit_lgbm, promptify
+from hd_helpers import fit_lgbm, promptify, generate_probability_levels
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
@@ -17,7 +17,7 @@ def get_ground_truth(data, task_spec):
 def load_dataset(dataset):
     return pd.read_parquet(f"data/clean/{dataset}.parquet")
         
-def evaluator(model_name, model, task_spec, check_cache=False):
+def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -48,7 +48,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     
     # Step 1: determine if query is marginal or conditional
     if "v_cond" in task_spec:
-        ttyp = "hd_old"
+        ttyp = "hd"
     elif len(task_spec["variables"]) == 1:
         ttyp = "marginal"
     elif len(task_spec["variables"]) == 2:
@@ -62,7 +62,10 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         n_mc = 128
 
     if ttyp in ["hd_old", "hd"]:
-        levels = sorted(data[task_spec["v_out"]].unique().tolist())
+        if prob:
+            levels = generate_probability_levels()
+        else:
+            levels = sorted(data[task_spec["v_out"]].unique().tolist())
     else:
         levels = data[task_spec["variables"][0]].unique().tolist()
 
@@ -157,7 +160,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         for i, cond_row in tqdm(cond_df.iterrows(), total=len(cond_df)):
             
             # get the natural language prompt for the row
-            row_prompt = promptify(out_var, cond_vars, cond_row, dataset_name)
+            row_prompt = promptify(out_var, cond_vars, cond_row, dataset_name, prob=prob)
             # model values
             model_vals, model_weights, model_texts = extract_pv(row_prompt, levels, model_name, model, task_spec)
             cond_df.at[i, "llm_pred"] = model_weights[1] # get the P(Y = 1 | X = x)
@@ -176,7 +179,7 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         cond_df["llm_pred"] = np.nan
         
         prompts = [
-            promptify(out_var, cond_vars, row, dataset_name)  # type: ignore[name‑defined]
+            promptify(out_var, cond_vars, row, dataset_name, prob=prob)  # type: ignore[name‑defined]
             for _, row in cond_df.iterrows()
         ]
         
@@ -196,7 +199,9 @@ def evaluator(model_name, model, task_spec, check_cache=False):
     
     if ttyp == "hd":
         # save the full dataset with predictions
-        data.to_parquet(os.path.join("data", "benchmark", file_name))
+        if prob:
+            file_name = "PROB_" + file_name
+        data.to_parquet(os.path.join("data", "benchmark-hd", file_name))
     else:
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
             json.dump(results, f, indent=4)
