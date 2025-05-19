@@ -4,7 +4,7 @@ import re
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load LLama3.3-70B (Instruct tuned) from local path
-model_path = "/local/eb/dp3144/llama3_70b"
+model_path = ""
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.float16, device_map="auto")
 

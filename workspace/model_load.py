@@ -5,19 +5,19 @@ import models
 
 # Model paths and instruct flags
 MODEL_PATHS = {
-    # TODO: remove local paths
     ### instruct versions
-    "llama3_8b_instruct": ("/local/eb/dp3144/llama3_8b_instruct", True),  # LLaMA 3.1 8B-Instruct
-    "llama3_70b_instruct": ("/local/eb/dp3144/llama3_70b_instruct", True),  # LLaMA 3.3 70B-Instruct
-    "mistral_7b_instruct": ("/local/eb/dp3144/mistral_7b_instruct", True),  # Instruct Mistral
-    "phi4": ("/local/eb/dp3144/phi4", True),  # Microsoft Phi-4
-    "gemma3_27b_instruct": ("/local/eb/dp3144/gemma3_27b_instruct", True),  # Gemma 27B-Instruct
-    "deepseek_7b_chat": ("/local/eb/dp3144/deepseek_7b_chat", True),  # Instruct DeepSeek
+    "llama3_8b_instruct": ("meta-llama/Meta-Llama-3-8B-Instruct", True),  # LLaMA 3.1 8B-Instruct
+    "llama3_70b_instruct": ("meta-llama/Meta-Llama-3-70B-Instruct", True),  # LLaMA 3.3 70B-Instruct
+    "mistral_7b_instruct": ("mistralai/Mistral-7B-Instruct-v0.3", True),  # Instruct Mistral
+    "phi4": ("microsoft/phi-4", True),  # Microsoft Phi-4
+    "gemma3_27b_instruct": ("google/gemma-3-27b-it", True),  # Gemma 27B-Instruct
+    "deepseek_7b_chat": ("deepseek-ai/deepseek-llm-7b-chat", True),  # Instruct DeepSeek
+    # "nemotron_8b_base": ("nvidia/Nemotron-H-8B-Base-8K", False)
     ### non-instruct versions
-    "llama3_8b": ("/local/eb/dp3144/llama3_8b", False),  # Regular LLaMA 3 8B
-    "mistral_7b": ("/local/eb/dp3144/mistral_7b", False),  # Regular Mistral
-    "deepseek_7b": ("/local/eb/dp3144/deepseek_7b", False),  # Regular DeepSeek
-    "gpt2": ("/local/eb/dp3144/gpt2", False),  # Regular GPT-2
+    # "llama3_8b": ("", False),  # Regular LLaMA 3 8B
+    # "mistral_7b": ("", False),  # Regular Mistral
+    # "deepseek_7b": ("", False),  # Regular DeepSeek
+    # "gpt2": ("", False),  # Regular GPT-2
 }
 
 OPENAI_API_MODELS = {
@@ -64,7 +64,7 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16, # keep bf16
             device_map="auto",
-            cache_dir="/capstor/scratch/cscs/pokanovi/hf_cache",
+            # cache_dir="",
             attn_implementation="eager" # key line
         )
     else:
@@ -73,7 +73,7 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
             device_map="auto",
-            cache_dir="/capstor/scratch/cscs/pokanovi/hf_cache"
+            # cache_dir=""
         )
     hf_model = models.HuggingFaceModel(model, tokenizer)
     hf_model.is_instruct = is_instruct

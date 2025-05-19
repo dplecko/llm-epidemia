@@ -9,12 +9,8 @@ Clone the repo as usual.
 
 ### 1. Data Download & Setup
 
-- Run the data pre-processing scripts, which download the data and create `.parquet` files:
-  - `r/acs-census.R` for [American Community Survey (ACS) microdata](https://www.census.gov/programs-surveys/acs/microdata/access.html) from the US Census Bureau
-  - `r/nhanes.R` for the [NHANES](https://wwwn.cdc.gov/nchs/nhanes/) dataset from CDC
-  - `r/gss.R` for the [General Social Survey (GSS)](https://gss.norc.org/us/en/gss.html) dataset from NORC
+- More details in `datasets/README.md`
 
-- Alternatively, skip the above step by downloading the parquet files directly from [this Google Drive link](https://drive.google.com/drive/folders/1oBtj89taYOmeNU81FLs6okNbdFLmenFy?usp=drive_link)
 
 - Place the `.parquet` files in the `data/clean` directory
 
@@ -96,9 +92,3 @@ Clone the repo as usual.
   cannot be distinguished from guessing the answer uniformly at random.
   - Scores between 0-100 are assigned assigned as a linear interpolation of the two extremes,
   based on the value of the distributional distance between `model_vals` and `true_vals`.
-
-- **Scoring illustration**:
-
-  ![Visualization of scoring approach.](images/model-scoring.png)
-
-

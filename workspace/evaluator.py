@@ -5,7 +5,7 @@ import json
 from tqdm import tqdm
 
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
-from model_load import load_model
+from model_load import load_model, MODEL_PATHS
 from evaluator_helpers import extract_pv, compress_vals, extract_pv_batch
 from task_spec import task_specs, task_specs_hd
 from helpers import task_to_filename
@@ -143,10 +143,6 @@ def evaluator(model_name, model, task_spec, check_cache=False):
                 "model_texts": model_texts
             })
     elif ttyp == "hd_old":
-        # TODO create a single promopt:
-        # task_spec["prompt"] = generate_promt()  # use the nsduh_con and nsduh_out
-        # multi variable conditioning
-        # assume varibles are ordered according to the generated prompt
 
         cond_vars = task_spec["v_cond"]
         out_var = task_spec["v_out"]
@@ -205,50 +201,14 @@ def evaluator(model_name, model, task_spec, check_cache=False):
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
             json.dump(results, f, indent=4)
 
-# if __name__ == "__main__":
-#     d2d = False
 
-#     if d2d:
-#         task_sel = range(2)
-#         models = ["data/clean/nhanes.parquet", "data/clean/gss.parquet"]
-#     else:
-#         task_sel = [0] # range(1) # range(len(task_specs))
-#         models = ["llama3_8b_instruct"]
-
-#     for model_name in models:
-#         model = load_model(model_name)
-#         for i in task_sel:
-#             evaluator(model_name, model, task_specs[i], check_cache=True)
-
-models = ["gemma3_27b_instruct"]
-# models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", "gemma3_27b_instruct"]
+models = MODEL_PATHS.keys()
 for model_name in models:
     print("\nEntering model: ", model_name, "\n")
     model = load_model(model_name)
     for i in tqdm(range(len(task_specs))):
         evaluator(model_name, model, task_specs[i], check_cache=True)
+        
+    for i in tqdm(range(len(task_specs_hd))):
+        evaluator(model_name, model, task_specs_hd[i], check_cache=True)
 
-# model_name = "gemma3_27b_instruct"
-# model = load_model(model_name)
-# for i in range(len(task_specs)):
-#     evaluator(model_name, model, task_specs[i], check_cache=False)
-# model_name = "llama3_8b_instruct"
-# model = load_model(model_name)
-
-# import time
-# start = time.time()
-# evaluator(model_name, model, task_specs_hd[10], check_cache=False)
-
-# end = time.time()
-# print(f"Elapsed time: {end - start:.2f} seconds")
-
-# for i in range(len(task_specs_hd)):
-#     evaluator(model_name, model, task_specs_hd[i], check_cache=False)
-
-# 
-df1 = pd.read_parquet('data/benchmark/mistral_7b_instruct_brfss_diabetes_age_group_education_race_income.parquet')
-df2 = pd.read_parquet('data/benchmark-hdold/mistral_7b_instruct_brfss_diabetes_age_group_education_race_income.parquet')
-df3 = pd.read_parquet('data/benchmark-hdold/mistral2_7b_instruct_brfss_diabetes_age_group_education_race_income.parquet')
-
-
-df3["llm_pred"].corr(df2["llm_pred"])

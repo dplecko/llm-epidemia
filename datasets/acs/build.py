@@ -20,7 +20,10 @@ vars = [
     "NPF", "NOC", "ENG", "SCHL", "PERNP", "WAGP", "WKHP",
     "ESR", "COW", "OCCP", "INDP", "POWSP"
 ]
-key = "1ddb0b9f7331dd07bcf3fc8b492d66c69d751cc4"
+key = ""
+
+if len(key) == 0:
+    raise ValueError("Please set your Census API key in the `key` variable.")
 
 params = {
     "get": ",".join(vars),
