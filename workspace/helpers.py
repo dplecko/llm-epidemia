@@ -3,6 +3,11 @@ import pandas as pd
 import numpy as np
 from itertools import combinations
 import random
+import pdbpp
+
+def add(x):
+    x = x+5
+    return x
 
 model_name_map = {
     "llama3_8b_instruct": "LLama3 8B",
@@ -13,7 +18,50 @@ model_name_map = {
     "gemma3_27b_instruct": "Gemma3 27B",
 }
 
+dts_map = {
+    "nhanes": "NHANES",
+    "gss": "GSS",
+    "brfss": "BRFSS",
+    "nsduh": "NSDUH",
+    "acs": "ACS",
+    "edu": "IPEDS",
+    "fbi_arrests": "FBI Arrests",
+    "labor": "BLS",
+    "meps": "MEPS",
+    "scf": "SCF",
+}
+
+var_map = {
+    # Outcomes
+    "diabetes": "Diabetes",
+    "high_bp": "High Blood Pressure",
+    "depression": "Depression",
+    "insured": "Health Insurance",
+    "cig_monthly": "Cigarette Use (Last 30d)",
+    "mj_ever": "Marijuana Use",
+    "coc_ever": "Cocaine Use",
+    # Conditions
+    "house_own": "Home Ownership",
+    "age_group": "Age",
+    "age": "Age",
+    "education": "Education",
+    "education_years": "Education",
+    "edu": "Education",
+    "race": "Race",
+    "sex": "Sex",
+    "income": "Income"
+}
+
 model_display_map = {v: k for k, v in model_name_map.items()}
+
+def hd_taskname(task):
+    dataset = task['dataset'].split('/')[-1].split('.')[0]
+    dataset = dts_map.get(dataset, dataset)
+    out = var_map.get(task['v_out'], task['v_out'])
+    cond = pd.Series(task['v_cond']).map(var_map).tolist()
+    # pdbpp.set_trace()
+    cond = ", ".join(cond)
+    return dataset + ": " + out + " by " + cond
 
 def hd_taskgen(out_spec, cond_spec, d_min=2, d_max=5, max_per_dim=100):
     random.seed(42)

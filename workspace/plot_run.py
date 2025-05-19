@@ -3,7 +3,7 @@ import pandas as pd
 import sys, os
 import numpy as np
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
-from helpers import model_name
+from helpers import model_name, dts_map
 from bench_eval import eval_task, eval_to_score, hd_corr_plot, hd_corr_df, build_eval_df
 from task_spec import task_specs, task_specs_hd
 from plotnine import *
@@ -18,14 +18,10 @@ model_colors = {
 }
 
 def name_and_sort(df):
-    # df = eval_hd.groupby("model").agg(
-    #     score=("score", "mean")
-    # ).reset_index()
     df["Model"] = df["model"].apply(model_name)
     df = df.sort_values("score", ascending=False)
     df["Model"] = pd.Categorical(df["Model"], categories=df["Model"], ordered=True)
     return df
-
 
 # low-dimensional leaderboard
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
@@ -53,18 +49,6 @@ plt_low.save("data/plots/ld_leaderboard.png", dpi=300, width=8, height=6)
 df_bydata = eval_df.groupby(["model", "dataset"]).agg(
     score=("score", "mean")
 ).reset_index()
-dts_map = {
-    "nhanes": "NHANES",
-    "gss": "GSS",
-    "brfss": "BRFSS",
-    "nsduh": "NSDUH",
-    "acs": "ACS",
-    "edu": "IPEDS",
-    "fbi_arrests": "FBI Arrests",
-    "labor": "BLS",
-    "meps": "MEPS",
-    "scf": "SCF",
-}
 df_bydata["dataset"] = df_bydata["dataset"].map(dts_map)
 # Calculate mean score per dataset
 dataset_order = (df_bydata.groupby("dataset")["score"].mean()
@@ -156,3 +140,12 @@ plt_lcomb = (ggplot(df_cmb, aes(x="Model", y="score", fill="Setting")) +
              legend_margin=5))
 
 plt_lcomb.save("data/plots/combined_leaderboard.png", dpi=300, width=5.5, height=3.3)
+
+
+# evaluation for the probability case
+import os, sys
+import pandas as pd
+
+os.listdir("data/benchmark")
+
+df = pd.read_parquet("data/benchmark/PROB_llama3_8b_instruct_meps_insured_age_education_years_sex.parquet")
