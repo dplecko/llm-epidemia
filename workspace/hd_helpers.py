@@ -50,13 +50,24 @@ def promptify(out_var, cond_vars, cond_row, dataset_name, prob=False):
     return prompt
 
 
-def generate_probability_levels():
+def gen_prob_lvls():
     levels = ['0%']
     for i in range(20):
         level = f"{i * 5}% - {(i + 1) * 5}%"
         levels.append(level)
     levels.append('100%')
     return levels
+
+def prob_to_float(ans):
+    if '-' in ans:
+        a, b = map(int, ans.replace('%', '').split(' - '))
+        return (a + b) / 200
+    return int(ans.replace('%', '')) / 100
+
+def decode_prob_lvl(vals, probs):
+    idx = probs.index(max(probs))
+    return prob_to_float(vals[idx])
+
 
 def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     """

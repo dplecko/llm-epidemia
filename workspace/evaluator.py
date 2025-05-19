@@ -9,7 +9,7 @@ from model_load import load_model, MODEL_PATHS
 from evaluator_helpers import extract_pv, compress_vals, extract_pv_batch
 from task_spec import task_specs, task_specs_hd
 from helpers import task_to_filename
-from hd_helpers import fit_lgbm, promptify, generate_probability_levels
+from hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
@@ -63,7 +63,7 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
 
     if ttyp in ["hd_old", "hd"]:
         if prob:
-            levels = generate_probability_levels()
+            levels = gen_prob_lvls()
         else:
             levels = sorted(data[task_spec["v_out"]].unique().tolist())
     else:
@@ -190,8 +190,12 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
             model=model,
             task_spec=task_spec,
         )
-        llm_probabilities = [x[1] for x in model_weights]
-        cond_df['llm_pred'] = llm_probabilities  # get the P(Y = 1 | X = x)
+        if prob:
+            llm_probs = [decode_prob_lvl(vals, probs) for vals, probs in zip(model_vals, model_weights)]
+        else:
+            llm_probs = [x[1] for x in model_weights]
+        
+        cond_df['llm_pred'] = llm_probs  # get the P(Y = 1 | X = x)
         data = data.merge(cond_df, on=cond_vars, how="left")
 
     # save to disk
