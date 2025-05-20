@@ -179,9 +179,10 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
             model_name=model_name,
             model=model,
             task_spec=task_spec,
+            prob=prob,
         )
         if prob:
-            llm_probs = [decode_prob_lvl(vals, probs) for vals, probs in zip(model_vals, model_weights)]
+            llm_probs = [decode_prob_lvl(model_vals, probs) for probs in model_weights]
         else:
             llm_probs = [x[1] for x in model_weights]
         
@@ -201,13 +202,14 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
             json.dump(results, f, indent=4)
 
 
-models = MODEL_PATHS.keys()
+# models = MODEL_PATHS.keys()
+models = ['llama3_8b_instruct']
 for model_name in models:
     print("\nEntering model: ", model_name, "\n")
     model = load_model(model_name)
-    for i in tqdm(range(len(task_specs))):
-        evaluator(model_name, model, task_specs[i], check_cache=True)
+    # for i in tqdm(range(len(task_specs))):
+    #     evaluator(model_name, model, task_specs[i], check_cache=True)
         
     for i in tqdm(range(len(task_specs_hd))):
-        evaluator(model_name, model, task_specs_hd[i], check_cache=True)
+        evaluator(model_name, model, task_specs_hd[i], check_cache=True, prob=True)
 

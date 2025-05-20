@@ -204,17 +204,19 @@ class HuggingFaceModel(AbstractModel):
         return levels, [sum(vals) / len(vals) for vals in average_probs.values()], None
     
     
-    def predict_batch(self, prompts, levels, num_permutations, max_batch_size):
+    def predict_batch(self, prompts, levels, num_permutations, max_batch_size, prob):
         average_probs = [defaultdict(list) for _ in prompts]
         n_fact        = math.factorial(len(levels))
         self.tokenizer.pad_token = self.tokenizer.eos_token
         # because of batch padding
         self.tokenizer.padding_side = "left" 
-        if n_fact > num_permutations:           # sample `num_permutations` times
-            permutation_iter = (None for _ in range(num_permutations))
-        else:                                   # exhaustively iterate all permutations
-            permutation_iter = itertools.permutations(levels)
-            
+        if not prob:
+            if n_fact > num_permutations:           # sample `num_permutations` times
+                permutation_iter = (None for _ in range(num_permutations))
+            else:                                   # exhaustively iterate all permutations
+                permutation_iter = itertools.permutations(levels)
+        else:
+            permutation_iter = [levels]
         for perm in permutation_iter:
             processed_prompts, answer_maps = [], []
             for pr in prompts:
