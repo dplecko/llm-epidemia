@@ -1,11 +1,7 @@
 
-import sys, os
-sys.path.append(os.path.join(os.getcwd(), "workspace"))
-import pandas as pd
-from task_spec import task_specs, task_specs_hd
-from helpers import hd_taskname
-# low-dimensional
+from workspace.common import *
 
+# low-dimensional
 res = []
 for i in range(len(task_specs)):
     res.append({

@@ -11,11 +11,16 @@ def add(x):
 
 model_name_map = {
     "llama3_8b_instruct": "LLama3 8B",
+    "llama3_8b": "LLama3 8B",
     "llama3_70b_instruct": "LLama3 70B",
+    "llama3_70b": "LLama3 70B",
     "mistral_7b_instruct": "Mistral 7B",
+    "mistral_7b": "Mistral 7B",
     "deepseek_7b_chat": "DeepSeek 7B",
+    "deepseek_7b": "DeepSeek 7B",
     "phi4": "Phi4",
     "gemma3_27b_instruct": "Gemma3 27B",
+    "gemma3_27b": "Gemma3 27B",
 }
 
 dts_map = {

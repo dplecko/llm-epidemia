@@ -141,11 +141,22 @@ plt_lcomb = (ggplot(df_cmb, aes(x="Model", y="score", fill="Setting")) +
 
 plt_lcomb.save("data/plots/combined_leaderboard.png", dpi=300, width=5.5, height=3.3)
 
-
-# evaluation for the probability case
-import os, sys
-import pandas as pd
-
-os.listdir("data/benchmark")
-
-df = pd.read_parquet("data/benchmark/PROB_llama3_8b_instruct_meps_insured_age_education_years_sex.parquet")
+# likelihood plots
+eval_prob, eval_probmap = build_eval_df(models, task_specs_hd, prob = True)
+df_prob = eval_prob.groupby(["model"]).agg(
+    score=("score", "mean"),
+    # sd_cor=("correlation", "std")
+).reset_index()
+df_prob = name_and_sort(df_prob)
+plt_prob = (ggplot(df_prob, aes(x="Model", y="score", fill="Model")) +
+       geom_col(color = "black") +
+       labs(title="High-Dimensional Setting Leaderboard", x="Model", y="Average Score") +
+       theme_bw() + coord_cartesian(ylim=(0, 100)) +
+       geom_text(aes(label=round(df_prob["score"]).astype(int)), va="bottom", color="darkred", size=12, fontweight="bold") +
+       geom_hline(yintercept = 100, color = "darkgreen", linetype = "dashed") +
+       annotate("text", x=1.5, y=95, label="Perfect Score", color="darkgreen", fontweight="bold") +
+       theme(panel_background=element_rect(fill="white"), plot_background=element_rect(fill="white"),
+             legend_position="none", 
+             axis_title_x=element_text(margin={"t": 40, "r": 0, "b": 0, "l": 0}),
+             axis_text_x=element_text(margin={"t": 0, "r": 0, "b": 50, "l": 0})) +
+       scale_fill_manual(values=model_colors))

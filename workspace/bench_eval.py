@@ -171,12 +171,14 @@ def dat_name_clean(path):
     base = path.split("/")[-1]
     return re.sub(r"\.parquet$", "", base)
 
-def eval_task(model_name, task):
+def eval_task(model_name, task, prob):
 
     mode = "logits"
     dataset = dat_name_clean(task["dataset"])
 
     fname = task_to_filename(model_name, task)
+    if prob:
+        fname = "PROB_" + fname
     path = os.path.join("data", "benchmark", fname)
 
     if "json" in path:
@@ -191,13 +193,13 @@ def eval_task(model_name, task):
         res = pd.read_parquet(path)
         return eval_hd(res, task)
 
-def build_eval_df(models, tasks):
+def build_eval_df(models, tasks, prob = False):
     rows = []
     eval_map = {}
     for model in models:
         for i, task in enumerate(tqdm(tasks, desc="Processing Tasks")):
             try:
-                df_eval = eval_task(model, task)
+                df_eval = eval_task(model, task, prob = prob)
                 score = eval_to_score(df_eval)
             except Exception as e:
                 print(f"[ERROR] model={model}, task={task.get('name', i)}")
@@ -213,6 +215,7 @@ def build_eval_df(models, tasks):
                 "dataset": dataset,
                 "dim": len(task["v_cond"]) if "v_cond" in task else 1,
                 "score": score,
+                "prob": prob,
             })
 
     return pd.DataFrame(rows), eval_map
