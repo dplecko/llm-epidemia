@@ -64,7 +64,7 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16, # keep bf16
             device_map="auto",
-            # cache_dir="",
+            cache_dir="",
             attn_implementation="eager" # key line
         )
     else:
@@ -73,7 +73,7 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
             device_map="auto",
-            # cache_dir=""
+            cache_dir="/capstor/scratch/cscs/pokanovi/hf_cache"
         )
     hf_model = models.HuggingFaceModel(model, tokenizer)
     hf_model.is_instruct = is_instruct

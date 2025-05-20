@@ -163,7 +163,14 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
             row_prompt = promptify(out_var, cond_vars, cond_row, dataset_name, prob=prob)
             # model values
             model_vals, model_weights, model_texts = extract_pv(row_prompt, levels, model_name, model, task_spec)
-            cond_df.at[i, "llm_pred"] = model_weights[1] # get the P(Y = 1 | X = x)
+            # cond_df.at[i, "llm_pred"] = model_weights[1] # get the P(Y = 1 | X = x)
+            
+            if prob:
+                llm_probs = decode_prob_lvl(model_vals, model_weights)
+            else:
+                llm_probs = [x[1] for x in model_weights]
+                
+            cond_df.at[i, 'llm_pred'] = llm_probs  # get the P(Y = 1 | X = x)
 
         data = data.merge(cond_df, on=cond_vars, how="left")
     elif ttyp == "hd":
@@ -202,7 +209,7 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
     # save to disk
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     
-    if ttyp == "hd":
+    if ttyp == "hd" or ttyp == "hd_old":
         # save the full dataset with predictions
         if prob:
             file_name = "PROB_" + file_name

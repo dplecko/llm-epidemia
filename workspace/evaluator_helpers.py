@@ -66,7 +66,7 @@ def txt_to_num(text):
 
 
 ### Generalized extraction function ###
-def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
+def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128, prob=False):
     """
     Unified interface for extracting predicted values using sampling or logits.
 
@@ -86,7 +86,7 @@ def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
     else:
         max_batch_size = 128
    
-    return model.predict(prompt, levels, n_mc, max_batch_size,)
+    return model.predict(prompt, levels, n_mc, max_batch_size, prob)
 
 
 def extract_pv_batch(prompts, levels, model_name, model, task_spec, n_mc=128, prob=False):
