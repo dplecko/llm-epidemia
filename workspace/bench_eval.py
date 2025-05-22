@@ -6,7 +6,7 @@ from tqdm import tqdm
 import re
 import sys
 import os
-import json
+import json, pdbpp
 import traceback
 sys.path.append(os.path.abspath("workspace"))
 from metrics import ks_w, cat_to_distr
@@ -176,7 +176,11 @@ def eval_task(model_name, task, prob):
     mode = "logits"
     dataset = dat_name_clean(task["dataset"])
 
-    fname = task_to_filename(model_name, task)
+    if model_name == "model_mean":
+        fname = task_to_filename("llama3_8b_instruct", task)
+    else:
+        fname = task_to_filename(model_name, task)
+    
     if prob:
         fname = "PROB_" + fname
     path = os.path.join("data", "benchmark", fname)
@@ -191,6 +195,8 @@ def eval_task(model_name, task, prob):
         return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
     elif "parquet" in path:
         res = pd.read_parquet(path)
+        if model_name == "model_mean":
+            res["llm_pred"] = (res[task["v_out"]].isin(["Yes", "yes"])).mean()
         return eval_hd(res, task)
 
 def build_eval_df(models, tasks, prob = False):

@@ -8,21 +8,6 @@ from bench_eval import eval_task, eval_to_score, hd_corr_plot, hd_corr_df, build
 from task_spec import task_specs, task_specs_hd
 from plotnine import *
 
-model_colors = {
-    "LLama3 8B": "#1f77b4",
-    "LLama3 70B": "#ff7f0e",
-    "Mistral 7B": "#2ca02c",
-    "DeepSeek 7B": "#17becf",
-    "Phi4": "#d62728",
-    "Gemma3 27B": "#9467bd",
-}
-
-def name_and_sort(df):
-    df["Model"] = df["model"].apply(model_name)
-    df = df.sort_values("score", ascending=False)
-    df["Model"] = pd.Categorical(df["Model"], categories=df["Model"], ordered=True)
-    return df
-
 # low-dimensional leaderboard
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
           "gemma3_27b_instruct", "deepseek_7b_chat"]
@@ -142,21 +127,149 @@ plt_lcomb = (ggplot(df_cmb, aes(x="Model", y="score", fill="Setting")) +
 plt_lcomb.save("data/plots/combined_leaderboard.png", dpi=300, width=5.5, height=3.3)
 
 # likelihood plots
+models = ["llama3_70b_instruct", "llama3_8b_instruct", "mistral_7b_instruct", "phi4",
+          "gemma3_27b_instruct", "deepseek_7b_chat", "deepseekR1_32b"]
 eval_prob, eval_probmap = build_eval_df(models, task_specs_hd, prob = True)
 df_prob = eval_prob.groupby(["model"]).agg(
     score=("score", "mean"),
     # sd_cor=("correlation", "std")
 ).reset_index()
 df_prob = name_and_sort(df_prob)
+
+# model mean baseline
+mm, _ = build_eval_df(["model_mean"], task_specs_hd)
+
 plt_prob = (ggplot(df_prob, aes(x="Model", y="score", fill="Model")) +
        geom_col(color = "black") +
-       labs(title="High-Dimensional Setting Leaderboard", x="Model", y="Average Score") +
+       labs(x="Model", y="Average Score") +
        theme_bw() + coord_cartesian(ylim=(0, 100)) +
        geom_text(aes(label=round(df_prob["score"]).astype(int)), va="bottom", color="darkred", size=12, fontweight="bold") +
        geom_hline(yintercept = 100, color = "darkgreen", linetype = "dashed") +
+       geom_hline(yintercept = mm["score"].mean(), color = "orange", linetype = "dashed") +
+       annotate("text", x=5.5, y=mm["score"].mean()+3, label="Mean-Baseline Score", color="orange", fontweight="bold") +
        annotate("text", x=1.5, y=95, label="Perfect Score", color="darkgreen", fontweight="bold") +
        theme(panel_background=element_rect(fill="white"), plot_background=element_rect(fill="white"),
-             legend_position="none", 
-             axis_title_x=element_text(margin={"t": 40, "r": 0, "b": 0, "l": 0}),
-             axis_text_x=element_text(margin={"t": 0, "r": 0, "b": 50, "l": 0})) +
+             legend_position="none", axis_text_x=element_text(rotation=10)) +
        scale_fill_manual(values=model_colors))
+
+plt_prob.save("data/plots/PROB_leaderboard.png", dpi=300, width=6.6, height=3.3)
+
+# response distribution for models
+# fls = os.listdir("data/benchmark")
+# res = pd.DataFrame()
+# for f in tqdm(fls):
+#     if "PROB" in f:
+#         df = pd.read_parquet("data/benchmark/" + f)
+#         df = df[["llm_pred"]]
+#         df["model"] = "_".join(f.split("_")[1:4])
+#         df["dataset"] = f.split("_")[4]
+#         df["task"] = f
+#         res = pd.concat([res, df])
+#         # print("\n", f, "\n")
+#         # print(df["llm_pred"].value_counts())
+
+# plt_distr = (ggplot(res, aes(x='llm_pred')) + geom_histogram(bins=22) +
+#     theme_bw() + facet_wrap(["model"]))
+
+# plt_distr.save("data/plots/prob_distr.png", dpi=300, width=5.5, height=3.3)
+
+# GPT likelihood analysis
+fls = [s for s in os.listdir("data/benchmark") if re.search("PROB_gpt", s)]
+
+gpt_t = [x.replace("PROB_gpt-4.1", "") for x in fls]
+all_t = [task_to_filename("", task_specs_hd[i]) for i in range(len(task_specs_hd))]
+
+df = pd.DataFrame(all_t, columns = ["tasks"])
+df["has_gpt"] = False
+df["size"] = np.nan
+df["dataset"] = ""
+for i in tqdm(range(len(df))):
+    df.loc[i, "has_gpt"] = df.loc[i, "tasks"] in gpt_t
+    df.loc[i, "size"] = hd_tasksize(task_specs_hd[i])[0]
+    df.loc[i, "dataset"] = task_specs_hd[i]["dataset"]
+
+ggplot(df, aes(x = "tasks", y = "size", fill = "has_gpt")) + geom_col()
+
+np.quantile(df["size"], q = [0.5, 0.75, 0.9])
+
+prop = np.cumsum(sorted(df["size"].values)) / sum(df["size"])
+
+df[df["has_gpt"] == True]["size"].sum()
+
+df["inc"] = df["size"] <= 250
+(df["inc"] == True).sum()
+df[df["inc"] == True]["dataset"].value_counts()
+df[df["inc"] == True]["size"].sum()
+
+all_pred = pd.DataFrame()
+for f in tqdm(fls):
+    preds = pd.read_parquet("data/benchmark/" + f)
+    preds = preds[["llm_pred"]]
+    all_pred = pd.concat([all_pred, preds])
+
+
+# plt_distr = (ggplot(all_pred, aes(x='llm_pred')) + geom_histogram(bins=22, fill="red",color="black") +
+#     theme_bw())
+
+# plt_distr
+
+# evaluate GPT 4.1 on select indices
+idx = [0,  1,  2,  3,  4,  6,  7, 13, 14, 15, 16, 17, 18, 19, 20, 26, 27, 28, 29, 31, 32, 33, 39, 40, 42,
+  44, 45, 50, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 68, 69, 70, 72, 73, 74, 75, 76,
+  77, 78, 80, 81, 83, 84, 85, 86, 87, 88, 89, 90, 91]
+
+task_sel = [task_specs_hd[i] for i in range(len(task_specs_hd)) if i in idx]
+eval_gpt, eval_gptmap = build_eval_df(models + ["gpt-4.1", "o4-mini"], task_sel, prob = True)
+
+df_gpt = eval_gpt.groupby(["model"]).agg(
+    score=("score", "mean"),
+    # sd_cor=("correlation", "std")
+).reset_index()
+df_gpt = name_and_sort(df_gpt)
+
+# model mean baseline
+mm, _ = build_eval_df(["model_mean"], task_sel)
+
+plt_gpt = (ggplot(df_gpt, aes(x="Model", y="score", fill="Model")) +
+       geom_point(size=0, color="white") +
+       scale_fill_manual(values=model_colors) +
+       annotate("rect", xmin=2.5, xmax=9.5, ymin=-2, ymax=42, alpha=0.2, fill="lightgray", color="gray") +
+       annotate("text", x=8, y=44, label="Open-weights Models") +
+       geom_col(color = "black") +
+       labs(x="Model", y="Average Score") +
+       theme_bw() + coord_cartesian(ylim=(0, 100)) +
+       geom_hline(yintercept = mm["score"].mean(), color = "orange", linetype = "dashed") +
+       geom_text(aes(label=round(df_gpt["score"]).astype(int)), va="bottom", color="darkred", size=12, fontweight="bold") +
+       geom_hline(yintercept = 100, color = "darkgreen", linetype = "dashed") +
+       annotate("text", x=5.5, y=mm["score"].mean()+3, label="Mean-Baseline Score", color="orange", fontweight="bold") +
+       annotate("text", x=1.5, y=95, label="Perfect Score", color="darkgreen", fontweight="bold") +
+       theme(panel_background=element_rect(fill="white"), plot_background=element_rect(fill="white"),
+             legend_position="none", axis_text_x=element_text(rotation=15)))
+
+plt_gpt
+
+plt_gpt.save("data/plots/PROB_GPT.png", dpi=500, width=7.7, height=4)
+
+print(eval_gpt[eval_gpt["model"] == "gpt-4.1"])
+
+# poor performance tasks
+zscore_idx = eval_gpt[(eval_gpt["model"] == "gpt-4.1") & (eval_gpt["score"] == 0.0)]["task_id"].tolist()
+rag_sel = np.array(gpt_idx)[zscore_idx]
+rag_sel_fin = df.loc[rag_sel][df.loc[rag_sel, "size"] <= 150].index
+
+
+# heatmap
+models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
+          "gemma3_27b_instruct", "deepseek_7b_chat"]
+eval_heat, _ = build_eval_df(models, task_specs_hd)
+ordr = eval_heat.groupby(["model"]).agg(score=("score", "mean"))["score"]
+eval_heat["model"] = pd.Categorical(eval_heat["model"], categories=ordr.sort_values(ascending=True).index.values, ordered=True)
+
+hmap = (ggplot(eval_heat, aes(y = "model", x = "task_id", fill="score")) + 
+    geom_tile() + 
+    theme_bw() +
+    geom_text(aes(label="round(score)")) +
+    theme(axis_text_y=element_text(rotation = 15)) +
+    scale_fill_cmap(cmap_name="viridis"))
+
+hmap.save("data/plots/heatmap.png", dpi=500, width=25, height=5)

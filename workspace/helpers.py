@@ -3,11 +3,8 @@ import pandas as pd
 import numpy as np
 from itertools import combinations
 import random
+import subprocess
 import pdbpp
-
-def add(x):
-    x = x+5
-    return x
 
 model_name_map = {
     "llama3_8b_instruct": "LLama3 8B",
@@ -21,6 +18,21 @@ model_name_map = {
     "phi4": "Phi4",
     "gemma3_27b_instruct": "Gemma3 27B",
     "gemma3_27b": "Gemma3 27B",
+    "deepseekR1_32b": "DeepSeek R1 (Qwen 32B)",
+    "gpt-4.1": "GPT 4.1",
+    "o4-mini": "o4 mini"
+}
+
+model_colors = {
+    "LLama3 8B": "#1f77b4",
+    "LLama3 70B": "#ff7f0e",
+    "Mistral 7B": "#2ca02c",
+    "DeepSeek 7B": "#17becf",
+    "Phi4": "#d62728",
+    "Gemma3 27B": "#9467bd",
+    "DeepSeek R1 (Qwen 32B)": "#8c564b",
+    "GPT 4.1": "#e377c2",
+    "o4 mini": "#7f7f7f"
 }
 
 dts_map = {
@@ -119,6 +131,8 @@ def weighted_corr(x, y, w):
     return cov / np.sqrt(vx * vy)
 
 def weighted_L1(x, y, w):
+    if np.any(np.isnan(x)) or np.any(np.isnan(y)) or np.any(np.isnan(w)):
+        return np.nan
     return np.sum(np.abs(x - y) * w) / np.sum(w)
 
 def model_name(mod):
@@ -156,3 +170,18 @@ def hd_tasksize(task_spec):
     df_sub = df_sub.drop_duplicates()
     return len(df_sub), len(cond_vars)
 
+def sync_bench():
+    cmd = [
+        "rsync", "-avz", "--update", "--progress",
+        "-e", "ssh",
+        "eb0:~/llm-epidemia/data/benchmark/",
+        "~/trust/llm-epidemia/data/benchmark/"
+    ]
+    subprocess.run(" ".join(cmd), shell=True)
+
+# plotting helpers
+def name_and_sort(df):
+    df["Model"] = df["model"].apply(model_name)
+    df = df.sort_values("score", ascending=False)
+    df["Model"] = pd.Categorical(df["Model"], categories=df["Model"], ordered=True)
+    return df
