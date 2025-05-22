@@ -6,7 +6,7 @@ source("r/eval.R")
 source("r/eval-helpers.R")
 source("r/helpers.R")
 source("r/zzz-deps.R")
-source_python("workspace/task_spec.py")
+source_python("workspace/task_spec_old.py")
 sync_bench() # download the data from the server
 
 # Load fonts and setup theme
