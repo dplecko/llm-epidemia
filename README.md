@@ -46,7 +46,7 @@ pip install -r requirements.txt
 - **Run the model evaluator**:
   - Use `workspace/extract.py` and the `task_extract()` function
   ```python
-  python workspace/evaluator.py
+  python workspace/extract.py
   ```
 
 
