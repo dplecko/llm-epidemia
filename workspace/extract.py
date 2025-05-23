@@ -3,11 +3,8 @@ from workspace.common import *
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
-
-def load_dataset(dataset):
-    return pd.read_parquet(f"data/clean/{dataset}.parquet")
         
-def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
+def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -202,14 +199,10 @@ def evaluator(model_name, model, task_spec, check_cache=False, prob=False):
             json.dump(results, f, indent=4)
 
 
-# models = MODEL_PATHS.keys()
-models = ['llama3_8b_instruct']
+models = MODEL_PATHS.keys()
 for model_name in models:
     print("\nEntering model: ", model_name, "\n")
     model = load_model(model_name)
-    # for i in tqdm(range(len(task_specs))):
-    #     evaluator(model_name, model, task_specs[i], check_cache=True)
-        
     for i in tqdm(range(len(task_specs_hd))):
-        evaluator(model_name, model, task_specs_hd[i], check_cache=True, prob=True)
+        task_extract(model_name, model, task_specs_hd[i], check_cache=True, prob=False)
 

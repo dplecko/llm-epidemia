@@ -1,12 +1,6 @@
 
 import re
-import torch
-import pdb
 from collections import defaultdict
-import pandas as pd
-import numpy as np
-
-
 
 def max_lvl_len(levels, tokenizer):
     """
@@ -20,7 +14,6 @@ def max_lvl_len(levels, tokenizer):
         int: Maximum number of tokens for any single word across all levels.
     """
     return max(max(len(tokenizer.tokenize(word)) for word in lvl) for lvl in levels)
-
 
 def txt_to_lvl(text, levels):
     """
@@ -50,7 +43,6 @@ def txt_to_lvl(text, levels):
     else:
         return None  # No match found
 
-
 def txt_to_num(text):
     """
     Extract the first numeric value from text.
@@ -64,8 +56,27 @@ def txt_to_num(text):
     matches = re.findall(r'-?\d+(?:\.\d+)?', text)
     return float(matches[0]) if matches else None
 
+def d2d_wgh_col(dataset):
 
-### Generalized extraction function ###
+    if "nhanes" in dataset:
+        mc_wgh_col = "mec_wgh"
+    elif "census" in dataset:
+        mc_wgh_col = "weight"
+    elif "gss" in dataset:
+        mc_wgh_col = "wgh"
+    else:
+        mc_wgh_col = None
+
+    return mc_wgh_col
+
+def compress_vals(true_vals, wghs):
+    agg = defaultdict(float)
+    for v, w in zip(true_vals, wghs):
+        agg[v] += w
+    items = agg.items()
+    vals, weights = zip(*items)
+    return list(vals), list(weights)
+
 def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
     """
     Unified interface for extracting predicted values using sampling or logits.
@@ -88,7 +99,6 @@ def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
    
     return model.predict(prompt, levels, n_mc, max_batch_size,)
 
-
 def extract_pv_batch(prompts, levels, model_name, model, task_spec, n_mc=128, prob=False):
     max_batch = 32 if model_name == "llama3_70b_instruct" else 128
     return model.predict_batch(  # type: ignore[attr‑defined]
@@ -98,25 +108,3 @@ def extract_pv_batch(prompts, levels, model_name, model, task_spec, n_mc=128, pr
         max_batch_size=max_batch,
         prob=prob
     )
-
-
-def d2d_wgh_col(dataset):
-
-    if "nhanes" in dataset:
-        mc_wgh_col = "mec_wgh"
-    elif "census" in dataset:
-        mc_wgh_col = "weight"
-    elif "gss" in dataset:
-        mc_wgh_col = "wgh"
-    else:
-        mc_wgh_col = None
-
-    return mc_wgh_col
-
-def compress_vals(true_vals, wghs):
-    agg = defaultdict(float)
-    for v, w in zip(true_vals, wghs):
-        agg[v] += w
-    items = agg.items()
-    vals, weights = zip(*items)
-    return list(vals), list(weights)

@@ -1,6 +1,7 @@
 
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
+sys.path.append(os.path.join(os.getcwd(), "workspace/utils"))
 import pandas as pd
 import numpy as np
 import re, json
@@ -9,7 +10,7 @@ from tqdm import tqdm
 import pdbpp
 
 # our own code
-from bench_eval import build_eval_df
+from eval import build_eval_df
 from task_spec import task_specs, task_specs_hd
 from helpers import model_name, dts_map, task_to_filename, hd_tasksize, hd_taskname, name_and_sort, model_colors
 from hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl

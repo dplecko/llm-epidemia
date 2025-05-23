@@ -1,10 +1,7 @@
 
 import pandas as pd
-import numpy as np
-from itertools import combinations
-import random
 import subprocess
-import pdbpp
+import re
 
 model_name_map = {
     "llama3_8b_instruct": "LLama3 8B",
@@ -71,34 +68,6 @@ var_map = {
 
 model_display_map = {v: k for k, v in model_name_map.items()}
 
-def hd_taskname(task):
-    dataset = task['dataset'].split('/')[-1].split('.')[0]
-    dataset = dts_map.get(dataset, dataset)
-    out = var_map.get(task['v_out'], task['v_out'])
-    cond = pd.Series(task['v_cond']).map(var_map).tolist()
-    # pdbpp.set_trace()
-    cond = ", ".join(cond)
-    return dataset + ": " + out + " by " + cond
-
-def hd_taskgen(out_spec, cond_spec, d_min=2, d_max=5, max_per_dim=100):
-    random.seed(42)
-    tasks_hd = []
-    for v_out in out_spec.keys():
-        for r in range(d_min, min(d_max, len(cond_spec)) + 1):
-            cnt = 0
-            all_combinations = list(combinations(cond_spec.keys(), r))
-            random.shuffle(all_combinations)
-            for v_cond in all_combinations:
-                if cnt > max_per_dim:
-                    break
-                else:
-                    cnt += 1
-                tasks_hd.append({
-                    "v_out": v_out,
-                    "v_cond": list(v_cond)
-                })
-    return tasks_hd
-
 def task_to_filename(model_name, task_spec):
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     if "v_cond" in task_spec:
@@ -111,29 +80,14 @@ def task_to_filename(model_name, task_spec):
         file_name = file_name + ".json"
     return file_name
 
-def weighted_corr(x, y, w):
-    
-    if np.all(x == x[0]) or np.all(y == y[0]):
-        return 0
-    
-    # Weighted means
-    mx = np.average(x, weights=w)
-    my = np.average(y, weights=w)
-    
-    # Weighted covariance
-    cov = np.sum(w * (x - mx) * (y - my))
-    
-    # Weighted variances
-    vx = np.sum(w * (x - mx) ** 2)
-    vy = np.sum(w * (y - my) ** 2)
-    
-    # Weighted correlation
-    return cov / np.sqrt(vx * vy)
-
-def weighted_L1(x, y, w):
-    if np.any(np.isnan(x)) or np.any(np.isnan(y)) or np.any(np.isnan(w)):
-        return np.nan
-    return np.sum(np.abs(x - y) * w) / np.sum(w)
+def hd_taskname(task):
+    dataset = task['dataset'].split('/')[-1].split('.')[0]
+    dataset = dts_map.get(dataset, dataset)
+    out = var_map.get(task['v_out'], task['v_out'])
+    cond = pd.Series(task['v_cond']).map(var_map).tolist()
+    # pdbpp.set_trace()
+    cond = ", ".join(cond)
+    return dataset + ": " + out + " by " + cond
 
 def model_name(mod):
     if isinstance(mod, pd.Series):
@@ -149,6 +103,10 @@ def model_unname(mod):
         return [model_display_map.get(m, m) for m in mod]
     return model_display_map.get(mod, mod)
 
+def dat_name_clean(path):
+    base = path.split("/")[-1]
+    return re.sub(r"\.parquet$", "", base)
+
 def bin_labels(breaks, unit="$", exact=False, last_plus = False):
     if exact:
         if last_plus:
@@ -163,13 +121,6 @@ def bin_labels(breaks, unit="$", exact=False, last_plus = False):
         labels.append(f"{breaks[-1]}+ {unit}")
     return labels
 
-def hd_tasksize(task_spec):
-    df = pd.read_parquet(task_spec["dataset"])
-    cond_vars = task_spec["v_cond"]
-    df_sub = df[cond_vars]
-    df_sub = df_sub.drop_duplicates()
-    return len(df_sub), len(cond_vars)
-
 def sync_bench():
     cmd = [
         "rsync", "-avz", "--update", "--progress",
@@ -178,10 +129,3 @@ def sync_bench():
         "~/trust/llm-epidemia/data/benchmark/"
     ]
     subprocess.run(" ".join(cmd), shell=True)
-
-# plotting helpers
-def name_and_sort(df):
-    df["Model"] = df["model"].apply(model_name)
-    df = df.sort_values("score", ascending=False)
-    df["Model"] = pd.Categorical(df["Model"], categories=df["Model"], ordered=True)
-    return df

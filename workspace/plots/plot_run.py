@@ -1,10 +1,12 @@
 
 import pandas as pd
-import sys, os
+import sys
+import os
 import numpy as np
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
+sys.path.append(os.path.join(os.getcwd(), "workspace/utils"))
 from helpers import model_name, dts_map
-from bench_eval import eval_task, eval_to_score, hd_corr_plot, hd_corr_df, build_eval_df
+from bench_eval import hd_corr_plot, hd_corr_df, build_eval_df
 from task_spec import task_specs, task_specs_hd
 from plotnine import *
 
@@ -214,11 +216,11 @@ for f in tqdm(fls):
 # plt_distr
 
 # evaluate GPT 4.1 on select indices
-idx = [0,  1,  2,  3,  4,  6,  7, 13, 14, 15, 16, 17, 18, 19, 20, 26, 27, 28, 29, 31, 32, 33, 39, 40, 42,
+gpt_idx = [0,  1,  2,  3,  4,  6,  7, 13, 14, 15, 16, 17, 18, 19, 20, 26, 27, 28, 29, 31, 32, 33, 39, 40, 42,
   44, 45, 50, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 68, 69, 70, 72, 73, 74, 75, 76,
   77, 78, 80, 81, 83, 84, 85, 86, 87, 88, 89, 90, 91]
 
-task_sel = [task_specs_hd[i] for i in range(len(task_specs_hd)) if i in idx]
+task_sel = [task_specs_hd[i] for i in range(len(task_specs_hd)) if i in gpt_idx]
 eval_gpt, eval_gptmap = build_eval_df(models + ["gpt-4.1", "o4-mini"], task_sel, prob = True)
 
 df_gpt = eval_gpt.groupby(["model"]).agg(
@@ -257,6 +259,10 @@ zscore_idx = eval_gpt[(eval_gpt["model"] == "gpt-4.1") & (eval_gpt["score"] == 0
 rag_sel = np.array(gpt_idx)[zscore_idx]
 rag_sel_fin = df.loc[rag_sel][df.loc[rag_sel, "size"] <= 150].index
 
+# rag eval
+eval_rag, _ = build_eval_df(["gpt-4.1_web"], 
+                            [task_specs_hd[t] for t in range(len(task_specs_hd)) if t in rag_sel_fin],
+                            prob = True)
 
 # heatmap
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
@@ -269,7 +275,7 @@ hmap = (ggplot(eval_heat, aes(y = "model", x = "task_id", fill="score")) +
     geom_tile() + 
     theme_bw() +
     geom_text(aes(label="round(score)")) +
-    theme(axis_text_y=element_text(rotation = 15)) +
+    # theme(axis_text_y=element_text(rotation = 15)) +
     scale_fill_cmap(cmap_name="viridis"))
 
 hmap.save("data/plots/heatmap.png", dpi=500, width=25, height=5)

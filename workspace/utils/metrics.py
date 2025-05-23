@@ -41,8 +41,31 @@ def tabulate_w(x, w=None, nbins=None):
             out[xi - 1] += wi
     return out
 
-
 def cat_to_distr(x, w, nbins):
     x = np.asarray(x)
     distr = tabulate_w(x + 1, w=w, nbins=nbins)
     return distr / distr.sum()
+
+def weighted_corr(x, y, w):
+    
+    if np.all(x == x[0]) or np.all(y == y[0]):
+        return 0
+    
+    # Weighted means
+    mx = np.average(x, weights=w)
+    my = np.average(y, weights=w)
+    
+    # Weighted covariance
+    cov = np.sum(w * (x - mx) * (y - my))
+    
+    # Weighted variances
+    vx = np.sum(w * (x - mx) ** 2)
+    vy = np.sum(w * (y - my) ** 2)
+    
+    # Weighted correlation
+    return cov / np.sqrt(vx * vy)
+
+def weighted_L1(x, y, w):
+    if np.any(np.isnan(x)) or np.any(np.isnan(y)) or np.any(np.isnan(w)):
+        return np.nan
+    return np.sum(np.abs(x - y) * w) / np.sum(w)

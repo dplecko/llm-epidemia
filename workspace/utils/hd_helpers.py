@@ -1,14 +1,11 @@
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-# from xgboost import XGBClassifier, XGBRegressor
 import importlib.util
 import os
+import random
 from sklearn.model_selection import StratifiedKFold
+from itertools import combinations
 
 def load_specs(dataset_name, prob=False):
     """
@@ -49,7 +46,6 @@ def promptify(out_var, cond_vars, cond_row, dataset_name, prob=False):
     
     return prompt
 
-
 def gen_prob_lvls():
     levels = ['0%']
     for i in range(20):
@@ -67,7 +63,6 @@ def prob_to_float(ans):
 def decode_prob_lvl(vals, probs):
     idx = probs.index(max(probs))
     return prob_to_float(vals[idx])
-
 
 def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     """
@@ -182,3 +177,29 @@ def bootstrap_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, n_bootstr
         oob_preds_matrix[:, b] = oob_preds
 
     return oob_preds_matrix
+
+def hd_tasksize(task_spec):
+    df = pd.read_parquet(task_spec["dataset"])
+    cond_vars = task_spec["v_cond"]
+    df_sub = df[cond_vars]
+    df_sub = df_sub.drop_duplicates()
+    return len(df_sub), len(cond_vars)
+
+def hd_taskgen(out_spec, cond_spec, d_min=2, d_max=5, max_per_dim=100):
+    random.seed(42)
+    tasks_hd = []
+    for v_out in out_spec.keys():
+        for r in range(d_min, min(d_max, len(cond_spec)) + 1):
+            cnt = 0
+            all_combinations = list(combinations(cond_spec.keys(), r))
+            random.shuffle(all_combinations)
+            for v_cond in all_combinations:
+                if cnt > max_per_dim:
+                    break
+                else:
+                    cnt += 1
+                tasks_hd.append({
+                    "v_out": v_out,
+                    "v_cond": list(v_cond)
+                })
+    return tasks_hd
