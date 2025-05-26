@@ -76,16 +76,9 @@ meps_pout = {
     "insured": "what is the probability that they have health insurance?",
 }
 
-# tasks_meps_hd = [
-#     {
-#         "v_out": "insured",
-#         "v_cond": ["age", "education_years", "sex", "race"]
-#     }
-# ]
-
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
-from helpers import hd_taskgen
+from hd_helpers import hd_taskgen
 tasks_meps_hd = hd_taskgen(meps_out, meps_cond)
 
 for task in tasks_meps_hd:

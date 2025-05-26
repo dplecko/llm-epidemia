@@ -11,10 +11,7 @@ eval_df["Model"] = model_name(eval_df["model"])
 eval_df["Instruction Tuned"] = eval_df["model"].str.contains(r"(_instruct|_chat)")
 
 # plot one: side-by-side performance
-df_bvi = eval_df.groupby(["Model", "model", "Instruction Tuned"]).agg(
-    score=("score", "mean"),
-    # sd_cor=("correlation", "std")
-).reset_index()
+df_bvi = eval_df.groupby(["Model", "model", "Instruction Tuned"]).agg(score=("score", "mean")).reset_index()
 
 mod_ord = (df_bvi.groupby("Model")["score"].mean().sort_values(ascending=False).index.tolist())
 df_bvi["Model"] = pd.Categorical(df_bvi["Model"], categories=mod_ord, ordered=True)

@@ -113,7 +113,7 @@ scf_pout = {
 
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
-from helpers import hd_taskgen
+from hd_helpers import hd_taskgen
 tasks_scf_hd = hd_taskgen(scf_out, scf_cond)
 
 for task in tasks_scf_hd:

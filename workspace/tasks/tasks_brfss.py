@@ -89,7 +89,7 @@ brfss_pout = {
 
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
-from helpers import hd_taskgen
+from hd_helpers import hd_taskgen
 tasks_brfss_hd = hd_taskgen(brfss_out, brfss_cond, max_per_dim=3)
 
 for task in tasks_brfss_hd:

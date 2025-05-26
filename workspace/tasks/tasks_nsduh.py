@@ -86,7 +86,7 @@ nsduh_pout = {
 
 import sys, os
 sys.path.append(os.path.join(os.getcwd(), "workspace"))
-from helpers import hd_taskgen
+from hd_helpers import hd_taskgen
 tasks_nsduh_hd = hd_taskgen(nsduh_out, nsduh_cond)
 
 for task in tasks_nsduh_hd:
