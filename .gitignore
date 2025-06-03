@@ -1,6 +1,7 @@
 data/
 results/
 paper/
+www/img/
 *.log
 __pycache__/
 *.pyc

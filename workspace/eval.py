@@ -196,7 +196,7 @@ def eval_task(model_name, task, prob):
 
 def build_eval_df(models, tasks, prob = False):
     rows = []
-    eval_map = {}
+    eval_map = []
     for model in models:
         for i, task in enumerate(tqdm(tasks, desc="Processing Tasks")):
             try:
@@ -207,7 +207,7 @@ def build_eval_df(models, tasks, prob = False):
                 traceback.print_exc()
                 df_eval, score = None, None
             
-            eval_map[i] = df_eval
+            eval_map.append(df_eval) 
             dataset = task["dataset"].split("/")[-1].split(".")[0]
             rows.append({
                 "model": model,

@@ -1,0 +1,626 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Qualitative Model Knowledge Inspection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #0d1b2a;
+      color: #f8f9fa;
+    }
+
+    table.table-dark {
+      background-color: #0d1b2a;
+    }
+
+    .table-dark th,
+    .table-dark td {
+      background-color: #0d1b2a;
+      color: #f8f9fa;
+    }
+
+    .table-dark thead th {
+      background-color: #1a2638;
+      color: #ffffff;
+    }
+
+    .plot-img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+
+    .active-cell {
+      background-color: #003366 !important; /* Deep blue */
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="text-light">
+  <div id="navbar"></div>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("navbar").innerHTML = data);
+  </script>
+
+  <section class="container my-5">
+    <h1 class="mb-4 text-center">Qualitative Model Knowledge Inspection</h1>
+    <div class="table-responsive">
+<table class='table table-dark table-bordered text-center align-middle'>
+<thead class='table-light text-dark'><tr><th>Task</th><th>DeepSeek 7B</th><th>Gemma3 27B</th><th>LLama3 70B</th><th>LLama3 8B</th><th>Mistral 7B</th><th>Phi4</th></tr></thead>
+<tbody>
+<tr><td>Census: Employment Status by Sex</td><td id='trigger-0-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 0)">62</td><td id='trigger-0-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 0)">100</td><td id='trigger-0-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 0)">100</td><td id='trigger-0-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 0)">100</td><td id='trigger-0-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 0)">100</td><td id='trigger-0-phi4' class='score-cell' onclick="togglePlot('phi4', 0)">100</td></tr>
+<tr id='plot-0-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-0-deepseek_7b_chat'></td></tr>
+<tr id='plot-0-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-0-gemma3_27b_instruct'></td></tr>
+<tr id='plot-0-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-0-llama3_70b_instruct'></td></tr>
+<tr id='plot-0-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-0-llama3_8b_instruct'></td></tr>
+<tr id='plot-0-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-0-mistral_7b_instruct'></td></tr>
+<tr id='plot-0-phi4' style='display:none;'><td colspan='7' id='plot-cell-0-phi4'></td></tr>
+<tr><td>Census: Employment Status by Race</td><td id='trigger-1-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 1)">100</td><td id='trigger-1-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 1)">100</td><td id='trigger-1-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 1)">100</td><td id='trigger-1-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 1)">100</td><td id='trigger-1-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 1)">100</td><td id='trigger-1-phi4' class='score-cell' onclick="togglePlot('phi4', 1)">100</td></tr>
+<tr id='plot-1-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-1-deepseek_7b_chat'></td></tr>
+<tr id='plot-1-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-1-gemma3_27b_instruct'></td></tr>
+<tr id='plot-1-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-1-llama3_70b_instruct'></td></tr>
+<tr id='plot-1-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-1-llama3_8b_instruct'></td></tr>
+<tr id='plot-1-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-1-mistral_7b_instruct'></td></tr>
+<tr id='plot-1-phi4' style='display:none;'><td colspan='7' id='plot-cell-1-phi4'></td></tr>
+<tr><td>Census: Employment Status by Age</td><td id='trigger-2-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 2)">32</td><td id='trigger-2-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 2)">100</td><td id='trigger-2-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 2)">100</td><td id='trigger-2-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 2)">91</td><td id='trigger-2-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 2)">100</td><td id='trigger-2-phi4' class='score-cell' onclick="togglePlot('phi4', 2)">100</td></tr>
+<tr id='plot-2-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-2-deepseek_7b_chat'></td></tr>
+<tr id='plot-2-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-2-gemma3_27b_instruct'></td></tr>
+<tr id='plot-2-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-2-llama3_70b_instruct'></td></tr>
+<tr id='plot-2-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-2-llama3_8b_instruct'></td></tr>
+<tr id='plot-2-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-2-mistral_7b_instruct'></td></tr>
+<tr id='plot-2-phi4' style='display:none;'><td colspan='7' id='plot-cell-2-phi4'></td></tr>
+<tr><td>Census: Employer by Sex</td><td id='trigger-3-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 3)">100</td><td id='trigger-3-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 3)">100</td><td id='trigger-3-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 3)">100</td><td id='trigger-3-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 3)">100</td><td id='trigger-3-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 3)">100</td><td id='trigger-3-phi4' class='score-cell' onclick="togglePlot('phi4', 3)">100</td></tr>
+<tr id='plot-3-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-3-deepseek_7b_chat'></td></tr>
+<tr id='plot-3-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-3-gemma3_27b_instruct'></td></tr>
+<tr id='plot-3-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-3-llama3_70b_instruct'></td></tr>
+<tr id='plot-3-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-3-llama3_8b_instruct'></td></tr>
+<tr id='plot-3-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-3-mistral_7b_instruct'></td></tr>
+<tr id='plot-3-phi4' style='display:none;'><td colspan='7' id='plot-cell-3-phi4'></td></tr>
+<tr><td>Census: Employer by Race</td><td id='trigger-4-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 4)">100</td><td id='trigger-4-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 4)">100</td><td id='trigger-4-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 4)">100</td><td id='trigger-4-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 4)">100</td><td id='trigger-4-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 4)">100</td><td id='trigger-4-phi4' class='score-cell' onclick="togglePlot('phi4', 4)">100</td></tr>
+<tr id='plot-4-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-4-deepseek_7b_chat'></td></tr>
+<tr id='plot-4-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-4-gemma3_27b_instruct'></td></tr>
+<tr id='plot-4-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-4-llama3_70b_instruct'></td></tr>
+<tr id='plot-4-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-4-llama3_8b_instruct'></td></tr>
+<tr id='plot-4-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-4-mistral_7b_instruct'></td></tr>
+<tr id='plot-4-phi4' style='display:none;'><td colspan='7' id='plot-cell-4-phi4'></td></tr>
+<tr><td>Census: Employer by Age</td><td id='trigger-5-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 5)">100</td><td id='trigger-5-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 5)">100</td><td id='trigger-5-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 5)">100</td><td id='trigger-5-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 5)">100</td><td id='trigger-5-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 5)">100</td><td id='trigger-5-phi4' class='score-cell' onclick="togglePlot('phi4', 5)">100</td></tr>
+<tr id='plot-5-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-5-deepseek_7b_chat'></td></tr>
+<tr id='plot-5-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-5-gemma3_27b_instruct'></td></tr>
+<tr id='plot-5-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-5-llama3_70b_instruct'></td></tr>
+<tr id='plot-5-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-5-llama3_8b_instruct'></td></tr>
+<tr id='plot-5-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-5-mistral_7b_instruct'></td></tr>
+<tr id='plot-5-phi4' style='display:none;'><td colspan='7' id='plot-cell-5-phi4'></td></tr>
+<tr><td>Census: Salary by Sex</td><td id='trigger-6-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 6)">100</td><td id='trigger-6-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 6)">100</td><td id='trigger-6-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 6)">100</td><td id='trigger-6-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 6)">100</td><td id='trigger-6-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 6)">100</td><td id='trigger-6-phi4' class='score-cell' onclick="togglePlot('phi4', 6)">100</td></tr>
+<tr id='plot-6-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-6-deepseek_7b_chat'></td></tr>
+<tr id='plot-6-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-6-gemma3_27b_instruct'></td></tr>
+<tr id='plot-6-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-6-llama3_70b_instruct'></td></tr>
+<tr id='plot-6-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-6-llama3_8b_instruct'></td></tr>
+<tr id='plot-6-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-6-mistral_7b_instruct'></td></tr>
+<tr id='plot-6-phi4' style='display:none;'><td colspan='7' id='plot-cell-6-phi4'></td></tr>
+<tr><td>Census: Salary by Race</td><td id='trigger-7-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 7)">100</td><td id='trigger-7-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 7)">0</td><td id='trigger-7-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 7)">100</td><td id='trigger-7-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 7)">100</td><td id='trigger-7-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 7)">100</td><td id='trigger-7-phi4' class='score-cell' onclick="togglePlot('phi4', 7)">100</td></tr>
+<tr id='plot-7-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-7-deepseek_7b_chat'></td></tr>
+<tr id='plot-7-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-7-gemma3_27b_instruct'></td></tr>
+<tr id='plot-7-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-7-llama3_70b_instruct'></td></tr>
+<tr id='plot-7-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-7-llama3_8b_instruct'></td></tr>
+<tr id='plot-7-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-7-mistral_7b_instruct'></td></tr>
+<tr id='plot-7-phi4' style='display:none;'><td colspan='7' id='plot-cell-7-phi4'></td></tr>
+<tr><td>Census: Salary by Age</td><td id='trigger-8-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 8)">100</td><td id='trigger-8-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 8)">0</td><td id='trigger-8-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 8)">100</td><td id='trigger-8-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 8)">100</td><td id='trigger-8-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 8)">100</td><td id='trigger-8-phi4' class='score-cell' onclick="togglePlot('phi4', 8)">100</td></tr>
+<tr id='plot-8-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-8-deepseek_7b_chat'></td></tr>
+<tr id='plot-8-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-8-gemma3_27b_instruct'></td></tr>
+<tr id='plot-8-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-8-llama3_70b_instruct'></td></tr>
+<tr id='plot-8-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-8-llama3_8b_instruct'></td></tr>
+<tr id='plot-8-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-8-mistral_7b_instruct'></td></tr>
+<tr id='plot-8-phi4' style='display:none;'><td colspan='7' id='plot-cell-8-phi4'></td></tr>
+<tr><td>Census: Education by Sex</td><td id='trigger-9-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 9)">11</td><td id='trigger-9-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 9)">0</td><td id='trigger-9-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 9)">0</td><td id='trigger-9-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 9)">20</td><td id='trigger-9-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 9)">0</td><td id='trigger-9-phi4' class='score-cell' onclick="togglePlot('phi4', 9)">0</td></tr>
+<tr id='plot-9-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-9-deepseek_7b_chat'></td></tr>
+<tr id='plot-9-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-9-gemma3_27b_instruct'></td></tr>
+<tr id='plot-9-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-9-llama3_70b_instruct'></td></tr>
+<tr id='plot-9-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-9-llama3_8b_instruct'></td></tr>
+<tr id='plot-9-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-9-mistral_7b_instruct'></td></tr>
+<tr id='plot-9-phi4' style='display:none;'><td colspan='7' id='plot-cell-9-phi4'></td></tr>
+<tr><td>Census: Education by Race</td><td id='trigger-10-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 10)">8</td><td id='trigger-10-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 10)">0</td><td id='trigger-10-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 10)">0</td><td id='trigger-10-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 10)">22</td><td id='trigger-10-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 10)">2</td><td id='trigger-10-phi4' class='score-cell' onclick="togglePlot('phi4', 10)">0</td></tr>
+<tr id='plot-10-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-10-deepseek_7b_chat'></td></tr>
+<tr id='plot-10-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-10-gemma3_27b_instruct'></td></tr>
+<tr id='plot-10-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-10-llama3_70b_instruct'></td></tr>
+<tr id='plot-10-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-10-llama3_8b_instruct'></td></tr>
+<tr id='plot-10-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-10-mistral_7b_instruct'></td></tr>
+<tr id='plot-10-phi4' style='display:none;'><td colspan='7' id='plot-cell-10-phi4'></td></tr>
+<tr><td>Census: Education by Age</td><td id='trigger-11-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 11)">12</td><td id='trigger-11-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 11)">0</td><td id='trigger-11-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 11)">26</td><td id='trigger-11-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 11)">47</td><td id='trigger-11-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 11)">37</td><td id='trigger-11-phi4' class='score-cell' onclick="togglePlot('phi4', 11)">21</td></tr>
+<tr id='plot-11-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-11-deepseek_7b_chat'></td></tr>
+<tr id='plot-11-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-11-gemma3_27b_instruct'></td></tr>
+<tr id='plot-11-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-11-llama3_70b_instruct'></td></tr>
+<tr id='plot-11-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-11-llama3_8b_instruct'></td></tr>
+<tr id='plot-11-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-11-mistral_7b_instruct'></td></tr>
+<tr id='plot-11-phi4' style='display:none;'><td colspan='7' id='plot-cell-11-phi4'></td></tr>
+<tr><td>BRFSS: Exercise by State</td><td id='trigger-12-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 12)">76</td><td id='trigger-12-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 12)">0</td><td id='trigger-12-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 12)">54</td><td id='trigger-12-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 12)">0</td><td id='trigger-12-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 12)">71</td><td id='trigger-12-phi4' class='score-cell' onclick="togglePlot('phi4', 12)">0</td></tr>
+<tr id='plot-12-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-12-deepseek_7b_chat'></td></tr>
+<tr id='plot-12-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-12-gemma3_27b_instruct'></td></tr>
+<tr id='plot-12-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-12-llama3_70b_instruct'></td></tr>
+<tr id='plot-12-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-12-llama3_8b_instruct'></td></tr>
+<tr id='plot-12-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-12-mistral_7b_instruct'></td></tr>
+<tr id='plot-12-phi4' style='display:none;'><td colspan='7' id='plot-cell-12-phi4'></td></tr>
+<tr><td>BRFSS: Diabetes by State</td><td id='trigger-13-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 13)">0</td><td id='trigger-13-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 13)">0</td><td id='trigger-13-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 13)">0</td><td id='trigger-13-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 13)">0</td><td id='trigger-13-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 13)">0</td><td id='trigger-13-phi4' class='score-cell' onclick="togglePlot('phi4', 13)">0</td></tr>
+<tr id='plot-13-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-13-deepseek_7b_chat'></td></tr>
+<tr id='plot-13-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-13-gemma3_27b_instruct'></td></tr>
+<tr id='plot-13-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-13-llama3_70b_instruct'></td></tr>
+<tr id='plot-13-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-13-llama3_8b_instruct'></td></tr>
+<tr id='plot-13-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-13-mistral_7b_instruct'></td></tr>
+<tr id='plot-13-phi4' style='display:none;'><td colspan='7' id='plot-cell-13-phi4'></td></tr>
+<tr><td>BRFSS: High BP by State</td><td id='trigger-14-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 14)">0</td><td id='trigger-14-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 14)">0</td><td id='trigger-14-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 14)">0</td><td id='trigger-14-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 14)">0</td><td id='trigger-14-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 14)">0</td><td id='trigger-14-phi4' class='score-cell' onclick="togglePlot('phi4', 14)">0</td></tr>
+<tr id='plot-14-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-14-deepseek_7b_chat'></td></tr>
+<tr id='plot-14-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-14-gemma3_27b_instruct'></td></tr>
+<tr id='plot-14-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-14-llama3_70b_instruct'></td></tr>
+<tr id='plot-14-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-14-llama3_8b_instruct'></td></tr>
+<tr id='plot-14-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-14-mistral_7b_instruct'></td></tr>
+<tr id='plot-14-phi4' style='display:none;'><td colspan='7' id='plot-cell-14-phi4'></td></tr>
+<tr><td>BRFSS: Asthma by State</td><td id='trigger-15-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 15)">0</td><td id='trigger-15-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 15)">0</td><td id='trigger-15-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 15)">0</td><td id='trigger-15-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 15)">0</td><td id='trigger-15-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 15)">0</td><td id='trigger-15-phi4' class='score-cell' onclick="togglePlot('phi4', 15)">79</td></tr>
+<tr id='plot-15-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-15-deepseek_7b_chat'></td></tr>
+<tr id='plot-15-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-15-gemma3_27b_instruct'></td></tr>
+<tr id='plot-15-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-15-llama3_70b_instruct'></td></tr>
+<tr id='plot-15-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-15-llama3_8b_instruct'></td></tr>
+<tr id='plot-15-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-15-mistral_7b_instruct'></td></tr>
+<tr id='plot-15-phi4' style='display:none;'><td colspan='7' id='plot-cell-15-phi4'></td></tr>
+<tr><td>BRFSS: Cholesterol by State</td><td id='trigger-16-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 16)">0</td><td id='trigger-16-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 16)">0</td><td id='trigger-16-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 16)">0</td><td id='trigger-16-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 16)">0</td><td id='trigger-16-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 16)">0</td><td id='trigger-16-phi4' class='score-cell' onclick="togglePlot('phi4', 16)">0</td></tr>
+<tr id='plot-16-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-16-deepseek_7b_chat'></td></tr>
+<tr id='plot-16-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-16-gemma3_27b_instruct'></td></tr>
+<tr id='plot-16-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-16-llama3_70b_instruct'></td></tr>
+<tr id='plot-16-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-16-llama3_8b_instruct'></td></tr>
+<tr id='plot-16-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-16-mistral_7b_instruct'></td></tr>
+<tr id='plot-16-phi4' style='display:none;'><td colspan='7' id='plot-cell-16-phi4'></td></tr>
+<tr><td>BRFSS: Visual Impairments by State</td><td id='trigger-17-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 17)">0</td><td id='trigger-17-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 17)">0</td><td id='trigger-17-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 17)">9</td><td id='trigger-17-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 17)">17</td><td id='trigger-17-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 17)">0</td><td id='trigger-17-phi4' class='score-cell' onclick="togglePlot('phi4', 17)">91</td></tr>
+<tr id='plot-17-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-17-deepseek_7b_chat'></td></tr>
+<tr id='plot-17-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-17-gemma3_27b_instruct'></td></tr>
+<tr id='plot-17-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-17-llama3_70b_instruct'></td></tr>
+<tr id='plot-17-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-17-llama3_8b_instruct'></td></tr>
+<tr id='plot-17-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-17-mistral_7b_instruct'></td></tr>
+<tr id='plot-17-phi4' style='display:none;'><td colspan='7' id='plot-cell-17-phi4'></td></tr>
+<tr><td>BRFSS: Hearing Impairments by State</td><td id='trigger-18-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 18)">0</td><td id='trigger-18-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 18)">0</td><td id='trigger-18-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 18)">9</td><td id='trigger-18-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 18)">17</td><td id='trigger-18-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 18)">0</td><td id='trigger-18-phi4' class='score-cell' onclick="togglePlot('phi4', 18)">91</td></tr>
+<tr id='plot-18-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-18-deepseek_7b_chat'></td></tr>
+<tr id='plot-18-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-18-gemma3_27b_instruct'></td></tr>
+<tr id='plot-18-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-18-llama3_70b_instruct'></td></tr>
+<tr id='plot-18-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-18-llama3_8b_instruct'></td></tr>
+<tr id='plot-18-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-18-mistral_7b_instruct'></td></tr>
+<tr id='plot-18-phi4' style='display:none;'><td colspan='7' id='plot-cell-18-phi4'></td></tr>
+<tr><td>BRFSS: Heart Attack by State</td><td id='trigger-19-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 19)">0</td><td id='trigger-19-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 19)">0</td><td id='trigger-19-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 19)">0</td><td id='trigger-19-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 19)">0</td><td id='trigger-19-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 19)">0</td><td id='trigger-19-phi4' class='score-cell' onclick="togglePlot('phi4', 19)">0</td></tr>
+<tr id='plot-19-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-19-deepseek_7b_chat'></td></tr>
+<tr id='plot-19-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-19-gemma3_27b_instruct'></td></tr>
+<tr id='plot-19-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-19-llama3_70b_instruct'></td></tr>
+<tr id='plot-19-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-19-llama3_8b_instruct'></td></tr>
+<tr id='plot-19-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-19-mistral_7b_instruct'></td></tr>
+<tr id='plot-19-phi4' style='display:none;'><td colspan='7' id='plot-cell-19-phi4'></td></tr>
+<tr><td>BRFSS: Stroke by State</td><td id='trigger-20-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 20)">0</td><td id='trigger-20-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 20)">0</td><td id='trigger-20-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 20)">0</td><td id='trigger-20-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 20)">0</td><td id='trigger-20-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 20)">0</td><td id='trigger-20-phi4' class='score-cell' onclick="togglePlot('phi4', 20)">0</td></tr>
+<tr id='plot-20-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-20-deepseek_7b_chat'></td></tr>
+<tr id='plot-20-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-20-gemma3_27b_instruct'></td></tr>
+<tr id='plot-20-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-20-llama3_70b_instruct'></td></tr>
+<tr id='plot-20-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-20-llama3_8b_instruct'></td></tr>
+<tr id='plot-20-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-20-mistral_7b_instruct'></td></tr>
+<tr id='plot-20-phi4' style='display:none;'><td colspan='7' id='plot-cell-20-phi4'></td></tr>
+<tr><td>Department of Education: Sex by Type of Degree</td><td id='trigger-21-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 21)">1</td><td id='trigger-21-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 21)">1</td><td id='trigger-21-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 21)">34</td><td id='trigger-21-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 21)">40</td><td id='trigger-21-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 21)">30</td><td id='trigger-21-phi4' class='score-cell' onclick="togglePlot('phi4', 21)">8</td></tr>
+<tr id='plot-21-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-21-deepseek_7b_chat'></td></tr>
+<tr id='plot-21-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-21-gemma3_27b_instruct'></td></tr>
+<tr id='plot-21-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-21-llama3_70b_instruct'></td></tr>
+<tr id='plot-21-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-21-llama3_8b_instruct'></td></tr>
+<tr id='plot-21-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-21-mistral_7b_instruct'></td></tr>
+<tr id='plot-21-phi4' style='display:none;'><td colspan='7' id='plot-cell-21-phi4'></td></tr>
+<tr><td>FBI Crime Statistics: Sex by Crime Type</td><td id='trigger-22-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 22)">31</td><td id='trigger-22-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 22)">21</td><td id='trigger-22-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 22)">34</td><td id='trigger-22-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 22)">91</td><td id='trigger-22-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 22)">44</td><td id='trigger-22-phi4' class='score-cell' onclick="togglePlot('phi4', 22)">69</td></tr>
+<tr id='plot-22-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-22-deepseek_7b_chat'></td></tr>
+<tr id='plot-22-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-22-gemma3_27b_instruct'></td></tr>
+<tr id='plot-22-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-22-llama3_70b_instruct'></td></tr>
+<tr id='plot-22-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-22-llama3_8b_instruct'></td></tr>
+<tr id='plot-22-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-22-mistral_7b_instruct'></td></tr>
+<tr id='plot-22-phi4' style='display:none;'><td colspan='7' id='plot-cell-22-phi4'></td></tr>
+<tr><td>FBI Crime Statistics: Race by Crime Type</td><td id='trigger-23-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 23)">39</td><td id='trigger-23-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 23)">23</td><td id='trigger-23-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 23)">52</td><td id='trigger-23-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 23)">33</td><td id='trigger-23-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 23)">18</td><td id='trigger-23-phi4' class='score-cell' onclick="togglePlot('phi4', 23)">54</td></tr>
+<tr id='plot-23-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-23-deepseek_7b_chat'></td></tr>
+<tr id='plot-23-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-23-gemma3_27b_instruct'></td></tr>
+<tr id='plot-23-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-23-llama3_70b_instruct'></td></tr>
+<tr id='plot-23-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-23-llama3_8b_instruct'></td></tr>
+<tr id='plot-23-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-23-mistral_7b_instruct'></td></tr>
+<tr id='plot-23-phi4' style='display:none;'><td colspan='7' id='plot-cell-23-phi4'></td></tr>
+<tr><td>GSS: Political View by Age</td><td id='trigger-24-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 24)">0</td><td id='trigger-24-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 24)">0</td><td id='trigger-24-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 24)">0</td><td id='trigger-24-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 24)">100</td><td id='trigger-24-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 24)">61</td><td id='trigger-24-phi4' class='score-cell' onclick="togglePlot('phi4', 24)">0</td></tr>
+<tr id='plot-24-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-24-deepseek_7b_chat'></td></tr>
+<tr id='plot-24-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-24-gemma3_27b_instruct'></td></tr>
+<tr id='plot-24-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-24-llama3_70b_instruct'></td></tr>
+<tr id='plot-24-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-24-llama3_8b_instruct'></td></tr>
+<tr id='plot-24-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-24-mistral_7b_instruct'></td></tr>
+<tr id='plot-24-phi4' style='display:none;'><td colspan='7' id='plot-cell-24-phi4'></td></tr>
+<tr><td>GSS: Political View by Race</td><td id='trigger-25-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 25)">0</td><td id='trigger-25-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 25)">0</td><td id='trigger-25-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 25)">0</td><td id='trigger-25-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 25)">0</td><td id='trigger-25-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 25)">0</td><td id='trigger-25-phi4' class='score-cell' onclick="togglePlot('phi4', 25)">0</td></tr>
+<tr id='plot-25-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-25-deepseek_7b_chat'></td></tr>
+<tr id='plot-25-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-25-gemma3_27b_instruct'></td></tr>
+<tr id='plot-25-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-25-llama3_70b_instruct'></td></tr>
+<tr id='plot-25-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-25-llama3_8b_instruct'></td></tr>
+<tr id='plot-25-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-25-mistral_7b_instruct'></td></tr>
+<tr id='plot-25-phi4' style='display:none;'><td colspan='7' id='plot-cell-25-phi4'></td></tr>
+<tr><td>GSS: Political View by Education</td><td id='trigger-26-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 26)">0</td><td id='trigger-26-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 26)">0</td><td id='trigger-26-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 26)">0</td><td id='trigger-26-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 26)">19</td><td id='trigger-26-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 26)">0</td><td id='trigger-26-phi4' class='score-cell' onclick="togglePlot('phi4', 26)">0</td></tr>
+<tr id='plot-26-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-26-deepseek_7b_chat'></td></tr>
+<tr id='plot-26-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-26-gemma3_27b_instruct'></td></tr>
+<tr id='plot-26-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-26-llama3_70b_instruct'></td></tr>
+<tr id='plot-26-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-26-llama3_8b_instruct'></td></tr>
+<tr id='plot-26-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-26-mistral_7b_instruct'></td></tr>
+<tr id='plot-26-phi4' style='display:none;'><td colspan='7' id='plot-cell-26-phi4'></td></tr>
+<tr><td>GSS: Political View by Income</td><td id='trigger-27-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 27)">2</td><td id='trigger-27-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 27)">0</td><td id='trigger-27-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 27)">0</td><td id='trigger-27-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 27)">65</td><td id='trigger-27-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 27)">0</td><td id='trigger-27-phi4' class='score-cell' onclick="togglePlot('phi4', 27)">0</td></tr>
+<tr id='plot-27-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-27-deepseek_7b_chat'></td></tr>
+<tr id='plot-27-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-27-gemma3_27b_instruct'></td></tr>
+<tr id='plot-27-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-27-llama3_70b_instruct'></td></tr>
+<tr id='plot-27-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-27-llama3_8b_instruct'></td></tr>
+<tr id='plot-27-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-27-mistral_7b_instruct'></td></tr>
+<tr id='plot-27-phi4' style='display:none;'><td colspan='7' id='plot-cell-27-phi4'></td></tr>
+<tr><td>GSS: Political View by Sex</td><td id='trigger-28-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 28)">0</td><td id='trigger-28-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 28)">0</td><td id='trigger-28-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 28)">0</td><td id='trigger-28-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 28)">0</td><td id='trigger-28-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 28)">0</td><td id='trigger-28-phi4' class='score-cell' onclick="togglePlot('phi4', 28)">0</td></tr>
+<tr id='plot-28-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-28-deepseek_7b_chat'></td></tr>
+<tr id='plot-28-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-28-gemma3_27b_instruct'></td></tr>
+<tr id='plot-28-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-28-llama3_70b_instruct'></td></tr>
+<tr id='plot-28-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-28-llama3_8b_instruct'></td></tr>
+<tr id='plot-28-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-28-mistral_7b_instruct'></td></tr>
+<tr id='plot-28-phi4' style='display:none;'><td colspan='7' id='plot-cell-28-phi4'></td></tr>
+<tr><td>GSS: Party Affiliation by Age</td><td id='trigger-29-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 29)">0</td><td id='trigger-29-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 29)">0</td><td id='trigger-29-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 29)">0</td><td id='trigger-29-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 29)">0</td><td id='trigger-29-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 29)">15</td><td id='trigger-29-phi4' class='score-cell' onclick="togglePlot('phi4', 29)">0</td></tr>
+<tr id='plot-29-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-29-deepseek_7b_chat'></td></tr>
+<tr id='plot-29-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-29-gemma3_27b_instruct'></td></tr>
+<tr id='plot-29-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-29-llama3_70b_instruct'></td></tr>
+<tr id='plot-29-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-29-llama3_8b_instruct'></td></tr>
+<tr id='plot-29-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-29-mistral_7b_instruct'></td></tr>
+<tr id='plot-29-phi4' style='display:none;'><td colspan='7' id='plot-cell-29-phi4'></td></tr>
+<tr><td>GSS: Party Affiliation by Race</td><td id='trigger-30-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 30)">0</td><td id='trigger-30-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 30)">0</td><td id='trigger-30-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 30)">26</td><td id='trigger-30-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 30)">5</td><td id='trigger-30-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 30)">50</td><td id='trigger-30-phi4' class='score-cell' onclick="togglePlot('phi4', 30)">0</td></tr>
+<tr id='plot-30-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-30-deepseek_7b_chat'></td></tr>
+<tr id='plot-30-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-30-gemma3_27b_instruct'></td></tr>
+<tr id='plot-30-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-30-llama3_70b_instruct'></td></tr>
+<tr id='plot-30-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-30-llama3_8b_instruct'></td></tr>
+<tr id='plot-30-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-30-mistral_7b_instruct'></td></tr>
+<tr id='plot-30-phi4' style='display:none;'><td colspan='7' id='plot-cell-30-phi4'></td></tr>
+<tr><td>GSS: Party Affiliation by Education</td><td id='trigger-31-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 31)">0</td><td id='trigger-31-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 31)">0</td><td id='trigger-31-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 31)">0</td><td id='trigger-31-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 31)">0</td><td id='trigger-31-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 31)">0</td><td id='trigger-31-phi4' class='score-cell' onclick="togglePlot('phi4', 31)">0</td></tr>
+<tr id='plot-31-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-31-deepseek_7b_chat'></td></tr>
+<tr id='plot-31-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-31-gemma3_27b_instruct'></td></tr>
+<tr id='plot-31-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-31-llama3_70b_instruct'></td></tr>
+<tr id='plot-31-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-31-llama3_8b_instruct'></td></tr>
+<tr id='plot-31-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-31-mistral_7b_instruct'></td></tr>
+<tr id='plot-31-phi4' style='display:none;'><td colspan='7' id='plot-cell-31-phi4'></td></tr>
+<tr><td>GSS: Party Affiliation by Income</td><td id='trigger-32-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 32)">0</td><td id='trigger-32-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 32)">0</td><td id='trigger-32-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 32)">0</td><td id='trigger-32-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 32)">0</td><td id='trigger-32-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 32)">0</td><td id='trigger-32-phi4' class='score-cell' onclick="togglePlot('phi4', 32)">0</td></tr>
+<tr id='plot-32-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-32-deepseek_7b_chat'></td></tr>
+<tr id='plot-32-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-32-gemma3_27b_instruct'></td></tr>
+<tr id='plot-32-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-32-llama3_70b_instruct'></td></tr>
+<tr id='plot-32-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-32-llama3_8b_instruct'></td></tr>
+<tr id='plot-32-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-32-mistral_7b_instruct'></td></tr>
+<tr id='plot-32-phi4' style='display:none;'><td colspan='7' id='plot-cell-32-phi4'></td></tr>
+<tr><td>GSS: Party Affiliation by Sex</td><td id='trigger-33-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 33)">0</td><td id='trigger-33-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 33)">0</td><td id='trigger-33-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 33)">0</td><td id='trigger-33-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 33)">25</td><td id='trigger-33-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 33)">94</td><td id='trigger-33-phi4' class='score-cell' onclick="togglePlot('phi4', 33)">0</td></tr>
+<tr id='plot-33-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-33-deepseek_7b_chat'></td></tr>
+<tr id='plot-33-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-33-gemma3_27b_instruct'></td></tr>
+<tr id='plot-33-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-33-llama3_70b_instruct'></td></tr>
+<tr id='plot-33-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-33-llama3_8b_instruct'></td></tr>
+<tr id='plot-33-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-33-mistral_7b_instruct'></td></tr>
+<tr id='plot-33-phi4' style='display:none;'><td colspan='7' id='plot-cell-33-phi4'></td></tr>
+<tr><td>Department of Labor: Sex by Occupation</td><td id='trigger-34-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 34)">37</td><td id='trigger-34-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 34)">22</td><td id='trigger-34-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 34)">46</td><td id='trigger-34-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 34)">52</td><td id='trigger-34-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 34)">35</td><td id='trigger-34-phi4' class='score-cell' onclick="togglePlot('phi4', 34)">15</td></tr>
+<tr id='plot-34-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-34-deepseek_7b_chat'></td></tr>
+<tr id='plot-34-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-34-gemma3_27b_instruct'></td></tr>
+<tr id='plot-34-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-34-llama3_70b_instruct'></td></tr>
+<tr id='plot-34-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-34-llama3_8b_instruct'></td></tr>
+<tr id='plot-34-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-34-mistral_7b_instruct'></td></tr>
+<tr id='plot-34-phi4' style='display:none;'><td colspan='7' id='plot-cell-34-phi4'></td></tr>
+<tr><td>Department of Labor: Race by Occupation</td><td id='trigger-35-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 35)">0</td><td id='trigger-35-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 35)">0</td><td id='trigger-35-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 35)">8</td><td id='trigger-35-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 35)">43</td><td id='trigger-35-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 35)">0</td><td id='trigger-35-phi4' class='score-cell' onclick="togglePlot('phi4', 35)">0</td></tr>
+<tr id='plot-35-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-35-deepseek_7b_chat'></td></tr>
+<tr id='plot-35-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-35-gemma3_27b_instruct'></td></tr>
+<tr id='plot-35-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-35-llama3_70b_instruct'></td></tr>
+<tr id='plot-35-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-35-llama3_8b_instruct'></td></tr>
+<tr id='plot-35-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-35-mistral_7b_instruct'></td></tr>
+<tr id='plot-35-phi4' style='display:none;'><td colspan='7' id='plot-cell-35-phi4'></td></tr>
+<tr><td>MEPS: Expenditure by Age Group</td><td id='trigger-36-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 36)">8</td><td id='trigger-36-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 36)">0</td><td id='trigger-36-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 36)">0</td><td id='trigger-36-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 36)">3</td><td id='trigger-36-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 36)">0</td><td id='trigger-36-phi4' class='score-cell' onclick="togglePlot('phi4', 36)">0</td></tr>
+<tr id='plot-36-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-36-deepseek_7b_chat'></td></tr>
+<tr id='plot-36-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-36-gemma3_27b_instruct'></td></tr>
+<tr id='plot-36-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-36-llama3_70b_instruct'></td></tr>
+<tr id='plot-36-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-36-llama3_8b_instruct'></td></tr>
+<tr id='plot-36-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-36-mistral_7b_instruct'></td></tr>
+<tr id='plot-36-phi4' style='display:none;'><td colspan='7' id='plot-cell-36-phi4'></td></tr>
+<tr><td>MEPS: Office-based Visits by Age Group</td><td id='trigger-37-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 37)">0</td><td id='trigger-37-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 37)">0</td><td id='trigger-37-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 37)">0</td><td id='trigger-37-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 37)">11</td><td id='trigger-37-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 37)">0</td><td id='trigger-37-phi4' class='score-cell' onclick="togglePlot('phi4', 37)">0</td></tr>
+<tr id='plot-37-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-37-deepseek_7b_chat'></td></tr>
+<tr id='plot-37-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-37-gemma3_27b_instruct'></td></tr>
+<tr id='plot-37-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-37-llama3_70b_instruct'></td></tr>
+<tr id='plot-37-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-37-llama3_8b_instruct'></td></tr>
+<tr id='plot-37-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-37-mistral_7b_instruct'></td></tr>
+<tr id='plot-37-phi4' style='display:none;'><td colspan='7' id='plot-cell-37-phi4'></td></tr>
+<tr><td>MEPS: Inpatient Visits by Age Group</td><td id='trigger-38-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 38)">19</td><td id='trigger-38-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 38)">0</td><td id='trigger-38-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 38)">0</td><td id='trigger-38-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 38)">6</td><td id='trigger-38-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 38)">0</td><td id='trigger-38-phi4' class='score-cell' onclick="togglePlot('phi4', 38)">0</td></tr>
+<tr id='plot-38-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-38-deepseek_7b_chat'></td></tr>
+<tr id='plot-38-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-38-gemma3_27b_instruct'></td></tr>
+<tr id='plot-38-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-38-llama3_70b_instruct'></td></tr>
+<tr id='plot-38-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-38-llama3_8b_instruct'></td></tr>
+<tr id='plot-38-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-38-mistral_7b_instruct'></td></tr>
+<tr id='plot-38-phi4' style='display:none;'><td colspan='7' id='plot-cell-38-phi4'></td></tr>
+<tr><td>MEPS: Dental Visits by Age Group</td><td id='trigger-39-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 39)">0</td><td id='trigger-39-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 39)">0</td><td id='trigger-39-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 39)">0</td><td id='trigger-39-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 39)">9</td><td id='trigger-39-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 39)">0</td><td id='trigger-39-phi4' class='score-cell' onclick="togglePlot('phi4', 39)">0</td></tr>
+<tr id='plot-39-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-39-deepseek_7b_chat'></td></tr>
+<tr id='plot-39-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-39-gemma3_27b_instruct'></td></tr>
+<tr id='plot-39-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-39-llama3_70b_instruct'></td></tr>
+<tr id='plot-39-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-39-llama3_8b_instruct'></td></tr>
+<tr id='plot-39-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-39-mistral_7b_instruct'></td></tr>
+<tr id='plot-39-phi4' style='display:none;'><td colspan='7' id='plot-cell-39-phi4'></td></tr>
+<tr><td>MEPS: Has Insurance by Age Group</td><td id='trigger-40-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 40)">85</td><td id='trigger-40-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 40)">87</td><td id='trigger-40-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 40)">88</td><td id='trigger-40-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 40)">51</td><td id='trigger-40-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 40)">30</td><td id='trigger-40-phi4' class='score-cell' onclick="togglePlot('phi4', 40)">85</td></tr>
+<tr id='plot-40-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-40-deepseek_7b_chat'></td></tr>
+<tr id='plot-40-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-40-gemma3_27b_instruct'></td></tr>
+<tr id='plot-40-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-40-llama3_70b_instruct'></td></tr>
+<tr id='plot-40-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-40-llama3_8b_instruct'></td></tr>
+<tr id='plot-40-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-40-mistral_7b_instruct'></td></tr>
+<tr id='plot-40-phi4' style='display:none;'><td colspan='7' id='plot-cell-40-phi4'></td></tr>
+<tr><td>MEPS: Expenditure by Race</td><td id='trigger-41-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 41)">0</td><td id='trigger-41-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 41)">0</td><td id='trigger-41-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 41)">0</td><td id='trigger-41-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 41)">0</td><td id='trigger-41-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 41)">0</td><td id='trigger-41-phi4' class='score-cell' onclick="togglePlot('phi4', 41)">0</td></tr>
+<tr id='plot-41-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-41-deepseek_7b_chat'></td></tr>
+<tr id='plot-41-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-41-gemma3_27b_instruct'></td></tr>
+<tr id='plot-41-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-41-llama3_70b_instruct'></td></tr>
+<tr id='plot-41-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-41-llama3_8b_instruct'></td></tr>
+<tr id='plot-41-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-41-mistral_7b_instruct'></td></tr>
+<tr id='plot-41-phi4' style='display:none;'><td colspan='7' id='plot-cell-41-phi4'></td></tr>
+<tr><td>MEPS: Office-based Visits by Race</td><td id='trigger-42-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 42)">0</td><td id='trigger-42-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 42)">0</td><td id='trigger-42-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 42)">0</td><td id='trigger-42-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 42)">0</td><td id='trigger-42-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 42)">0</td><td id='trigger-42-phi4' class='score-cell' onclick="togglePlot('phi4', 42)">0</td></tr>
+<tr id='plot-42-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-42-deepseek_7b_chat'></td></tr>
+<tr id='plot-42-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-42-gemma3_27b_instruct'></td></tr>
+<tr id='plot-42-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-42-llama3_70b_instruct'></td></tr>
+<tr id='plot-42-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-42-llama3_8b_instruct'></td></tr>
+<tr id='plot-42-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-42-mistral_7b_instruct'></td></tr>
+<tr id='plot-42-phi4' style='display:none;'><td colspan='7' id='plot-cell-42-phi4'></td></tr>
+<tr><td>MEPS: Inpatient Visits by Race</td><td id='trigger-43-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 43)">8</td><td id='trigger-43-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 43)">0</td><td id='trigger-43-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 43)">0</td><td id='trigger-43-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 43)">0</td><td id='trigger-43-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 43)">0</td><td id='trigger-43-phi4' class='score-cell' onclick="togglePlot('phi4', 43)">0</td></tr>
+<tr id='plot-43-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-43-deepseek_7b_chat'></td></tr>
+<tr id='plot-43-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-43-gemma3_27b_instruct'></td></tr>
+<tr id='plot-43-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-43-llama3_70b_instruct'></td></tr>
+<tr id='plot-43-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-43-llama3_8b_instruct'></td></tr>
+<tr id='plot-43-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-43-mistral_7b_instruct'></td></tr>
+<tr id='plot-43-phi4' style='display:none;'><td colspan='7' id='plot-cell-43-phi4'></td></tr>
+<tr><td>MEPS: Dental Visits by Race</td><td id='trigger-44-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 44)">0</td><td id='trigger-44-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 44)">0</td><td id='trigger-44-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 44)">0</td><td id='trigger-44-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 44)">7</td><td id='trigger-44-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 44)">0</td><td id='trigger-44-phi4' class='score-cell' onclick="togglePlot('phi4', 44)">0</td></tr>
+<tr id='plot-44-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-44-deepseek_7b_chat'></td></tr>
+<tr id='plot-44-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-44-gemma3_27b_instruct'></td></tr>
+<tr id='plot-44-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-44-llama3_70b_instruct'></td></tr>
+<tr id='plot-44-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-44-llama3_8b_instruct'></td></tr>
+<tr id='plot-44-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-44-mistral_7b_instruct'></td></tr>
+<tr id='plot-44-phi4' style='display:none;'><td colspan='7' id='plot-cell-44-phi4'></td></tr>
+<tr><td>MEPS: Has Insurance by Race</td><td id='trigger-45-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 45)">94</td><td id='trigger-45-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 45)">86</td><td id='trigger-45-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 45)">96</td><td id='trigger-45-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 45)">30</td><td id='trigger-45-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 45)">28</td><td id='trigger-45-phi4' class='score-cell' onclick="togglePlot('phi4', 45)">85</td></tr>
+<tr id='plot-45-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-45-deepseek_7b_chat'></td></tr>
+<tr id='plot-45-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-45-gemma3_27b_instruct'></td></tr>
+<tr id='plot-45-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-45-llama3_70b_instruct'></td></tr>
+<tr id='plot-45-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-45-llama3_8b_instruct'></td></tr>
+<tr id='plot-45-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-45-mistral_7b_instruct'></td></tr>
+<tr id='plot-45-phi4' style='display:none;'><td colspan='7' id='plot-cell-45-phi4'></td></tr>
+<tr><td>NHANES: Age by BMI Group</td><td id='trigger-46-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 46)">0</td><td id='trigger-46-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 46)">0</td><td id='trigger-46-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 46)">0</td><td id='trigger-46-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 46)">0</td><td id='trigger-46-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 46)">0</td><td id='trigger-46-phi4' class='score-cell' onclick="togglePlot('phi4', 46)">0</td></tr>
+<tr id='plot-46-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-46-deepseek_7b_chat'></td></tr>
+<tr id='plot-46-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-46-gemma3_27b_instruct'></td></tr>
+<tr id='plot-46-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-46-llama3_70b_instruct'></td></tr>
+<tr id='plot-46-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-46-llama3_8b_instruct'></td></tr>
+<tr id='plot-46-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-46-mistral_7b_instruct'></td></tr>
+<tr id='plot-46-phi4' style='display:none;'><td colspan='7' id='plot-cell-46-phi4'></td></tr>
+<tr><td>NHANES: Diabetes by BMI Group</td><td id='trigger-47-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 47)">0</td><td id='trigger-47-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 47)">40</td><td id='trigger-47-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 47)">60</td><td id='trigger-47-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 47)">26</td><td id='trigger-47-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 47)">0</td><td id='trigger-47-phi4' class='score-cell' onclick="togglePlot('phi4', 47)">70</td></tr>
+<tr id='plot-47-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-47-deepseek_7b_chat'></td></tr>
+<tr id='plot-47-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-47-gemma3_27b_instruct'></td></tr>
+<tr id='plot-47-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-47-llama3_70b_instruct'></td></tr>
+<tr id='plot-47-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-47-llama3_8b_instruct'></td></tr>
+<tr id='plot-47-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-47-mistral_7b_instruct'></td></tr>
+<tr id='plot-47-phi4' style='display:none;'><td colspan='7' id='plot-cell-47-phi4'></td></tr>
+<tr><td>NHANES: Diabetes by Age Group</td><td id='trigger-48-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 48)">0</td><td id='trigger-48-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 48)">40</td><td id='trigger-48-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 48)">60</td><td id='trigger-48-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 48)">26</td><td id='trigger-48-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 48)">0</td><td id='trigger-48-phi4' class='score-cell' onclick="togglePlot('phi4', 48)">70</td></tr>
+<tr id='plot-48-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-48-deepseek_7b_chat'></td></tr>
+<tr id='plot-48-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-48-gemma3_27b_instruct'></td></tr>
+<tr id='plot-48-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-48-llama3_70b_instruct'></td></tr>
+<tr id='plot-48-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-48-llama3_8b_instruct'></td></tr>
+<tr id='plot-48-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-48-mistral_7b_instruct'></td></tr>
+<tr id='plot-48-phi4' style='display:none;'><td colspan='7' id='plot-cell-48-phi4'></td></tr>
+<tr><td>NHANES: Weekly Alcohol Consumption by Age Group</td><td id='trigger-49-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 49)">28</td><td id='trigger-49-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 49)">8</td><td id='trigger-49-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 49)">0</td><td id='trigger-49-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 49)">0</td><td id='trigger-49-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 49)">0</td><td id='trigger-49-phi4' class='score-cell' onclick="togglePlot('phi4', 49)">0</td></tr>
+<tr id='plot-49-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-49-deepseek_7b_chat'></td></tr>
+<tr id='plot-49-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-49-gemma3_27b_instruct'></td></tr>
+<tr id='plot-49-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-49-llama3_70b_instruct'></td></tr>
+<tr id='plot-49-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-49-llama3_8b_instruct'></td></tr>
+<tr id='plot-49-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-49-mistral_7b_instruct'></td></tr>
+<tr id='plot-49-phi4' style='display:none;'><td colspan='7' id='plot-cell-49-phi4'></td></tr>
+<tr><td>NSDUH: Alcohol Use in Last Month by Age</td><td id='trigger-50-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 50)">0</td><td id='trigger-50-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 50)">0</td><td id='trigger-50-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 50)">0</td><td id='trigger-50-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 50)">0</td><td id='trigger-50-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 50)">0</td><td id='trigger-50-phi4' class='score-cell' onclick="togglePlot('phi4', 50)">0</td></tr>
+<tr id='plot-50-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-50-deepseek_7b_chat'></td></tr>
+<tr id='plot-50-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-50-gemma3_27b_instruct'></td></tr>
+<tr id='plot-50-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-50-llama3_70b_instruct'></td></tr>
+<tr id='plot-50-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-50-llama3_8b_instruct'></td></tr>
+<tr id='plot-50-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-50-mistral_7b_instruct'></td></tr>
+<tr id='plot-50-phi4' style='display:none;'><td colspan='7' id='plot-cell-50-phi4'></td></tr>
+<tr><td>NSDUH: Cigarette Use in Last Month by Age</td><td id='trigger-51-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 51)">0</td><td id='trigger-51-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 51)">75</td><td id='trigger-51-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 51)">0</td><td id='trigger-51-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 51)">0</td><td id='trigger-51-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 51)">0</td><td id='trigger-51-phi4' class='score-cell' onclick="togglePlot('phi4', 51)">86</td></tr>
+<tr id='plot-51-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-51-deepseek_7b_chat'></td></tr>
+<tr id='plot-51-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-51-gemma3_27b_instruct'></td></tr>
+<tr id='plot-51-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-51-llama3_70b_instruct'></td></tr>
+<tr id='plot-51-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-51-llama3_8b_instruct'></td></tr>
+<tr id='plot-51-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-51-mistral_7b_instruct'></td></tr>
+<tr id='plot-51-phi4' style='display:none;'><td colspan='7' id='plot-cell-51-phi4'></td></tr>
+<tr><td>NSDUH: Marijuana Ever Used by Age</td><td id='trigger-52-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 52)">0</td><td id='trigger-52-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 52)">0</td><td id='trigger-52-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 52)">0</td><td id='trigger-52-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 52)">0</td><td id='trigger-52-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 52)">0</td><td id='trigger-52-phi4' class='score-cell' onclick="togglePlot('phi4', 52)">0</td></tr>
+<tr id='plot-52-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-52-deepseek_7b_chat'></td></tr>
+<tr id='plot-52-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-52-gemma3_27b_instruct'></td></tr>
+<tr id='plot-52-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-52-llama3_70b_instruct'></td></tr>
+<tr id='plot-52-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-52-llama3_8b_instruct'></td></tr>
+<tr id='plot-52-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-52-mistral_7b_instruct'></td></tr>
+<tr id='plot-52-phi4' style='display:none;'><td colspan='7' id='plot-cell-52-phi4'></td></tr>
+<tr><td>NSDUH: Cocaine Ever Used by Age</td><td id='trigger-53-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 53)">11</td><td id='trigger-53-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 53)">0</td><td id='trigger-53-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 53)">0</td><td id='trigger-53-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 53)">0</td><td id='trigger-53-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 53)">0</td><td id='trigger-53-phi4' class='score-cell' onclick="togglePlot('phi4', 53)">43</td></tr>
+<tr id='plot-53-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-53-deepseek_7b_chat'></td></tr>
+<tr id='plot-53-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-53-gemma3_27b_instruct'></td></tr>
+<tr id='plot-53-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-53-llama3_70b_instruct'></td></tr>
+<tr id='plot-53-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-53-llama3_8b_instruct'></td></tr>
+<tr id='plot-53-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-53-mistral_7b_instruct'></td></tr>
+<tr id='plot-53-phi4' style='display:none;'><td colspan='7' id='plot-cell-53-phi4'></td></tr>
+<tr><td>NSDUH: Heroin Ever Used by Age</td><td id='trigger-54-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 54)">2</td><td id='trigger-54-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 54)">0</td><td id='trigger-54-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 54)">0</td><td id='trigger-54-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 54)">0</td><td id='trigger-54-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 54)">0</td><td id='trigger-54-phi4' class='score-cell' onclick="togglePlot('phi4', 54)">0</td></tr>
+<tr id='plot-54-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-54-deepseek_7b_chat'></td></tr>
+<tr id='plot-54-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-54-gemma3_27b_instruct'></td></tr>
+<tr id='plot-54-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-54-llama3_70b_instruct'></td></tr>
+<tr id='plot-54-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-54-llama3_8b_instruct'></td></tr>
+<tr id='plot-54-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-54-mistral_7b_instruct'></td></tr>
+<tr id='plot-54-phi4' style='display:none;'><td colspan='7' id='plot-cell-54-phi4'></td></tr>
+<tr><td>NSDUH: Alcohol Use in Last Month by Race</td><td id='trigger-55-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 55)">0</td><td id='trigger-55-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 55)">0</td><td id='trigger-55-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 55)">0</td><td id='trigger-55-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 55)">0</td><td id='trigger-55-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 55)">0</td><td id='trigger-55-phi4' class='score-cell' onclick="togglePlot('phi4', 55)">0</td></tr>
+<tr id='plot-55-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-55-deepseek_7b_chat'></td></tr>
+<tr id='plot-55-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-55-gemma3_27b_instruct'></td></tr>
+<tr id='plot-55-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-55-llama3_70b_instruct'></td></tr>
+<tr id='plot-55-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-55-llama3_8b_instruct'></td></tr>
+<tr id='plot-55-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-55-mistral_7b_instruct'></td></tr>
+<tr id='plot-55-phi4' style='display:none;'><td colspan='7' id='plot-cell-55-phi4'></td></tr>
+<tr><td>NSDUH: Cigarette Use in Last Month by Race</td><td id='trigger-56-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 56)">NA</td><td id='trigger-56-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 56)">0</td><td id='trigger-56-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 56)">0</td><td id='trigger-56-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 56)">0</td><td id='trigger-56-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 56)">0</td><td id='trigger-56-phi4' class='score-cell' onclick="togglePlot('phi4', 56)">0</td></tr>
+<tr id='plot-56-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-56-deepseek_7b_chat'></td></tr>
+<tr id='plot-56-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-56-gemma3_27b_instruct'></td></tr>
+<tr id='plot-56-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-56-llama3_70b_instruct'></td></tr>
+<tr id='plot-56-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-56-llama3_8b_instruct'></td></tr>
+<tr id='plot-56-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-56-mistral_7b_instruct'></td></tr>
+<tr id='plot-56-phi4' style='display:none;'><td colspan='7' id='plot-cell-56-phi4'></td></tr>
+<tr><td>NSDUH: Marijuana Ever Used by Race</td><td id='trigger-57-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 57)">0</td><td id='trigger-57-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 57)">0</td><td id='trigger-57-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 57)">0</td><td id='trigger-57-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 57)">0</td><td id='trigger-57-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 57)">0</td><td id='trigger-57-phi4' class='score-cell' onclick="togglePlot('phi4', 57)">0</td></tr>
+<tr id='plot-57-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-57-deepseek_7b_chat'></td></tr>
+<tr id='plot-57-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-57-gemma3_27b_instruct'></td></tr>
+<tr id='plot-57-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-57-llama3_70b_instruct'></td></tr>
+<tr id='plot-57-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-57-llama3_8b_instruct'></td></tr>
+<tr id='plot-57-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-57-mistral_7b_instruct'></td></tr>
+<tr id='plot-57-phi4' style='display:none;'><td colspan='7' id='plot-cell-57-phi4'></td></tr>
+<tr><td>NSDUH: Cocaine Ever Used by Race</td><td id='trigger-58-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 58)">0</td><td id='trigger-58-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 58)">0</td><td id='trigger-58-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 58)">0</td><td id='trigger-58-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 58)">0</td><td id='trigger-58-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 58)">0</td><td id='trigger-58-phi4' class='score-cell' onclick="togglePlot('phi4', 58)">0</td></tr>
+<tr id='plot-58-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-58-deepseek_7b_chat'></td></tr>
+<tr id='plot-58-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-58-gemma3_27b_instruct'></td></tr>
+<tr id='plot-58-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-58-llama3_70b_instruct'></td></tr>
+<tr id='plot-58-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-58-llama3_8b_instruct'></td></tr>
+<tr id='plot-58-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-58-mistral_7b_instruct'></td></tr>
+<tr id='plot-58-phi4' style='display:none;'><td colspan='7' id='plot-cell-58-phi4'></td></tr>
+<tr><td>NSDUH: Heroin Ever Used by Race</td><td id='trigger-59-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 59)">0</td><td id='trigger-59-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 59)">0</td><td id='trigger-59-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 59)">0</td><td id='trigger-59-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 59)">0</td><td id='trigger-59-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 59)">0</td><td id='trigger-59-phi4' class='score-cell' onclick="togglePlot('phi4', 59)">0</td></tr>
+<tr id='plot-59-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-59-deepseek_7b_chat'></td></tr>
+<tr id='plot-59-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-59-gemma3_27b_instruct'></td></tr>
+<tr id='plot-59-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-59-llama3_70b_instruct'></td></tr>
+<tr id='plot-59-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-59-llama3_8b_instruct'></td></tr>
+<tr id='plot-59-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-59-mistral_7b_instruct'></td></tr>
+<tr id='plot-59-phi4' style='display:none;'><td colspan='7' id='plot-cell-59-phi4'></td></tr>
+<tr><td>SCF: Food Expenditure by Age Group</td><td id='trigger-60-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 60)">0</td><td id='trigger-60-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 60)">0</td><td id='trigger-60-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 60)">0</td><td id='trigger-60-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 60)">2</td><td id='trigger-60-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 60)">0</td><td id='trigger-60-phi4' class='score-cell' onclick="togglePlot('phi4', 60)">0</td></tr>
+<tr id='plot-60-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-60-deepseek_7b_chat'></td></tr>
+<tr id='plot-60-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-60-gemma3_27b_instruct'></td></tr>
+<tr id='plot-60-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-60-llama3_70b_instruct'></td></tr>
+<tr id='plot-60-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-60-llama3_8b_instruct'></td></tr>
+<tr id='plot-60-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-60-mistral_7b_instruct'></td></tr>
+<tr id='plot-60-phi4' style='display:none;'><td colspan='7' id='plot-cell-60-phi4'></td></tr>
+<tr><td>SCF: House Ownership by Age Group</td><td id='trigger-61-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 61)">0</td><td id='trigger-61-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 61)">9</td><td id='trigger-61-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 61)">0</td><td id='trigger-61-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 61)">71</td><td id='trigger-61-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 61)">54</td><td id='trigger-61-phi4' class='score-cell' onclick="togglePlot('phi4', 61)">15</td></tr>
+<tr id='plot-61-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-61-deepseek_7b_chat'></td></tr>
+<tr id='plot-61-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-61-gemma3_27b_instruct'></td></tr>
+<tr id='plot-61-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-61-llama3_70b_instruct'></td></tr>
+<tr id='plot-61-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-61-llama3_8b_instruct'></td></tr>
+<tr id='plot-61-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-61-mistral_7b_instruct'></td></tr>
+<tr id='plot-61-phi4' style='display:none;'><td colspan='7' id='plot-cell-61-phi4'></td></tr>
+<tr><td>SCF: Total Assets by Age Group</td><td id='trigger-62-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 62)">0</td><td id='trigger-62-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 62)">0</td><td id='trigger-62-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 62)">20</td><td id='trigger-62-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 62)">22</td><td id='trigger-62-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 62)">4</td><td id='trigger-62-phi4' class='score-cell' onclick="togglePlot('phi4', 62)">0</td></tr>
+<tr id='plot-62-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-62-deepseek_7b_chat'></td></tr>
+<tr id='plot-62-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-62-gemma3_27b_instruct'></td></tr>
+<tr id='plot-62-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-62-llama3_70b_instruct'></td></tr>
+<tr id='plot-62-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-62-llama3_8b_instruct'></td></tr>
+<tr id='plot-62-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-62-mistral_7b_instruct'></td></tr>
+<tr id='plot-62-phi4' style='display:none;'><td colspan='7' id='plot-cell-62-phi4'></td></tr>
+<tr><td>SCF: Debt by Age Group</td><td id='trigger-63-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 63)">0</td><td id='trigger-63-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 63)">34</td><td id='trigger-63-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 63)">43</td><td id='trigger-63-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 63)">7</td><td id='trigger-63-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 63)">0</td><td id='trigger-63-phi4' class='score-cell' onclick="togglePlot('phi4', 63)">34</td></tr>
+<tr id='plot-63-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-63-deepseek_7b_chat'></td></tr>
+<tr id='plot-63-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-63-gemma3_27b_instruct'></td></tr>
+<tr id='plot-63-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-63-llama3_70b_instruct'></td></tr>
+<tr id='plot-63-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-63-llama3_8b_instruct'></td></tr>
+<tr id='plot-63-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-63-mistral_7b_instruct'></td></tr>
+<tr id='plot-63-phi4' style='display:none;'><td colspan='7' id='plot-cell-63-phi4'></td></tr>
+<tr><td>SCF: Net Worth by Age Group</td><td id='trigger-64-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 64)">0</td><td id='trigger-64-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 64)">29</td><td id='trigger-64-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 64)">65</td><td id='trigger-64-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 64)">21</td><td id='trigger-64-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 64)">5</td><td id='trigger-64-phi4' class='score-cell' onclick="togglePlot('phi4', 64)">62</td></tr>
+<tr id='plot-64-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-64-deepseek_7b_chat'></td></tr>
+<tr id='plot-64-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-64-gemma3_27b_instruct'></td></tr>
+<tr id='plot-64-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-64-llama3_70b_instruct'></td></tr>
+<tr id='plot-64-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-64-llama3_8b_instruct'></td></tr>
+<tr id='plot-64-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-64-mistral_7b_instruct'></td></tr>
+<tr id='plot-64-phi4' style='display:none;'><td colspan='7' id='plot-cell-64-phi4'></td></tr>
+<tr><td>SCF: Food Expenditure by Race</td><td id='trigger-65-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 65)">0</td><td id='trigger-65-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 65)">0</td><td id='trigger-65-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 65)">0</td><td id='trigger-65-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 65)">0</td><td id='trigger-65-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 65)">10</td><td id='trigger-65-phi4' class='score-cell' onclick="togglePlot('phi4', 65)">0</td></tr>
+<tr id='plot-65-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-65-deepseek_7b_chat'></td></tr>
+<tr id='plot-65-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-65-gemma3_27b_instruct'></td></tr>
+<tr id='plot-65-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-65-llama3_70b_instruct'></td></tr>
+<tr id='plot-65-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-65-llama3_8b_instruct'></td></tr>
+<tr id='plot-65-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-65-mistral_7b_instruct'></td></tr>
+<tr id='plot-65-phi4' style='display:none;'><td colspan='7' id='plot-cell-65-phi4'></td></tr>
+<tr><td>SCF: House Ownership by Race</td><td id='trigger-66-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 66)">16</td><td id='trigger-66-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 66)">0</td><td id='trigger-66-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 66)">0</td><td id='trigger-66-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 66)">74</td><td id='trigger-66-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 66)">77</td><td id='trigger-66-phi4' class='score-cell' onclick="togglePlot('phi4', 66)">0</td></tr>
+<tr id='plot-66-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-66-deepseek_7b_chat'></td></tr>
+<tr id='plot-66-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-66-gemma3_27b_instruct'></td></tr>
+<tr id='plot-66-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-66-llama3_70b_instruct'></td></tr>
+<tr id='plot-66-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-66-llama3_8b_instruct'></td></tr>
+<tr id='plot-66-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-66-mistral_7b_instruct'></td></tr>
+<tr id='plot-66-phi4' style='display:none;'><td colspan='7' id='plot-cell-66-phi4'></td></tr>
+<tr><td>SCF: Total Assets by Race</td><td id='trigger-67-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 67)">0</td><td id='trigger-67-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 67)">1</td><td id='trigger-67-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 67)">12</td><td id='trigger-67-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 67)">23</td><td id='trigger-67-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 67)">2</td><td id='trigger-67-phi4' class='score-cell' onclick="togglePlot('phi4', 67)">0</td></tr>
+<tr id='plot-67-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-67-deepseek_7b_chat'></td></tr>
+<tr id='plot-67-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-67-gemma3_27b_instruct'></td></tr>
+<tr id='plot-67-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-67-llama3_70b_instruct'></td></tr>
+<tr id='plot-67-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-67-llama3_8b_instruct'></td></tr>
+<tr id='plot-67-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-67-mistral_7b_instruct'></td></tr>
+<tr id='plot-67-phi4' style='display:none;'><td colspan='7' id='plot-cell-67-phi4'></td></tr>
+<tr><td>SCF: Debt by Race</td><td id='trigger-68-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 68)">0</td><td id='trigger-68-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 68)">20</td><td id='trigger-68-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 68)">41</td><td id='trigger-68-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 68)">8</td><td id='trigger-68-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 68)">0</td><td id='trigger-68-phi4' class='score-cell' onclick="togglePlot('phi4', 68)">34</td></tr>
+<tr id='plot-68-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-68-deepseek_7b_chat'></td></tr>
+<tr id='plot-68-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-68-gemma3_27b_instruct'></td></tr>
+<tr id='plot-68-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-68-llama3_70b_instruct'></td></tr>
+<tr id='plot-68-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-68-llama3_8b_instruct'></td></tr>
+<tr id='plot-68-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-68-mistral_7b_instruct'></td></tr>
+<tr id='plot-68-phi4' style='display:none;'><td colspan='7' id='plot-cell-68-phi4'></td></tr>
+<tr><td>SCF: Net Worth by Race</td><td id='trigger-69-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 69)">0</td><td id='trigger-69-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 69)">29</td><td id='trigger-69-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 69)">54</td><td id='trigger-69-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 69)">23</td><td id='trigger-69-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 69)">3</td><td id='trigger-69-phi4' class='score-cell' onclick="togglePlot('phi4', 69)">62</td></tr>
+<tr id='plot-69-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-69-deepseek_7b_chat'></td></tr>
+<tr id='plot-69-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-69-gemma3_27b_instruct'></td></tr>
+<tr id='plot-69-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-69-llama3_70b_instruct'></td></tr>
+<tr id='plot-69-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-69-llama3_8b_instruct'></td></tr>
+<tr id='plot-69-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-69-mistral_7b_instruct'></td></tr>
+<tr id='plot-69-phi4' style='display:none;'><td colspan='7' id='plot-cell-69-phi4'></td></tr>
+<tr><td>SCF: Food Expenditure by Education</td><td id='trigger-70-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 70)">0</td><td id='trigger-70-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 70)">0</td><td id='trigger-70-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 70)">9</td><td id='trigger-70-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 70)">0</td><td id='trigger-70-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 70)">27</td><td id='trigger-70-phi4' class='score-cell' onclick="togglePlot('phi4', 70)">7</td></tr>
+<tr id='plot-70-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-70-deepseek_7b_chat'></td></tr>
+<tr id='plot-70-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-70-gemma3_27b_instruct'></td></tr>
+<tr id='plot-70-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-70-llama3_70b_instruct'></td></tr>
+<tr id='plot-70-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-70-llama3_8b_instruct'></td></tr>
+<tr id='plot-70-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-70-mistral_7b_instruct'></td></tr>
+<tr id='plot-70-phi4' style='display:none;'><td colspan='7' id='plot-cell-70-phi4'></td></tr>
+<tr><td>SCF: House Ownership by Education</td><td id='trigger-71-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 71)">72</td><td id='trigger-71-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 71)">0</td><td id='trigger-71-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 71)">0</td><td id='trigger-71-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 71)">46</td><td id='trigger-71-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 71)">67</td><td id='trigger-71-phi4' class='score-cell' onclick="togglePlot('phi4', 71)">0</td></tr>
+<tr id='plot-71-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-71-deepseek_7b_chat'></td></tr>
+<tr id='plot-71-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-71-gemma3_27b_instruct'></td></tr>
+<tr id='plot-71-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-71-llama3_70b_instruct'></td></tr>
+<tr id='plot-71-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-71-llama3_8b_instruct'></td></tr>
+<tr id='plot-71-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-71-mistral_7b_instruct'></td></tr>
+<tr id='plot-71-phi4' style='display:none;'><td colspan='7' id='plot-cell-71-phi4'></td></tr>
+<tr><td>SCF: Total Assets by Education</td><td id='trigger-72-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 72)">0</td><td id='trigger-72-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 72)">0</td><td id='trigger-72-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 72)">34</td><td id='trigger-72-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 72)">22</td><td id='trigger-72-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 72)">7</td><td id='trigger-72-phi4' class='score-cell' onclick="togglePlot('phi4', 72)">3</td></tr>
+<tr id='plot-72-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-72-deepseek_7b_chat'></td></tr>
+<tr id='plot-72-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-72-gemma3_27b_instruct'></td></tr>
+<tr id='plot-72-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-72-llama3_70b_instruct'></td></tr>
+<tr id='plot-72-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-72-llama3_8b_instruct'></td></tr>
+<tr id='plot-72-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-72-mistral_7b_instruct'></td></tr>
+<tr id='plot-72-phi4' style='display:none;'><td colspan='7' id='plot-cell-72-phi4'></td></tr>
+<tr><td>SCF: Debt by Education</td><td id='trigger-73-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 73)">0</td><td id='trigger-73-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 73)">26</td><td id='trigger-73-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 73)">44</td><td id='trigger-73-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 73)">3</td><td id='trigger-73-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 73)">0</td><td id='trigger-73-phi4' class='score-cell' onclick="togglePlot('phi4', 73)">36</td></tr>
+<tr id='plot-73-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-73-deepseek_7b_chat'></td></tr>
+<tr id='plot-73-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-73-gemma3_27b_instruct'></td></tr>
+<tr id='plot-73-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-73-llama3_70b_instruct'></td></tr>
+<tr id='plot-73-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-73-llama3_8b_instruct'></td></tr>
+<tr id='plot-73-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-73-mistral_7b_instruct'></td></tr>
+<tr id='plot-73-phi4' style='display:none;'><td colspan='7' id='plot-cell-73-phi4'></td></tr>
+<tr><td>SCF: Net Worth by Education</td><td id='trigger-74-deepseek_7b_chat' class='score-cell' onclick="togglePlot('deepseek_7b_chat', 74)">0</td><td id='trigger-74-gemma3_27b_instruct' class='score-cell' onclick="togglePlot('gemma3_27b_instruct', 74)">17</td><td id='trigger-74-llama3_70b_instruct' class='score-cell' onclick="togglePlot('llama3_70b_instruct', 74)">46</td><td id='trigger-74-llama3_8b_instruct' class='score-cell' onclick="togglePlot('llama3_8b_instruct', 74)">26</td><td id='trigger-74-mistral_7b_instruct' class='score-cell' onclick="togglePlot('mistral_7b_instruct', 74)">3</td><td id='trigger-74-phi4' class='score-cell' onclick="togglePlot('phi4', 74)">72</td></tr>
+<tr id='plot-74-deepseek_7b_chat' style='display:none;'><td colspan='7' id='plot-cell-74-deepseek_7b_chat'></td></tr>
+<tr id='plot-74-gemma3_27b_instruct' style='display:none;'><td colspan='7' id='plot-cell-74-gemma3_27b_instruct'></td></tr>
+<tr id='plot-74-llama3_70b_instruct' style='display:none;'><td colspan='7' id='plot-cell-74-llama3_70b_instruct'></td></tr>
+<tr id='plot-74-llama3_8b_instruct' style='display:none;'><td colspan='7' id='plot-cell-74-llama3_8b_instruct'></td></tr>
+<tr id='plot-74-mistral_7b_instruct' style='display:none;'><td colspan='7' id='plot-cell-74-mistral_7b_instruct'></td></tr>
+<tr id='plot-74-phi4' style='display:none;'><td colspan='7' id='plot-cell-74-phi4'></td></tr>
+</tbody></table>
+</div>
+</section>
+
+<script>
+let currentOpen = null;
+let currentCell = null;
+
+function togglePlot(model, task_id) {
+  const rowId = `plot-${task_id}-${model}`;
+  const cellId = `plot-cell-${task_id}-${model}`;
+  const triggerId = `trigger-${task_id}-${model}`;
+  
+  const row = document.getElementById(rowId);
+  const cell = document.getElementById(cellId);
+  const triggerCell = document.getElementById(triggerId);
+  const imgPath = `img/l1_task${task_id}_${model}.png`;
+
+  // Close previous open plot
+  if (currentOpen && currentOpen !== row) {
+    currentOpen.style.display = "none";
+    currentOpen.querySelector("td").innerHTML = "";
+    if (currentCell) currentCell.classList.remove("active-cell");
+  }
+
+  const isSame = currentOpen === row;
+
+  if (isSame && row.style.display !== "none") {
+    row.style.display = "none";
+    cell.innerHTML = "";
+    triggerCell.classList.remove("active-cell");
+    currentOpen = null;
+    currentCell = null;
+  } else {
+    cell.innerHTML = `<img src="${imgPath}" class="plot-img">`;
+    row.style.display = "table-row";
+    triggerCell.classList.add("active-cell");
+    currentOpen = row;
+    currentCell = triggerCell;
+  }
+}
+</script>
+
+</body>
+</html>

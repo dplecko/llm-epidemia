@@ -17,3 +17,4 @@ from plot_helpers import name_and_sort
 from hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, hd_tasksize
 from model_load import load_model, MODEL_PATHS
 from extract_helpers import extract_pv, compress_vals, extract_pv_batch
+from qual_inspect import make_detail_plotnine
