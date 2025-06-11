@@ -4,14 +4,12 @@ import plotly.graph_objects as go
 from plotly.colors import qualitative
 from workspace.utils.helpers import model_name
 from workspace.eval import build_eval_df
-from workspace.task_spec import task_specs_hd
+from workspace.task_spec import task_specs, task_specs_hd
 
 # Dummy data — replace with your actual df_scores
-eval_df, _ = build_eval_df(
-    models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
-              "gemma3_27b_instruct", "deepseek_7b_chat"],
-    tasks = task_specs_hd, prob = False
-)
+models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
+          "gemma3_27b_instruct", "deepseek_7b_chat"]
+eval_df, _ = build_eval_df(models, task_specs + task_specs_hd, prob = False)
 
 # Process
 agg = eval_df.groupby("model")[["score"]].mean().round().astype(int).reset_index()
@@ -75,5 +73,5 @@ fig.update_layout(
 )
 
 # Export
-fig.write_html("www/distribution.html", include_plotlyjs="cdn", full_html=True)
+fig.write_html("www/img/distribution.html", include_plotlyjs="cdn", full_html=True)
 

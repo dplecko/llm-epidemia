@@ -105,7 +105,7 @@ def kde_density(vals, wgh, label):
     kde.fit(weights=wgh, bw="scott", fft=False)
     return pd.DataFrame({"x": kde.support, "y": kde.density, "type": label})
 
-def make_detail_plotnine(df, task):
+def make_detail_plotnine(df, task, single_cond=None):
     if df.shape[0] == 1:
         # Marginal: histogram via geom_density
         true_vals = np.array(df["true_vals"].iloc[0]["vals"], dtype=float).copy()
@@ -148,17 +148,18 @@ def make_detail_plotnine(df, task):
             p += coord_cartesian(xlim=(0, 1), ylim=(0, 1))
 
     elif hasattr(df, "attrs") and "distr" in df.attrs:
-        distr = df.attrs["distr"]
-        distr["prop"] = distr["prop"].apply(float)
+        distr = df.attrs["distr"].copy()
+        distr["prop"] = distr["prop"].astype(float)
+
+        if single_cond is not None:
+            distr = distr[distr["cond"] == single_cond]
 
         p = (
             ggplot(distr, aes(x="lvl_names", y="prop", fill="type"))
             + geom_col(position="dodge", color="black")
-            + facet_wrap("~cond")
-            + theme_bw()
-            + labs(title=task["name"], x="Level", y="Proportion")
+            + labs(title=f'{task["name"]} – {single_cond}', x="Level", y="Proportion")
             + scale_y_continuous(labels=lambda l: [f"{v:.0%}" for v in l])
-            + theme(axis_text_x=element_text(rotation=45, hjust=1))
+            + theme(axis_text_x=element_text(rotation=45, ha="right"))
             + dark_theme()
         )
     else:

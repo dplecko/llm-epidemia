@@ -22,43 +22,46 @@
 
 <body class="text-light" style="background-color: #0d1b2a !important;">
   <div id="navbar"></div>
-  <script>
-    fetch("navbar.html")
-      .then(res => res.text())
-      .then(data => document.getElementById("navbar").innerHTML = data);
-  </script>
 
   <section class="container my-5">
     <h1 class="mb-4">Observational Distribution Benchmark – Results</h1>
 
     <div class="d-flex justify-content-center mb-4 gap-3">
-      <button class="btn btn-outline-light btn-toggle active" onclick="loadPlot('interactive_ld_bydataset')">By
+      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_ld_bydataset', this)">By
         Setting</button>
-      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_by_dim')">By Dimension</button>
-      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bysize')">By Model Size</button>
+      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_by_dim', this)">By
+        Dimension</button>
+      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bysize', this)">By Model
+        Size</button>
     </div>
 
-    <div id="plot-container" class="text-center">
-      <!-- Plot goes here -->
-    </div>
+    <div id="plot-container" class="text-center"></div>
   </section>
 
   <script>
-    function loadPlot(key) {
+    function loadPlot(key, clickedButton = null) {
       document.querySelectorAll('.btn-toggle').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (clickedButton) clickedButton.classList.add('active');
 
-      const basePath = `img/${key}.html`;  // assumes files like 'setting.html', 'dimension.html', etc.
-
+      const basePath = `img/${key}.html`;
       document.getElementById("plot-container").innerHTML = `
         <iframe src="${basePath}" width="100%" height="500" style="border:none; background-color:#0d1b2a;"></iframe>
       `;
     }
 
-    // Default load
-    window.onload = function () {
-      loadPlot('setting');
-    };
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("navbar.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("navbar").innerHTML = data;
+
+          // Once navbar is inserted, activate first button
+          requestAnimationFrame(() => {
+            const firstBtn = document.querySelector('.btn-toggle');
+            if (firstBtn) loadPlot('interactive_ld_bydataset', firstBtn);
+          });
+        });
+    });
   </script>
 
 </body>

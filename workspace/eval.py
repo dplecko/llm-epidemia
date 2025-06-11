@@ -11,8 +11,13 @@ sys.path.append(os.path.abspath("workspace/utils"))
 from metrics import cat_to_distr, weighted_L1
 from helpers import task_to_filename, dat_name_clean
 from hd_helpers import bootstrap_lgbm
+import pdbpp
 
 def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
+    
+    # remove NA values from levels
+    levels = [x for x in levels if not (isinstance(x, float) and np.isnan(x))]
+
     nbins = len(levels)
     lvl_names = levels
     rows = []
@@ -34,10 +39,11 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     for r in res:
         
         cond_wghs.append(r["total_weight"])
-        if len(r["model_vals"]) == len(levels):
-            n_mc = r["n_data"]
-        else:
-            n_mc = len(r["model_vals"]) 
+        n_mc = r["n_data"]
+        # if len(r["model_vals"]) == len(levels):
+        #     n_mc = r["n_data"]
+        # else:
+        #     n_mc = len(r["model_vals"]) 
         val_true = np.array([levels.index(v) for v in r["true_vals"]], dtype=int)
         wgh_true = np.array(r.get("true_weights", [1.0] * len(val_true)))
         
@@ -49,14 +55,14 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
 
         for i in range(nbins):
             distr_rows.append({
-                "lvl": i + 1,
+                "lvl": i,
                 "lvl_names": lvl_names[i],
                 "prop": distr_true[i],
                 "type": "Reality",
                 "cond": r["condition"]
             })
             distr_rows.append({
-                "lvl": i + 1,
+                "lvl": i,
                 "lvl_names": lvl_names[i],
                 "prop": distr_mod[i],
                 "type": "Model",

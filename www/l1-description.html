@@ -29,6 +29,11 @@
     .plot-container img {
       max-width: 500px;
     }
+
+    #toc a:hover {
+      color: #d4af37;
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -39,184 +44,385 @@
       .then(res => res.text())
       .then(data => document.getElementById("navbar").innerHTML = data);
   </script>
+  <div class="container my-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <div class="row">
+          <nav id="toc" class="col-lg-3 d-none d-lg-block text-light"
+            style="background-color: #0d1b2a; position:sticky; top:2rem; height:calc(100vh - 2rem); padding:1rem; border: 1px solid #222; border-radius: 0.5rem; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+            <h6 class="text-uppercase">Outline</h6>
+            <ul class="nav flex-column small" id="toc-list"></ul>
+          </nav>
 
-  <section class="container my-5">
-    <h1 class="mb-4">Observational Distribution Benchmark (Layer 1)</h1>
+          <main class="col-lg-8">
+            <section style="max-width: 950px;">
+              <!-- content -->
 
-    <h3>What is Observational Data?</h3>
-    <p>
-      Observational data refers to any data that is passively collected, without any specific interventions performed.
-      The name observational comes from the fact that the data collector is just <i>observing</i> the real world,
-      without acting in it.
-      This type of data reflects natural patterns in the world, and the vast majority of data we encounter is
-      observational.
-      This includes various forms of data such as surveys, administrative records, public health records,
-      electronic health records, company records and so on.
-    </p>
-    <p>
-      An illustrative example for distinguishing observational from non-observational data may be helpful here.
-      For instance, consider the investigation of tutoring and exam performance.
-      Students who attend private tutoring often perform better on tests — but this conclusion is drawn from
-      observational data, in which the choice of tutoring follows its natural regime.
-      In this natural regime, families choosing tutoring may differ in other ways, such as socioeconomic status (SES).
-      Therefore, it may co-occur that tutoring and high exam performance are both caused by better SES, which allows the
-      parents to spend more time helping their kids study.
-      In this context, it would be possible to obtain different kind of data, coming from a <i>randomized controlled
-        trial (RCT)</i>.
-      In the RCT setting, we would randomly assign tutoring to different students, and then check whether the
-      correlation of tutoring with improved exam performance still exists. This type of data is referred to as
-      <i>interventional</i>, since we actively changed the way in which tutoring is assigned (in our case, at random).
-      As a consequence of randomization, tutoring choice may no longer be correlated with the family's SES, in this way
-      avoiding possible spurious correlations.
-      Observational data, by contrast, reflects natural patterns without intervention, and may reflect both causal and
-      spurious correlations. You can read more about observational and interventional data in the section on
-      <a href="#">Pearl’s causal hierarchy</a>.
-    </p>
+              <br>
+              <h1 class="mb-4">Observational Distribution Benchmark (Layer 1)</h1>
 
-    <h3>How Can Models Exhibit Knowledge of Observational Distributions?</h3>
-    <p>
-      We will label observational distributions in the real world with \( P(V) \), where \( V \) is the set of variables
-      we are studying. As a running example for illustrating our benchmark, we will be interested in <i>smoking rates
-        across age groups</i>. This information is encoded in the distribution \(P(V_X, V_Y)\), where \( V_X \) denotes
-      age, and \(V_Y\) denotes smoking. To obtain the distribution of age and smoking in the real world, we refer to
-      <strong>National Survey on Drug Use and Health (NSDUH) 2023</strong>, collected by the Substance Abuse and
-      Mental Health Services Administration (SAMHSA). The NSDUH provides information on substance use and mental health
-      in the US, and includes information about cigarette usage across demographics.
-    </p>
-    <div class="bg-dark p-3 rounded border border-secondary">
-      <h5>Example: NSDUH – Smoking by Age</h5>
-      <p>
-        Let \( V_Y \) be whether a person has ever smoked, and \( V_X \) their age. From the NSDUH dataset, we can
-        recover the true distribution \(P(V_Y \mid V_X)\). Our goal is to compare this distribution to the models
-        distribution \( \tilde P(V_Y \mid V_X) \). The model's distribution is elicited using the following prompt
-        template:
-      </p>
+              <h3>What is Observational Data?</h3>
+              <p>
+                Observational data refers to any data that is passively collected, without any specific interventions
+                performed.
+                The name observational comes from the fact that the data collector is just <i>observing</i> the real
+                world,
+                without acting in it.
+                This type of data reflects natural patterns in the world, and the vast majority of data we encounter is
+                observational.
+                This includes various forms of data such as surveys, administrative records, public health records,
+                electronic health records, company records and so on.
+              </p>
+              <p>
+                An illustrative example for distinguishing observational from non-observational data may be helpful
+                here.
+                For instance, consider the investigation of tutoring and exam performance.
+                Students who attend private tutoring often perform better on tests — but this conclusion is drawn from
+                observational data, in which the choice of tutoring follows its natural regime.
+                In this natural regime, families choosing tutoring may differ in other ways, such as socioeconomic
+                status
+                (SES).
+                Therefore, it may co-occur that tutoring and high exam performance are both caused by better SES, which
+                allows the
+                parents to spend more time helping their kids study.
+                In this context, it would be possible to obtain different kind of data, coming from a <i>randomized
+                  controlled
+                  trial (RCT)</i>.
+                In the RCT setting, we would randomly assign tutoring to different students, and then check whether the
+                correlation of tutoring with improved exam performance still exists. This type of data is referred to as
+                <i>interventional</i>, since we actively changed the way in which tutoring is assigned (in our case, at
+                random).
+                As a consequence of randomization, tutoring choice may no longer be correlated with the family's SES, in
+                this way
+                avoiding possible spurious correlations.
+                Observational data, by contrast, reflects natural patterns without intervention, and may reflect both
+                causal
+                and
+                spurious correlations. You can read more about observational and interventional data in the section on
+                <a href="about.html#pch">Pearl’s causal hierarchy</a>.
+              </p>
 
-      <p>
-        For example, at for the age \( v_X = 16 \), this renders to the following prompt: <em>"Has a person aged 16 ever
-          smoked a cigarette?"</em>
-      </p>
-      <p>
-        The model is offered to choose between answers {"yes", "no"}, where the answers are labeled with letters of the
-        alphabet.
-      </p>
-      <pre class="text-light">A. yes <br>B. no</pre>
-      After asking such a question to a model, we inspect the relative probabilities for answers "A" and "B", and from
-      this compute the proportion of individuals for whom the model believes are smokers. For instance, if the answer
-      "A" has a probability of 1%, and answer "B" of 3%, the relative probability a positive answer is 0.01 / (0.01 +
-      0.03), and we infer that \( \tilde P(V_Y = 1 \mid V_X = 16) = 25 \% \).
+              <h3>How Can Models Exhibit Knowledge of Observational Distributions?</h3>
+              <p>
+                We will label observational distributions in the real world with \( P(V) \), where \( V \) is the set of
+                variables
+                we are studying. As a running example for illustrating our benchmark, we will be interested in
+                <i>smoking
+                  rates
+                  across age groups</i>. This information is encoded in the distribution \(P(V_X, V_Y)\), where \( V_X
+                \)
+                denotes
+                age, and \(V_Y\) denotes smoking. To obtain the distribution of age and smoking in the real world, we
+                refer
+                to
+                <strong>National Survey on Drug Use and Health (NSDUH) 2023</strong>, collected by the Substance Abuse
+                and
+                Mental Health Services Administration (SAMHSA). The NSDUH provides information on substance use and
+                mental
+                health
+                in the US, and includes information about cigarette usage across demographics.
+              </p>
+              <div class="bg-dark p-3 rounded border border-secondary">
+                <h5>Example: NSDUH – Smoking by Age (Question-Answer Prompting)</h5>
+                <p>
+                  Let \( V_Y \) be whether a person has ever smoked, and \( V_X \) their age. From the NSDUH dataset, we
+                  can
+                  recover the true distribution \(P(V_Y \mid V_X)\). Our goal is to compare this distribution to the
+                  models
+                  distribution \( \tilde P(V_Y \mid V_X) \). The model's distribution is elicited using the following
+                  type
+                  of
+                  question. For the age \( v_X = 16 \) years, we ask the model the following question: <em>"Has a person
+                    aged 16
+                    ever
+                    smoked a cigarette?"</em>
+                </p>
+                <p>
+                  The model is offered to choose between answers {"yes", "no"}, where the answers are labeled with
+                  letters
+                  of the
+                  alphabet:
+                </p>
+                <pre class="text-light">A. yes <br>B. no</pre>
+                After asking such a question to a model, we inspect the relative probabilities for answers "A" and "B",
+                and
+                from
+                this compute the proportion of individuals for whom the model believes are smokers. For instance, if the
+                answer
+                "A" has a probability of 1%, and answer "B" of 3%, the relative probability a positive answer is 0.01 /
+                (0.01 +
+                0.03), and we infer that \( \tilde P(V_Y = 1 \mid V_X = 16) = 25 \% \). Analogous questions are asked
+                for
+                all other values of \(v_X\).
+              </div>
+              <br>
+              <p>The above example illustrates several important concepts appearing in the benchmark. First, it
+                illustrates
+                the
+                concept of a <i><u>task</u></i>, in this case the task of recovering smoking status across age. The task
+                is
+                defined by the pair
+                \(V_Y\) (outcome variable of interest; in this case smoking) and the conditioning variables \(V_X\) (in
+                this
+                case
+                age). The goal in the task is to recover the distribution \(P(V_Y \mid V_X)\), for which different LLMs
+                can
+                be
+                used. However, in the task, we want to compare the distribution inferred by the LLM with the
+                ground-truth.
+                This
+                brings us to the second important concept of <i><u>reference dataset</u></i>, a ground-truth data source
+                from
+                which the true distribution can \(P(V_Y \mid
+                V_X)\) can be determined. In our example, this is the NSDUH dataset from SAMHSA, which records smoking
+                status of
+                different individuals, and provides sample weights to make the dataset representative at the national
+                level.
+                Finally, the third key concept is the <i><u>prompting technique</u></i>. In the above example, we used
+                the
+                so-called <i>question-answer</i> prompting technique. The model is asked a
+                question, while the model's probabilities are extracted from its next-token prediction probabilities
+                over
+                the
+                possible answers. There is also an alternative way for eliciting model probabilities, described in the
+                next
+                example:
+              </p>
+              <div class="bg-dark p-3 rounded border border-secondary">
+                <h5>Example (Continued): NSDUH – Smoking by Age (Likelihood Prompting)</h5>
+                <p>
+                  The alternative way to elicit the model's distribution is to ask the following: <em>"What is the
+                    probability
+                    that a person aged 16 ever smoked a cigarette?"</em>. The model is offered to choose between
+                  probability
+                  levels, where the answers are labeled with letters of the
+                  alphabet:
+                </p>
+                <pre class="text-light">A. 0% <br>B. 0-5% <br>C. 5-10% <br>... <br>U. 95-100% <br>V. 100%</pre>
+                After asking such a question to a model, we inspect which of the answers "A" to "V" has the highest
+                next-token
+                probability. For instance, if the answer
+                "A" has the highest probability, we set \( \tilde P(V_Y = 1 \mid V_X = 16) = 0 \% \), whereas if the
+                most
+                likely
+                answer is "B" we set \( \tilde P(V_Y = 1 \mid V_X = 16) = 2.5 \% \) as the midpoint of the interval
+                0-5%,
+                and so
+                on. By repeating the above type of question for different ages \(v_X\), we have an alternative way of
+                eliciting
+                the model's distribution.
+              </div>
+
+              <br>
+              <p>The above way of eliciting the model distribution is called <it>likelihood prompting</it>. We
+                investigate
+                both
+                the question-answer and likelihood prompting in our benchmark.</p>
+              <h5>Distribution at Age 16</h5>
+              <p>
+                After performing the above question-answering exercise, we can visualize the ground-truth smoking
+                distribution for
+                age 16, together with the distribution inferred from the model. In addition, we also plot the <i>uniform
+                  distribution</i>, which chooses between answers at random, assigning each answer equal probability (in
+                this
+                case, both answers "yes" and "no" are given a 50% probability). This distribution represents answers
+                without
+                having any idea about the true probabilities.
+              </p>
+              <div class="d-flex justify-content-center gap-4 my-4">
+
+                <div class="text-center">
+                  <img src="img/distribution_age16.png" alt="Smoking Distribution Age 16"
+                    class="img-fluid rounded border border-secondary mb-2" style="max-width: 400px;">
+                  <div class="text-muted small">Figure A: Aligned model distribution.</div>
+                </div>
+
+                <div class="text-center">
+                  <img src="img/distribution_age16_off.png" alt="Smoking Distribution Age 16 Off"
+                    class="img-fluid rounded border border-secondary mb-2" style="max-width: 400px;">
+                  <div class="text-muted small">Figure B: Misaligned model distribution.</div>
+                </div>
+
+              </div>
+              The above plots illustrate two settings: for Model A (in Figure A, left), we see an LLM distribution
+              exhibiting
+              partial
+              knowledge about
+              the observational distribution. The model's distribution does not align perfectly with the truth, but it's
+              much
+              closer to the ground truth than the uniform
+              distribution. For Model B (in Figure B, right), however, the model distribution is much further from the
+              ground
+              truth, overestimating
+              significantly the proportion of individuals who ever smoked a cigarette. These plots raise a natural
+              question:
+              how
+              do we
+              assign a score to a model, determining how well it approximates reality? This is described in detail
+              below.
+
+              <h5 class="mt-4">Comparison Plot</h5>
+              The above question-answering exercise can be repeated for different age groups, and we may compare the
+              true
+              probabilities with the model's probabilities across a range of ages.
+              <div class="plot-container my-4">
+                <img src="img/smoking_by_age_plot.png" alt="Smoking by Age Plot"
+                  class="img-fluid rounded border border-secondary">
+              </div>
+
+              <h3>How Do We Score Model Answers?</h3>
+              <p>
+                To evaluate how well a model understands observational patterns, we compare the model's predicted
+                distribution \(
+                \tilde{P}(V_Y \mid V_X) \) to the true distribution \( P(V_Y \mid V_X) \) from the dataset.
+                The core idea is simple: if the model's distribution closely matches the actual population distribution,
+                it
+                receives a high score (maximal score is 100). If the model's predictions are far off — for example, if
+                it
+                guesses
+                randomly or gives
+                constant answers regardless of the context — it receives a low score (minimal score is 0).
+              </p>
+              <p>
+                Technically, we use a distance metric called the \( L_1 \)-norm to quantify the difference between
+                distributions. This metric just sums up how much the model's predicted probabilities differ from the
+                real
+                ones.
+                However, instead of reporting raw distances, we turn them into a score S from 0 to 100, where S = 0 and
+                S =
+                100
+                are defined as follows:
+              <ul>
+                <li><strong>S = 100</strong> means the language model's answers are statistically indistinguishable from
+                  the
+                  true
+                  distribution - after
+                  accounting for sampling variability in the survey data such as NSDUH.</li>
+                <li><strong>S = 0</strong> means the model does not do better than guessing uniformly at random.
+                </li>
+              </ul>
+              Finally, the model's score is linearly interpolated between the poor (S = 0) and perfect answers (S =
+              100).
+              This
+              gives us a flexible scale that reflects how close the model's knowledge is to the empirical truth, and
+              such a
+              scoring strategy can be used across different tasks (beyond smoking status across age groups).
+              </p>
+
+              <h3>Which Tasks Do We Study More Broadly?</h3>
+              <p>
+                Our benchmark spans a diverse set of U.S. population datasets, each offering a unique lens into social,
+                economic,
+                health, and behavioral patterns. Below we a list of the datasets studied, along with the specific
+                statistics
+                we
+                investigate. We emphasize that the list is not exhaustive, but rather represents an initial first step
+                towards a
+                systematic study of observational distributions. We expect that numerous other datasets will be added to
+                the
+                benchmark in the future, including data from other countries.
+              </p>
+              <ol class="ps-3">
+                <li><strong>American Community Survey (ACS) 2023:</strong> Conducted by the U.S. Census Bureau, the ACS
+                  collects
+                  detailed demographic, social, economic, and housing data annually. We focus on income, education, and
+                  employment
+                  across different demographic groups.</li>
+
+                <li><strong>National Health and Nutrition Examination Survey (NHANES) 2021–2023:</strong> Administered
+                  by
+                  the CDC,
+                  NHANES combines interviews and physical exams to assess health and nutrition in the U.S. population.
+                  We
+                  analyze
+                  obesity, diabetes, and dietary habits by demographics.</li>
+
+                <li><strong>Behavioral Risk Factor Surveillance System (BRFSS) 2023:</strong> A CDC-run telephone survey
+                  system
+                  that
+                  tracks health-related behaviors and conditions. We examine exercise habits, diabetes, blood pressure,
+                  asthma,
+                  cholesterol, and impairments across U.S. states.</li>
+
+                <li><strong>Medical Expenditure Panel Survey (MEPS) 2023:</strong> Conducted by the AHRQ, MEPS collects
+                  data
+                  on
+                  health
+                  service usage, expenditures, and insurance. We study patterns of healthcare spending, utilization, and
+                  coverage
+                  across groups.</li>
+
+                <li><strong>National Survey on Drug Use and Health (NSDUH) 2023:</strong> Collected by SAMHSA, NSDUH
+                  provides data
+                  on
+                  substance use and mental health. We explore alcohol, cigarette, marijuana, cocaine, and heroin use
+                  across
+                  demographics.</li>
+
+                <li><strong>Survey of Consumer Finances (SCF) 2022:</strong> Sponsored by the Federal Reserve Board, the
+                  SCF
+                  details
+                  U.S. household finances. We investigate food spending, home ownership, assets, and debt by demographic
+                  characteristics.</li>
+
+                <li><strong>General Social Survey (GSS) 2022:</strong> Conducted by NORC at the University of Chicago,
+                  the
+                  GSS
+                  captures U.S. adults’ social attitudes, behaviors, and demographics. We analyze political views and
+                  party
+                  affiliation across age, sex, race, education, and income.</li>
+
+                <li><strong>Integrated Postsecondary Education Data System (IPEDS):</strong> Maintained by the U.S.
+                  Department of
+                  Education, IPEDS collects institutional-level data. We study degree attainment by sex across college
+                  programs.
+                </li>
+
+                <li><strong>Bureau of Labor Statistics (BLS) 2023:</strong> The U.S. Department of Labor provides data
+                  on
+                  occupations
+                  and worker demographics. We examine occupational distributions by sex and race.</li>
+
+                <li><strong>FBI Arrest Statistics (UCR Program):</strong> Compiled by the FBI’s Uniform Crime Reporting
+                  Program,
+                  this
+                  dataset records arrest statistics nationwide. We explore crime rates by race and sex.</li>
+              </ol>
+              <p>
+                The performance of different language models on our benchmark can be found at <a href="l1-results.html"
+                  class="text-decoration-underline">this page</a>, whereas the full list of tasks, with model scores, is
+                found <a href="interactive_table.html" class="text-decoration-underline">here</a>.
+              </p>
+            </section>
+          </main>
+        </div>
+      </div>
     </div>
-
-    <br>
-    <h5>Distribution at Age 16</h5>
-    <p>
-      After performing the above question-answering exercise, we can visualize the ground-truth smoking distribution for
-      age 16, together with the distribution inferred from the model. In addition, we also plot the <i>uniform
-        distribution</i>, which chooses between answers at random, assigning each answer equal probability (in this
-      case, both answers "yes" and "no" are given a 50% probability). This distribution represents answers without
-      having any idea about the true probabilities.
-    </p>
-    <div class="plot-container my-4">
-
-      <img src="img/distribution_age16.png" alt="Smoking Distribution Age 16"
-        class="img-fluid rounded border border-secondary">
-    </div>
-    The above plot illustrates how LLMs can exhibit partial knowledge about an observational distribution. The model's
-    distribution does not align perfectly with the truth, but it's much closer to the ground truth than the uniform
-    distribution. Our approach for assigning a score to a model will be described in detail below.
-
-    <h5 class="mt-4">Comparison Plot</h5>
-    The above question-answering exercise can be repeated for different age groups, and we may compare the true
-    probabilities with the model's probabilities across a range of ages.
-    <div class="plot-container my-4">
-      <img src="img/smoking_by_age_plot.png" alt="Smoking by Age Plot"
-        class="img-fluid rounded border border-secondary">
-    </div>
-
-    <h3>How Do We Score Model Answers?</h3>
-    <p>
-      To evaluate how well a model understands observational patterns, we compare the model's predicted distribution \(
-      \tilde{P}(V_Y \mid V_X) \) to the true distribution \( P(V_Y \mid V_X) \) from the dataset.
-      The core idea is simple: if the model's distribution closely matches the actual population distribution, it
-      receives a high score (maximal score is 100). If the model's predictions are far off — for example, if it guesses
-      randomly or gives
-      constant answers regardless of the context — it receives a low score (minimal score is 0).
-    </p>
-    <p>
-      Technically, we use a distance metric called the \( L_1 \)-norm to quantify the difference between
-      distributions. This metric just sums up how much the model's predicted probabilities differ from the real ones.
-      However, instead of reporting raw distances, we turn them into a score from 0 to 100:
-    <ul>
-      <li><strong>S = 100</strong> means the language model's answers are statistically indistinguishable from the true
-        distribution - after
-        accounting for sampling variability in the survey data such as NSDUH.</li>
-      <li><strong>S = 0</strong> means the model does no better than guessing uniformly at random.
-      </li>
-    </ul>
-    Finally, the model's score is linearly interpolated between the poor (S = 0) and perfect answers (S = 100). This
-    gives us a flexible scale that reflects how close the model's knowledge is to the empirical truth, and such a
-    scoring strategy can be used across different tasks (beyond smoking status across age groups).
-    </p>
-
-    <h3>Which Tasks Do We Study More Broadly?</h3>
-    <p>
-      Our benchmark spans a diverse set of U.S. population datasets, each offering a unique lens into social, economic,
-      health, and behavioral patterns. Below is a list of the datasets we study, along with the specific statistics we
-      investigate:
-    </p>
-    <ol class="ps-3">
-      <li><strong>American Community Survey (ACS) 2023:</strong> Conducted by the U.S. Census Bureau, the ACS collects
-        detailed demographic, social, economic, and housing data annually. We focus on income, education, and employment
-        across different demographic groups.</li>
-
-      <li><strong>National Health and Nutrition Examination Survey (NHANES) 2021–2023:</strong> Administered by the CDC,
-        NHANES combines interviews and physical exams to assess health and nutrition in the U.S. population. We analyze
-        obesity, diabetes, and dietary habits by demographics.</li>
-
-      <li><strong>Behavioral Risk Factor Surveillance System (BRFSS) 2023:</strong> A CDC-run telephone survey system
-        that
-        tracks health-related behaviors and conditions. We examine exercise habits, diabetes, blood pressure, asthma,
-        cholesterol, and impairments across U.S. states.</li>
-
-      <li><strong>Medical Expenditure Panel Survey (MEPS) 2023:</strong> Conducted by the AHRQ, MEPS collects data on
-        health
-        service usage, expenditures, and insurance. We study patterns of healthcare spending, utilization, and coverage
-        across groups.</li>
-
-      <li><strong>National Survey on Drug Use and Health (NSDUH) 2023:</strong> Collected by SAMHSA, NSDUH provides data
-        on
-        substance use and mental health. We explore alcohol, cigarette, marijuana, cocaine, and heroin use across
-        demographics.</li>
-
-      <li><strong>Survey of Consumer Finances (SCF) 2022:</strong> Sponsored by the Federal Reserve Board, the SCF
-        details
-        U.S. household finances. We investigate food spending, home ownership, assets, and debt by demographic
-        characteristics.</li>
-
-      <li><strong>General Social Survey (GSS) 2022:</strong> Conducted by NORC at the University of Chicago, the GSS
-        captures U.S. adults’ social attitudes, behaviors, and demographics. We analyze political views and party
-        affiliation across age, sex, race, education, and income.</li>
-
-      <li><strong>Integrated Postsecondary Education Data System (IPEDS):</strong> Maintained by the U.S. Department of
-        Education, IPEDS collects institutional-level data. We study degree attainment by sex across college programs.
-      </li>
-
-      <li><strong>Bureau of Labor Statistics (BLS) 2023:</strong> The U.S. Department of Labor provides data on
-        occupations
-        and worker demographics. We examine occupational distributions by sex and race.</li>
-
-      <li><strong>FBI Arrest Statistics (UCR Program):</strong> Compiled by the FBI’s Uniform Crime Reporting Program,
-        this
-        dataset records arrest statistics nationwide. We explore crime rates by race and sex.</li>
-    </ol>
-    <p>
-      The performance of different language models on our benchmark can be found at <a href="l1-results.html"
-        class="text-decoration-underline">this page</a>, whereas the full list of tasks, with model scores, is found <a
-        href="interactive_table.html" class="text-decoration-underline">here</a>.
-    </p>
-  </section>
-
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const content = document.querySelector("section");
+      const tocList = document.getElementById("toc-list");
+      const headers = content.querySelectorAll("h3, h5");
+
+      headers.forEach(h => {
+        const id = h.textContent.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]/g, "");
+        h.id = id;
+
+        const li = document.createElement("li");
+        li.className = "nav-item ms-" + (h.tagName === "H3" ? "0" : "3");
+
+        const a = document.createElement("a");
+        a.className = "nav-link text-light py-1";
+        a.href = `#${id}`;
+        a.textContent = h.textContent;
+
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+    });
+  </script>
 </body>
 
 </html>

@@ -37,13 +37,13 @@ def tabulate_w(x, w=None, nbins=None):
 
     out = np.zeros(nbins)
     for xi, wi in zip(x, w):
-        if 1 <= xi <= nbins:
-            out[xi - 1] += wi
+        if 0 <= xi <= nbins-1:
+            out[xi] += wi
     return out
 
 def cat_to_distr(x, w, nbins):
     x = np.asarray(x)
-    distr = tabulate_w(x + 1, w=w, nbins=nbins)
+    distr = tabulate_w(x, w=w, nbins=nbins)
     return distr / distr.sum()
 
 def weighted_corr(x, y, w):

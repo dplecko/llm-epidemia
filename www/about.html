@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>About — LLM Observatory</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="text-light" style="background-color: #0d1b2a !important;">
+
+<body class="text-light">
   <div id="navbar"></div>
   <script>
     fetch("navbar.html")
@@ -16,28 +18,182 @@
   </script>
 
   <section class="container my-5">
-    <h1 class="mb-4">About the LLM Observatory</h1>
+    <h1 class="mb-5 text-center">About the LLM Observatory</h1>
 
-    <div class="mb-5">
-      <h3>What We Study</h3>
-      <p>
-        The LLM Observatory is an open-source community initiative focused on evaluating how large language models perform on inference tasks grounded in observational data. We are especially interested in descriptive statistics, causal effects, and counterfactual reasoning.
+    <h3 class="border-bottom pb-2">Capabilities Expected from Modern AI Systems</h3>
+    <p>
+      Artificial intelligence (AI) systems have the potential to accelerate scientific progress across domains such as
+      healthcare, education, and economics.
+      As these systems are increasingly deployed in real-world settings, a core expectation is that they evolve beyond
+      surface-level language fluency
+      toward robust and reliable capabilities — including the ability to reason probabilistically about the world.
+    </p>
+    <p>
+      A crucial distinction emerges between two types of knowledge embedded in AI systems. <em>Factual knowledge</em>
+      corresponds to definitive answers
+      to well-established queries (e.g., “What is the capital of England?”). In contrast, <em>probabilistic
+        knowledge</em>
+      relates to uncertainties
+      inherent in real-world phenomena (e.g., “What is the sex of a computer science graduate in the US?”).
+    </p>
+    <p>
+      While much of current large language model (LLM) evaluation emphasizes factual recall and correctness,
+      less attention has been paid to whether these models encode statistical and causal patterns about the world —
+      patterns that
+      are
+      critical
+      for scientific inquiry, policy design, and societal decision-making.
+    </p>
+
+    <h3 class="border-bottom pb-2 mt-4" id="pch">Pearl’s Causal Hierarchy & Different Types of Queries about the world
+    </h3>
+
+    <p>
+      To systematically describe what kinds of questions an intelligent system can answer about the world, we rely on a
+      foundational framework known as
+      <strong>Pearl’s Causal Hierarchy</strong> (PCH). The PCH organizes knowledge into three qualitatively distinct
+      layers
+      of reasoning:
+    </p>
+
+    <ul>
+      <li><strong>Layer 1 — Observation (Seeing):</strong> Involves reasoning from passively collected data. Models at
+        this
+        level can recognize patterns, associations, and correlations — e.g., “What does a symptom tell us about the
+        disease?”</li>
+      <li><strong>Layer 2 — Intervention (Doing):</strong> Goes beyond correlation and answers questions about the
+        consequences of actions — e.g., “What if I take aspirin, will my headache go away?”</li>
+      <li><strong>Layer 3 — Counterfactual (Imagining):</strong> Supports reasoning about alternate realities — e.g.,
+        “Would
+        I still have had a headache if I hadn’t taken aspirin?”</li>
+    </ul>
+
+    <div class="text-center">
+      <img src="img/pch.png" class="img-fluid rounded border border-secondary"
+        style="max-width: 1000px; filter: invert(1) brightness(1.2);">
+    </div>
+    <br>
+
+    <p>
+      These layers correspond not just to types of statistical queries, but to fundamentally different cognitive
+      capabilities.
+      They are not interchangeable: each layer strictly contains more information than the previous one. For example,
+      observational data alone is insufficient to answer interventional or counterfactual questions unless supported by
+      causal assumptions or models.
+    </p>
+
+    <p>
+      In practice, many domains — such as medicine, policy-making, and economics — rely on assumptions about the
+      underlying
+      causal mechanisms that govern a system. Determining these mechanisms may be infeasible in complex, partially
+      observable environments where human behavior is involved. Yet, we typically assume such mechanisms exist, even if
+      we
+      cannot fully identify or express them. The PCH allows us to classify reasoning tasks according to their demands on
+      causal knowledge, and sets limits on what can be inferred given certain inputs.
+    </p>
+
+    <p>
+      In the LLM Observatory, we are interested in capabilities across all layers, in order to understand how
+      and whether modern AI systems — particularly large language models — exhibit capacities relevant to <em>different
+        types of probabilistic reasoning</em>. In particular, based on an important known result in the literature, we
+      can say that studying the first layer of the hierarchy is the critical first step:
+    </p>
+
+    <div class="bg-dark p-3 rounded border border-secondary mt-4">
+      <h5 class="text-light">Causal Hierarchy Theorem (Informal)</h5>
+      <p class="mb-1">
+        Let \( \mathcal{M} \) be a structural causal model (SCM), \( P(V) \) the observational
+        distribution, and \( \mathcal{A} \) a set of causal assumptions (e.g., a causal graph or ignorability
+        conditions).
+        Then:
+      </p>
+      <ul>
+        <li>(a) In the absence of \( \mathcal{A} \), the observational distribution \( P(V) \) is not
+          sufficient to identify interventional or counterfactual quantities.</li>
+        <li>(b) In the absence of \( P(V) \), the assumptions \( \mathcal{A} \) alone are not sufficient
+          either.</li>
+      </ul>
+      <p class="mb-0">
+        This result is known as the <strong>Causal Hierarchy Theorem</strong>, and it highlights that both data and
+        assumptions are necessary for causal inference.
       </p>
     </div>
+    <br>
 
-    <div class="mb-5">
-      <h3>How We Evaluate Language Models</h3>
-      <p>
-        We design structured benchmarks using tabular datasets and task definitions spanning multiple reasoning types (factual, interventional, counterfactual). Our evaluation metrics reflect both prediction accuracy and alignment with empirical distributions.
+    The first part of the above result is commonly considered in the causal inference literature -- in short,
+    it states that, in absence of causal assumptions, it is generally impossible to provide any guarantees for inference
+    over interventional or counterfactual distributions. The second part states that in absence of the observational
+    distribution, no inferences can be made for higher layers of the PCH, leading to the following important
+    consequence:
+
+    <div class="bg-dark p-3 rounded border border-secondary mt-4">
+      <h5 class="text-light">No Observational Distribution \(\implies\) No Layer 2/3 Inference</h5>
+      <p class="mb-1">
+        If a model's distribution \(\tilde P(V)\) differs from the true \(P(V)\), no guarantees can be provided for the
+        validity of the model's interventional or counterfactual inferences.
       </p>
     </div>
+    <br>
+    <p>The above statement is one of the key motivations of the observatory. It shows that if the model does not have
+      access to correct observational distributions (coming from passively observing the world), then we can provide no
+      guarantees for the model's interventional or counterfactual inferences. In other words, knowledge on observational
+      distributions is a <i>necessary</i> but not sufficient condition for any causal inferences. We next describe how
+      we study this challenge.</p>
 
-    <div class="mb-5">
-      <h3>Our Data Sources</h3>
-      <p>
-        Our benchmarks are built on trusted U.S. population datasets such as ACS, NHANES, NSDUH, MEPS, and others. These datasets offer rich statistical structure and support robust evaluation across diverse domains.
-      </p>
-    </div>
+    <h3 class="mt-5 mb-3 border-bottom pb-1">How We Study the Problem</h3>
+    <p>
+      The <strong>LLM Observatory</strong> is designed as a long-term effort to study the reasoning capabilities of AI
+      systems across increasingly complex types of probabilistic and causal knowledge. A recently released benchmark
+      evaluates
+      <em>observational (Layer 1)</em> capabilities, which is critical first step in understanding capabilities in
+      higher layers of the PCH. The Observatory is explicitly built to support future benchmarks
+      that address
+      <em>interventional</em> (Layer 2) and <em>counterfactual</em> (Layer 3) reasoning — capabilities required for
+      decision-making, planning, and scientific discovery.
+    </p>
+
+    <p>
+      According to the <em>Causal Hierarchy Theorem</em>, reliable reasoning at higher layers is not possible without
+      both
+      empirical knowledge (Layer 1) and structured assumptions about the environment. Our initial results suggest that
+      current language models are often misaligned with real-world observational data, posing fundamental challenges for
+      advancing up the causal ladder. Yet, this also presents a clear and measurable target for model developers.
+    </p>
+
+    <p>
+      The datasets below constitute the current Layer 1 benchmark (read more <a href="l1-description.html"
+        class="text-decoration-underline">here</a>) — a structured probe into whether language models
+      encode
+      the kinds of population-level associations needed for robust reasoning about the world:
+    </p>
+
+    <ol class="ps-3">
+      <li><strong>American Community Survey (ACS) 2023:</strong> Demographic, economic, and housing data; focus on
+        income,
+        education, and employment by group.</li>
+      <li><strong>National Health and Nutrition Examination Survey (NHANES) 2021–2023:</strong> Health and nutrition
+        data;
+        focus on obesity, diabetes, and diet by demographics.</li>
+      <li><strong>Behavioral Risk Factor Surveillance System (BRFSS) 2023:</strong> Health behaviors and outcomes by
+        state;
+        includes exercise, chronic conditions, and impairments.</li>
+      <li><strong>Medical Expenditure Panel Survey (MEPS) 2023:</strong> Health expenditures and insurance coverage;
+        analysis across population groups.</li>
+      <li><strong>National Survey on Drug Use and Health (NSDUH) 2023:</strong> Substance use and mental health data;
+        breakdown by demographic variables.</li>
+      <li><strong>Survey of Consumer Finances (SCF) 2022:</strong> Household finances; data on assets, debt, and
+        homeownership by group.</li>
+      <li><strong>General Social Survey (GSS) 2022:</strong> Social attitudes and political views; analyzed across age,
+        sex,
+        race, and education.</li>
+      <li><strong>Integrated Postsecondary Education Data System (IPEDS):</strong> Degree attainment across college
+        programs
+        by sex.</li>
+      <li><strong>Bureau of Labor Statistics (BLS) 2023:</strong> Occupational data; analysis by race and sex.</li>
+      <li><strong>FBI Arrest Statistics (UCR Program):</strong> Crime and arrest data; analyzed by race and sex.</li>
+    </ol>
+
   </section>
 </body>
+
 </html>
