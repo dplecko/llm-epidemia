@@ -52,9 +52,9 @@ function renderFilters() {
       ${Object.entries(datasetGroups).map(([group, datasets]) => `
         <div class="d-flex align-items-center gap-2 mt-2 mb-1">
           <span class="fw-bold text-warning mb-0">${group}</span>
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-warning btn-xs group-toggle" onclick="toggleGroup('${group}', true)">on</button>
-            <button type="button" class="btn btn-warning btn-xs group-toggle" onclick="toggleGroup('${group}', false)">off</button>
+          <div class="btn-group btn-group-subfilter" role="group">
+            <button class="btn btn-sm btn-outline-light" onclick="toggleGroup('${group}', true)">All</button>
+            <button class="btn btn-sm btn-outline-light" onclick="toggleGroup('${group}', false)">None</button>
           </div>
         </div>
         ${datasets.filter(d => allDatasets.has(d)).map(d => `

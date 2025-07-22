@@ -17,9 +17,18 @@
 
 <body>
     <div id="navbar"></div>
+    <link rel="stylesheet" href="style.css">
     <script>
-        fetch("navbar.html").then(r => r.text()).then(t => document.getElementById("navbar").innerHTML = t);
+        fetch("navbar.html")
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("navbar").innerHTML = data;
+                const s = document.createElement("script");
+                s.src = "highlight.js";
+                document.body.appendChild(s);
+            });
     </script>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 p-3">
@@ -168,10 +177,20 @@
 
             const legendDiv = document.createElement('div')
             legendDiv.className = 'inline-legend d-flex flex-wrap gap-2 mb-2'
-            legendDiv.innerHTML = datasetsUsed.map(ds => `
+            const groupedLegend = Object.entries(datasetGroups).map(([domain, dsList]) => {
+                const entries = dsList.filter(ds => datasetsUsed.includes(ds)).map(ds => `
         <span class="d-flex align-items-center">
             <span style="width:12px;height:12px;display:inline-block;background:${colorMap[ds]};margin-right:5px;border-radius:2px"></span>${ds}
-        </span>`).join(' ')
+        </span>`).join(' ');
+                return entries ? `
+  <div style="border:1px solid #999;padding:6px 10px;border-radius:6px;position:relative;" class="d-flex flex-wrap gap-2">
+    <div style="font-size:1rem;font-weight:600;color:#ffc107;margin-bottom:-4px;width:100%">${domain}</div>
+    ${entries}
+  </div>` : '';
+
+            }).join('');
+            legendDiv.innerHTML = groupedLegend;
+
             modelCard.appendChild(legendDiv)
 
             // Create chart canvas
@@ -182,6 +201,14 @@
             canvas.style.marginTop = '10px'
             modelCard.appendChild(canvas)
 
+            const domainOrder = ["Health", "Social", "Economic"];
+            const datasetOrder = domainOrder.flatMap(domain => datasetGroups[domain] || []);
+
+            filtered.sort((a, b) => {
+                const da = datasetOrder.indexOf(a.dataset);
+                const db = datasetOrder.indexOf(b.dataset);
+                return da - db;
+            });
             const ctx = canvas.getContext('2d')
 
             new Chart(ctx, {
@@ -231,6 +258,12 @@
         }
 
         loadData()
+    </script>
+    <div id="footer"></div>
+    <script>
+        fetch("footer.html")
+            .then(res => res.text())
+            .then(html => document.getElementById("footer").innerHTML = html);
     </script>
 </body>
 

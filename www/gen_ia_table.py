@@ -3,7 +3,7 @@ from workspace.common import *
 def safe_id(x):
     return re.sub(r'[^a-zA-Z0-9_]', '_', str(x))
 
-regen_plots = True
+regen_plots = False
 tasks = task_specs
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4",
           "gemma3_27b_instruct", "deepseek_7b_chat"]
@@ -62,16 +62,10 @@ if regen_plots:
 # Add dataset column
 # df_wide["dataset"] = df_wide["task_name"].str.extract(r'^(.*?):')
 
-# Prepare rowspan counts
-df_wide["dataset"] = df_wide["dataset"].map(dts_map)
-df_wide["task_name"] = df_wide["task_name"].str.replace(r'^.*?:\s*', '', regex=True)
-rowspans = df_wide["dataset"].value_counts().to_dict()
-
 # ---- Build HTML ----
 html = open("www/template/head.html").read()
 html += "<div class='table-responsive'>\n<table class='table table-dark table-bordered text-center align-middle'>\n"
 html += """<thead class='table-light text-dark'><tr>
-<th class='align-middle rotate'>Dataset</th>
 <th>
   Task<br>
   <button class='btn btn-sm btn-outline-light' onclick="restoreOrder()">Reset</button>
@@ -83,22 +77,12 @@ for model in model_cols:
     </th>"""
 html += "</tr></thead>\n<tbody>\n"
 
-last_dataset = None
-
 for _, row in df_wide.iterrows():
     task_id = row["task_id"]
     task_name = row["task_name"]
-    dataset = row["dataset"]
     safe_tid = safe_id(task_id)
 
-    html += f"<tr data-taskid='{safe_tid}'>"
-
-    if dataset != last_dataset:
-        rowspan = rowspans[dataset]
-        html += f"<td class='rotate text-warning' rowspan='{rowspan}'>{dataset}</td>"
-        last_dataset = dataset
-
-    html += f"<td>{task_name}</td>"
+    html += f"<tr data-taskid='{safe_tid}'><td>{task_name}</td>"
 
     for model in model_cols:
         val = row[model]
@@ -117,23 +101,47 @@ for _, row in df_wide.iterrows():
         select_id = f"facet-select-{safe_tid}-{model}"
         plot_div_id = f"vl-plot-{safe_tid}-{model}"
 
+        idx = model_cols.index(model)
+        prev_model = model_cols[idx - 1] if idx > 0 else None
+        next_model = model_cols[idx + 1] if idx + 1 < len(model_cols) else None
+
+        nav_buttons = ""
+        if prev_model:
+            nav_buttons += f"""<button class="btn btn-sm btn-outline-light" onclick="navigateModel('{task_id}', '{prev_model}', 0)">&lt; {model_name(prev_model)}</button>"""
+        if next_model:
+            nav_buttons += f"""<button class="btn btn-sm btn-outline-light" onclick="navigateModel('{task_id}', '{next_model}', 0)">{model_name(next_model)} &gt;</button>"""
+
         html += f"""<tr id='{plot_id}' style='display:none;'>
         <td colspan='{len(model_cols)+1}' id='{plot_cell_id}'>
-            <div class="d-flex align-items-center mb-2">
-                <label class="form-label text-white me-2 mb-0" for="{select_id}">Select Conditioning Value</label>
-                <select class="form-select form-select-sm bg-dark text-light border-secondary"
-                        id="{select_id}"
-                        onchange="updateFacetPlot('{task_id}', '{model}', '{safe_tid}')">
-                </select>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center">
+            <label class="form-label text-white me-2 mb-0" for="{select_id}">Select Conditioning Value</label>
+            <select class="form-select form-select-sm bg-dark text-light border-secondary"
+                    id="{select_id}"
+                    onchange="updateFacetPlot('{task_id}', '{model}', '{safe_tid}')">
+            </select>
             </div>
-            <div class="mb-2 text-light"><strong>Question:</strong> <em id="question-text-{safe_tid}-{model}"></em></div>
-            <div id="{plot_div_id}"></div>
+            <div class="d-flex gap-2">
+            {nav_buttons}
+            </div>
+        </div>
+        <div class="mb-2 text-light"><strong>Question:</strong> <em id="question-text-{safe_tid}-{model}"></em></div>
+        <div id="{plot_div_id}"></div>
         </td>
         </tr>\n"""
 
-
 html += "</tbody></table>\n</div>\n</section>\n"
 html += open("www/template/script.js").read()
+html += """
+<div id="footer"></div>
+<script>
+  fetch("footer.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("footer").innerHTML = html);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+"""
 html += "\n</body>\n</html>"
 
 with open("www/interactive_table.html", "w") as f:

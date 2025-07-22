@@ -70,7 +70,12 @@
     <script>
         fetch("navbar.html")
             .then(res => res.text())
-            .then(data => document.getElementById("navbar").innerHTML = data);
+            .then(data => {
+                document.getElementById("navbar").innerHTML = data;
+                const s = document.createElement("script");
+                s.src = "highlight.js";
+                document.body.appendChild(s);
+            });
     </script>
     <section class="container my-5">
         <h1 class="mb-4 text-center">Qualitative Model Knowledge Inspection</h1>

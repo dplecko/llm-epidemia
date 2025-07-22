@@ -113,6 +113,9 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
                 task_spec
             )
 
+            if prob:
+                decode_prob_matrix(...)
+
             if "weight" in filtered_data.columns:
                 weights = filtered_data["weight"].tolist()
             else:

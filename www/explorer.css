@@ -84,3 +84,9 @@ body {
             line-height: 1.1;
           }
           
+          .btn-group-subfilter .btn {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            line-height: 1.1;
+          }
+          

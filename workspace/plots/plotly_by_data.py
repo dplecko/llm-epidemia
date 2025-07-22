@@ -1,8 +1,8 @@
 
 import pandas as pd
 import plotly.express as px
-from utils.helpers import model_name, dts_map, model_colors
-from eval import build_eval_df
+from workspace.utils.helpers import model_name, dts_map, model_colors
+from workspace.eval import build_eval_df
 from task_spec import task_specs
 
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 

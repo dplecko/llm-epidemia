@@ -122,39 +122,46 @@
                 health
                 in the US, and includes information about cigarette usage across demographics.
               </p>
-              <div class="bg-dark p-3 rounded border border-secondary">
-                <h5>Example: NSDUH – Smoking by Age (Question-Answer Prompting)</h5>
-                <p>
-                  Let \( V_Y \) be whether a person has ever smoked, and \( V_X \) their age. From the NSDUH dataset, we
-                  can
-                  recover the true distribution \(P(V_Y \mid V_X)\). Our goal is to compare this distribution to the
-                  models
-                  distribution \( \tilde P(V_Y \mid V_X) \). The model's distribution is elicited using the following
-                  type
-                  of
-                  question. For the age \( v_X = 16 \) years, we ask the model the following question: <em>"Has a person
-                    aged 16
-                    ever
-                    smoked a cigarette?"</em>
-                </p>
-                <p>
-                  The model is offered to choose between answers {"yes", "no"}, where the answers are labeled with
-                  letters
-                  of the
-                  alphabet:
-                </p>
-                <pre class="text-light">A. yes <br>B. no</pre>
-                After asking such a question to a model, we inspect the relative probabilities for answers "A" and "B",
-                and
-                from
-                this compute the proportion of individuals for whom the model believes are smokers. For instance, if the
-                answer
-                "A" has a probability of 1%, and answer "B" of 3%, the relative probability a positive answer is 0.01 /
-                (0.01 +
-                0.03), and we infer that \( \tilde P(V_Y = 1 \mid V_X = 16) = 25 \% \). Analogous questions are asked
-                for
-                all other values of \(v_X\).
-              </div>
+              <section id="task-examples">
+                <div class="bg-dark p-3 rounded border border-secondary">
+                  <h5>Example: NSDUH – Smoking by Age (Question-Answer Prompting)</h5>
+                  <p>
+                    Let \( V_Y \) be whether a person has ever smoked, and \( V_X \) their age. From the NSDUH dataset,
+                    we
+                    can
+                    recover the true distribution \(P(V_Y \mid V_X)\). Our goal is to compare this distribution to the
+                    models
+                    distribution \( \tilde P(V_Y \mid V_X) \). The model's distribution is elicited using the following
+                    type
+                    of
+                    question. For the age \( v_X = 16 \) years, we ask the model the following question: <em>"Has a
+                      person
+                      aged 16
+                      ever
+                      smoked a cigarette?"</em>
+                  </p>
+                  <p>
+                    The model is offered to choose between answers {"yes", "no"}, where the answers are labeled with
+                    letters
+                    of the
+                    alphabet:
+                  </p>
+                  <pre class="text-light">A. yes <br>B. no</pre>
+                  After asking such a question to a model, we inspect the relative probabilities for answers "A" and
+                  "B",
+                  and
+                  from
+                  this compute the proportion of individuals for whom the model believes are smokers. For instance, if
+                  the
+                  answer
+                  "A" has a probability of 1%, and answer "B" of 3%, the relative probability a positive answer is 0.01
+                  /
+                  (0.01 +
+                  0.03), and we infer that \( \tilde P(V_Y = 1 \mid V_X = 16) = 25 \% \). Analogous questions are asked
+                  for
+                  all other values of \(v_X\).
+                </div>
+              </section>
               <br>
               <p>The above example illustrates several important concepts appearing in the benchmark. First, it
                 illustrates
@@ -422,6 +429,12 @@
         tocList.appendChild(li);
       });
     });
+  </script>
+  <div id="footer"></div>
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(html => document.getElementById("footer").innerHTML = html);
   </script>
 </body>
 

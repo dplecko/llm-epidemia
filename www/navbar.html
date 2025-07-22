@@ -14,30 +14,57 @@
     .navbar .btn {
       align-self: center;
     }
+
+    /* new lines */
+    .navbar .dropdown-menu {
+      background: #d4af37;
+      border: none;
+    }
+
+    .navbar .dropdown-item {
+      color: #fff;
+    }
+
+    .navbar .dropdown-item:hover {
+      background: #c79b2f;
+      color: #fff;
+    }
   </style>
   <div class="container d-flex justify-content-between align-items-center">
-    <a class="navbar-brand d-flex align-items-center" href="index2.html">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
       <img src="img/logo-icon.png" alt="LLM Logo" style="height:40px; margin-right:10px;">
       LLM Observatory
     </a>
     <ul class="navbar-nav flex-row gap-3">
-      <li class="nav-item">
-        <a class="btn btn-sm text-dark" href="quickstart.html" style="background-color: #d4af37;">
-          Quick Start
-        </a>
+      <li class="nav-item dropdown">
+        <div class="btn-group">
+          <a href="quickstart.html" class="btn btn-sm text-white" style="background-color: #d4af37;">
+            Quick Start
+          </a>
+          <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split text-white"
+            style="background-color: #d4af37;" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="about.html">About</a></li>
+            <li><a class="dropdown-item" href="l1-description.html">Methodology</a></li>
+            <li><a class="dropdown-item" href="l1-results.html">Results</a></li>
+          </ul>
+        </div>
       </li>
       <li class="nav-item">
-        <a class="btn btn-sm btn-primary text-white" href="explorer.html">
+        <a class="btn btn-sm btn-primary text-white nav-link-btn" href="explorer.html" data-page="explorer.html">
           Model Explorer
         </a>
       </li>
       <li class="nav-item">
-        <a class="btn btn-sm btn-primary text-white" href="l1-results.html">
+        <a class="btn btn-sm btn-primary text-white nav-link-btn" href="l1-results.html" data-page="l1-results.html">
           Summary Results
         </a>
       </li>
       <li class="nav-item">
-        <a class="btn btn-sm btn-primary text-white" href="interactive_table.html">
+        <a class="btn btn-sm btn-primary text-white nav-link-btn" href="interactive_table.html"
+          data-page="interactive_table.html">
           LLM Answers vs. Real World
         </a>
       </li>

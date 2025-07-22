@@ -169,4 +169,24 @@ function restoreOrder() {
   while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
   originalOrder.forEach(row => tbody.appendChild(row));
 }
+
+function navigateModel(task_id, newModel, dummyOffset) {
+  togglePlot(newModel, task_id)
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const firstRow = document.querySelector("table tbody tr[data-taskid]");
+  if (!firstRow) return;
+
+  const task_id = firstRow.getAttribute("data-taskid");
+  const firstModelCell = firstRow.querySelector(".score-cell");
+  if (!firstModelCell) return;
+
+  const modelMatch = firstModelCell.id.match(/^trigger-[^_]+-(.+)$/);
+  if (!modelMatch) return;
+
+  const model = modelMatch[1];
+  togglePlot(model, task_id);
+});
+
 </script>

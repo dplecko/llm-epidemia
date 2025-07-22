@@ -21,14 +21,29 @@
 </head>
 
 <body class="text-light" style="background-color: #0d1b2a !important;">
-  <div id="navbar"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <div id="navbar">
+    <script>
+      fetch("navbar.html")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("navbar").innerHTML = data;
+          const s = document.createElement("script");
+          s.src = "highlight.js";
+          document.body.appendChild(s);
+        });
+    </script>
+  </div>
 
   <section class="container my-5">
     <h1 class="mb-4">Observational Distribution Benchmark – Results</h1>
 
     <div class="d-flex justify-content-center mb-4 gap-3">
+      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_ld_bydomain', this)">By
+        Domain</button>
       <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_ld_bydataset', this)">By
-        Setting</button>
+        Dataset</button>
       <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_by_dim', this)">By
         Dimension</button>
       <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bysize', this)">By Model
@@ -58,10 +73,17 @@
           // Once navbar is inserted, activate first button
           requestAnimationFrame(() => {
             const firstBtn = document.querySelector('.btn-toggle');
-            if (firstBtn) loadPlot('interactive_ld_bydataset', firstBtn);
+            if (firstBtn) loadPlot('interactive_ld_bydomain', firstBtn);
           });
         });
     });
+  </script>
+
+  <div id="footer"></div>
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(html => document.getElementById("footer").innerHTML = html);
   </script>
 
 </body>
