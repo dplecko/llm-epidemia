@@ -18,6 +18,8 @@ jobs:
           mkdir -p img
           mv ../img/logo-icon.png img/logo-icon.png
           git init
+          git lfs install
+          git lfs track "img/logo-icon.png"
           git checkout -b main
           git config user.name "github-actions"
           git config user.email "actions@github.com"
