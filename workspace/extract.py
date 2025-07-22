@@ -56,6 +56,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
     else:
         if prob:
             levels = gen_prob_lvls()
+            q_levels = data[task_spec["variables"][0]].unique().tolist()
         else:
             levels = data[task_spec["variables"][0]].unique().tolist()
 
@@ -100,18 +101,24 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
                 data = data[data[v_sub].isin(target_val)]
             
             # update levels after subsetting
-            levels = data[task_spec["variables"][0]].unique().tolist()
+            if prob:
+                q_levels = data[task_spec["variables"][0]].unique().tolist()
+            else: 
+                levels = data[task_spec["variables"][0]].unique().tolist()
         
         for cond in tqdm(cond_range):
             filtered_data = data[data[task_spec["variables"][1]] == cond]
             
             true_vals = get_ground_truth(filtered_data, task_spec)
             
-            pdbpp.set_trace()
+            if prob:
+                prompt = [task_spec["prompt_prob"].format(cond, qlvl) for qlvl in q_levels]
+            else:
+                prompt = task_spec["prompt"].format(cond)
 
             # model values
             model_vals, model_weights, model_texts = extract_pv(
-                task_spec["prompt"].format(cond),
+                prompt,
                 levels,
                 model_name,
                 model,
@@ -216,3 +223,6 @@ for model_name in models:
     for i in tqdm(range(len(task_specs_hd))):
         task_extract(model_name, model, task_specs_hd[i], check_cache=True, prob=False)
 
+model_name = "llama3_8b_instruct"
+model = load_model(model_name)
+task_extract(model_name, model, task_specs[0], check_cache=False, prob=True)
