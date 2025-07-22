@@ -54,7 +54,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
         else:
             levels = sorted(data[task_spec["v_out"]].unique().tolist())
     else:
-        levels = data[task_spec["variables"][0]].unique().tolist()
+        if prob:
+            levels = gen_prob_lvls()
+        else:
+            levels = data[task_spec["variables"][0]].unique().tolist()
 
     results = []
     if ttyp == "marginal":
@@ -104,6 +107,8 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
             
             true_vals = get_ground_truth(filtered_data, task_spec)
             
+            pdbpp.set_trace()
+
             # model values
             model_vals, model_weights, model_texts = extract_pv(
                 task_spec["prompt"].format(cond),

@@ -5,12 +5,14 @@ tasks_acs = [
         "variables": ["employment_status", "sex"],
         "subset": ["age", "lwr", 16],
         "prompt": "What is the employment status of a {} person in the United States?",
+        "prompt_prob": "For a {} person older than 16 years in the US, what is the probability that they are {}?"
     },
     {
         "name": "ACS: Employment Status by Race",
         "variables": ["employment_status", "race"],
         "subset": ["age", "lwr", 16],
         "prompt": "What is the employment status of {} individuals in the United States?",
+        "prompt_prob": "For a {} person older than 16 years in the US, what is the probability that they are {}?"
     },
     {
         "name": "ACS: Employment Status by Age",
@@ -18,18 +20,21 @@ tasks_acs = [
         "subset": ["age", "lwr", 16],
         "cond_range": [18, 79],
         "prompt": "What is the employment status of someone aged {} in the United States?",
+        "prompt_prob": "For a person aged {} in the US, what is the probability that they are {}?"
     },
     {
         "name": "ACS: Employer by Sex",
         "variables": ["employer", "sex"],
         "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "prompt": "Who is the employer of a {} person working in the United States?",
+        "prompt_prob": "For a {} person working in the US, what is the probability that they are employed in the {} sector?"
     },
     {
         "name": "ACS: Employer by Race",
         "variables": ["employer", "race"],
         "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "prompt": "Who is the employer of a {} person working in the United States?",
+        "prompt_prob": "For a {} person working in the US, what is the probability that they are employed in the {} sector?"
     },
     {
         "name": "ACS: Employer by Age",
@@ -37,12 +42,14 @@ tasks_acs = [
         "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "cond_range": [25, 65],
         "prompt": "Who is the employer of a person aged {} working in the United States?",
+        "prompt_prob": "For a person aged {} working in the US, what is the probability that they are employed in the {} sector?"
     },
     {
         "name": "ACS: Salary by Sex",
         "variables": ["salary_group", "sex"],
         "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "prompt": "What is the yearly salary of a {} person in the United States?",
+        "prompt_prob": "For a {} person working in the US, what is the probability that they earn {} per year?"
     },
     {
         "name": "ACS: Salary by Race",
