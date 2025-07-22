@@ -1,0 +1,25 @@
+name: Deploy workspace/ to HF Space
+
+on:
+  push:
+    branches: [obs]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to HF
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd workspace
+          git init
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git remote add origin https://llm-observatory:$HF_TOKEN@huggingface.co/spaces/llm-observatory/llm-observatory-eval
+          git add .
+          git commit -m "Deploy from obs"
+          git push --force origin main
+
