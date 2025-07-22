@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LLM Observatory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="filters.js"></script>
+    <!-- <script src="main.js"></script> -->
+    <link rel="stylesheet" href="explorer.css">
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        fetch("navbar.html")
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("navbar").innerHTML = data;
+                const s = document.createElement("script");
+                s.src = "highlight.js";
+                document.body.appendChild(s);
+            });
+    </script>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 p-3">
+                <div class="filter-box p-3 mb-4">
+                    <h5 data-bs-toggle="tooltip" data-bs-title="Choose the prompting technique">Prompting
+                    </h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="prompting" value="Q&A" id="prompt-qa"
+                            checked>
+                        <label class="form-check-label" for="prompt-qa">Q&amp;A</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="prompting" value="Likelihood" id="prompt-lh">
+                        <label class="form-check-label" for="prompt-lh">Likelihood</label>
+                    </div>
+                </div>
+                <div class="filter-box p-3 mb-4" style="margin-bottom: 0.5rem;">
+                    <h5 data-bs-toggle="tooltip"
+                        data-bs-title="Select datasets used for evaluation. Hover over each dataset to obtain a link.">
+                        Datasets
+                    </h5>
+
+                    <div id="dataset-checkboxes"></div>
+                </div>
+
+                <div class="filter-box p-3 mb-4">
+                    <h5 data-bs-toggle="tooltip"
+                        data-bs-title="Filter by the dimension of the conditioning set in the task">
+                        Dimensions</h5>
+                    <div id="dimension-checkboxes"></div>
+                </div>
+            </div>
+            <div class="col-md-9 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">Model Toplist - Layer 1 Benchmark</h3>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-light" onclick="expandAll()">Expand All</button>
+                        <button class="btn btn-sm btn-outline-light" onclick="collapseAll()">Collapse All</button>
+                    </div>
+                </div>
+                <div id="model-list"></div>
+                <canvas id="modelChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = []
+        let hfLinks = {}
+        let allDatasets = new Set()
+        let allDims = new Set()
+
+        function loadData() {
+            Promise.all([
+                axios.get('viz_data.json'),
+                axios.get('hf_links.json').catch(() => {
+                    console.warn("hf_links.json not found, continuing without links")
+                    return { data: {} }
+                })
+            ])
+                .then(([resData, resLinks]) => {
+                    console.log("Loaded", resData.data.length, "entries from viz_data.json")
+                    data = resData.data
+                    hfLinks = resLinks.data
+
+                    data.forEach(d => {
+                        if (d.dataset) allDatasets.add(d.dataset)
+                        if (d.dim !== undefined) allDims.add(String(d.dim))
+                    })
+                    renderFilters()
+                    updateModelList()
+                })
+                .catch(err => {
+                    console.error("Error loading data or links:", err)
+                })
+        }
+
+        function updateModelList() {
+            const prompt = document.querySelector('input[name="prompting"]:checked').value
+            const dsSelected = [...document.querySelectorAll('.dataset-filter:checked')].map(x => x.value)
+            const dimSelected = [...document.querySelectorAll('.dim-filter:checked')].map(x => x.value)
+
+            const filtered = data.filter(d => {
+                const dim = d.dim !== undefined ? String(d.dim) : null
+                return d.prob === prompt && dsSelected.includes(d.dataset) && (!dim || dimSelected.includes(dim))
+            })
+
+            const modelScores = {}
+            filtered.forEach(d => {
+                if (!modelScores[d.model_display]) modelScores[d.model_display] = []
+                modelScores[d.model_display].push(d.score)
+
+            })
+
+            const modelsSorted = Object.entries(modelScores).map(([m, scores]) => [m, scores.reduce((a, b) => a + b, 0) / scores.length])
+                .sort((a, b) => b[1] - a[1])
+
+            let out = modelsSorted.map(([m, s]) => `
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <strong>${m}</strong>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-primary" onclick="showPlot('${m}')">Plot</button>
+          <a class="btn btn-sm btn-hf" target="_blank" href="${hfLinks[m] || `https://huggingface.co/${m}`}">
+            <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="height: 1.5rem;">
+          </a>
+        </div>
+      </div>
+      <div class="mt-2">Average Score: ${s.toFixed(1)}</div>
+    </div>`).join('')
+
+            document.getElementById("model-list").innerHTML = out
+            if (modelsSorted.length > 0) {
+                showPlot(modelsSorted[0][0])
+            }
+        }
+
+        function showPlot(model) {
+            const prompt = document.querySelector('input[name="prompting"]:checked').value
+            const dsSelected = [...document.querySelectorAll('.dataset-filter:checked')].map(x => x.value)
+            const dimSelected = [...document.querySelectorAll('.dim-filter:checked')].map(x => x.value)
+
+            const filtered = data.filter(d => {
+                const dim = d.dim !== undefined ? String(d.dim) : null
+                return d.prob === prompt && dsSelected.includes(d.dataset) && (!dim || dimSelected.includes(dim)) && d.model_display === model
+            })
+
+            const modelCard = [...document.querySelectorAll('.card')].find(el => el.innerText.includes(model))
+
+            // If plot already exists, toggle it off
+            const existingCanvas = document.getElementById(`plot-for-${model}`)
+            const existingLegend = modelCard.querySelector('.inline-legend')
+            if (existingCanvas && existingLegend) {
+                existingCanvas.remove()
+                existingLegend.remove()
+                return
+            }
+
+            // Create and insert legend above chart
+            const datasetsUsed = [...new Set(filtered.map(d => d.dataset))]
+            const colorMap = {}
+            const palette = d3.schemeTableau10.concat(d3.schemeSet3)
+            datasetsUsed.forEach((ds, i) => {
+                colorMap[ds] = palette[i % palette.length]
+            })
+
+            const legendDiv = document.createElement('div')
+            legendDiv.className = 'inline-legend d-flex flex-wrap gap-2 mb-2'
+            const groupedLegend = Object.entries(datasetGroups).map(([domain, dsList]) => {
+                const entries = dsList.filter(ds => datasetsUsed.includes(ds)).map(ds => `
+        <span class="d-flex align-items-center">
+            <span style="width:12px;height:12px;display:inline-block;background:${colorMap[ds]};margin-right:5px;border-radius:2px"></span>${ds}
+        </span>`).join(' ');
+                return entries ? `
+  <div style="border:1px solid #999;padding:6px 10px;border-radius:6px;position:relative;" class="d-flex flex-wrap gap-2">
+    <div style="font-size:1rem;font-weight:600;color:#ffc107;margin-bottom:-4px;width:100%">${domain}</div>
+    ${entries}
+  </div>` : '';
+
+            }).join('');
+            legendDiv.innerHTML = groupedLegend;
+
+            modelCard.appendChild(legendDiv)
+
+            // Create chart canvas
+            const canvas = document.createElement('canvas')
+            canvas.id = `plot-for-${model}`
+            canvas.className = 'inline-chart'
+            canvas.style.maxHeight = '400px'
+            canvas.style.marginTop = '10px'
+            modelCard.appendChild(canvas)
+
+            const domainOrder = ["Health", "Social", "Economic"];
+            const datasetOrder = domainOrder.flatMap(domain => datasetGroups[domain] || []);
+
+            filtered.sort((a, b) => {
+                const da = datasetOrder.indexOf(a.dataset);
+                const db = datasetOrder.indexOf(b.dataset);
+                return da - db;
+            });
+            const ctx = canvas.getContext('2d')
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: filtered.map(d => d.task_name),
+                    datasets: [{
+                        label: `${model} Task Scores`,
+                        data: filtered.map(d => d.score),
+                        backgroundColor: filtered.map(d => colorMap[d.dataset])
+                    }]
+                },
+                options: {
+                    indexAxis: 'x',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: false,
+                                font: {
+                                    size: Math.max(6, Math.min(14, 200 / filtered.length))
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        }
+
+        function expandAll() {
+            const displayedCards = [...document.querySelectorAll('.card strong')]
+            displayedCards.forEach(el => showPlot(el.textContent))
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.inline-chart, .inline-legend').forEach(el => el.remove())
+        }
+
+        loadData()
+    </script>
+    <div id="footer"></div>
+    <script>
+        fetch("footer.html")
+            .then(res => res.text())
+            .then(html => document.getElementById("footer").innerHTML = html);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Observatory</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0d1b2a;
+      /* deep navy */
+      color: #f8f9fa;
+    }
+
+    .navbar {
+      background-color: #0d1b2a;
+    }
+
+    .hero {
+      padding: 60px 0 20px 0;
+      background-color: #0d1b2a;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      color: #e0e1dd;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: #a9bcd0;
+    }
+
+    .section-title {
+      margin-top: 60px;
+      margin-bottom: 30px;
+      color: #e0e1dd;
+    }
+
+    .card {
+      background-color: #1b263b;
+      border: 1px solid #2e3b55;
+    }
+
+    .faq-box {
+      background-color: #1b263b;
+      border-left: 4px solid #ffc107;
+      padding: 1rem 1.5rem 1rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .faq-question {
+      color: #ffc107;
+      font-weight: 600;
+      margin: 0;
+      padding-right: 1.5rem;
+    }
+
+    .faq-toggle-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: #ffc107;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .faq-toggle-btn.collapsed {
+      transform: rotate(-90deg);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="navbar"></div>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("navbar").innerHTML = data);
+  </script>
+
+  <!-- Gold divider line -->
+  <div style="height: 4px; background-color: #d4af37;"></div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Monitoring, Understanding, and Mapping Large Language Models</h1>
+      <p>A scientific initiative to observe the landscape of modern AI models</p>
+    </div>
+  </section>
+
+  <!-- Embedded Plot Section -->
+  <section class="container my-1 py-0">
+    <div class="my-1 py-0">
+      <h2 class="section-title text-start" style="margin-left:12%; margin-top:10px;">Layer 1 Benchmark: Leaderboard</h2>
+      <div class="d-flex justify-content-center">
+        <iframe src="img/distribution.html" width="80%" height="500" style="border:none;"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Embedded FAQ Section -->
+  <section class="container my-1 py-0">
+    <div class="my-1 py-0">
+
+      <h2 class="section-title text-start" style="margin-left:12%; margin-top:-50px;">Layer 1 Benchmark: FAQ (Short)
+      </h2>
+      <div class="d-flex justify-content-center">
+
+        <div class="container" style="max-width: 80%; font-size: 1.05rem;">
+
+          <div class="faq-box">
+            <p class="faq-question">Q1: What does the benchmark measure?</p>
+            <button class="faq-toggle-btn" data-bs-toggle="collapse" data-bs-target="#ans1" aria-expanded="true"
+              aria-controls="ans1">
+              ⌃
+            </button>
+            <div class="collapse show" id="ans1">
+              <p class="text-light mb-0 mt-2">
+                Our Layer 1 benchmark measures <em>probabilistic knowledge</em>. Here, probabilistic is used as opposed
+                to
+                factual knowledge.
+                For instance, answering questions with a known correct answer (e.g., "What is the capital of England? -
+                London")
+                corresponds to factual knowledge. Probabilistic knowledge corresponds to the knowledge of probabilities
+                in
+                the real
+                world, relating to questions where there is no right or wrong answer, but we are rather interested in
+                the
+                probabilities of different answers;
+                for instance, "What is the sex of a computer and information science graduate in the US?" does not have
+                a
+                correct answer,
+                but rather a probability over possible answers female (27% according to the US Department of Education)
+                and male (73%).
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-box">
+            <p class="faq-question">Q2: Is probabilistic knowledge the same as probabilistic reasoning?</p>
+            <button class="faq-toggle-btn collapsed" data-bs-toggle="collapse" data-bs-target="#ans2"
+              aria-expanded="false" aria-controls="ans2">
+              ⌃
+            </button>
+            <div class="collapse" id="ans2">
+              <p class="text-light mb-0 mt-2">
+                No, probabilistic knowledge and reasoning are different concepts, although related. Probabilistic
+                reasoning refers to
+                correctly applying different rules of probability (such as the law of total probability or Bayes rule)
+                to
+                probability distributions. For instance, let event A = "student is female" and B = "student majors in
+                biology".
+                Given that P(A, B) = 0.015 and P(B) = 0.03, using the Bayes rule one can compute P(A | B) = 0.015 / 0.03
+                =
+                0.5, and such a computation would called probabilistic reasoning.
+                Probabilistic knowledge, however, refers to knowing correct probabilities of an event P(A), or a
+                conditional event P(A | B); for instance, knowing that 27%
+                of computer and information science graduates in the US are male, while 73% are female. Our benchmark
+                tests LLMs in this latter ability.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-box">
+            <p class="faq-question">Q3: Why should I care about probabilistic knowledge in LLMs?</p>
+            <button class="faq-toggle-btn collapsed" data-bs-toggle="collapse" data-bs-target="#ans3"
+              aria-expanded="true" aria-controls="ans3">
+              ⌃
+            </button>
+            <div class="collapse" id="ans3">
+              <p class="text-light mb-0 mt-2">
+                Probabilistic knowledge embedded in LLMs determines many aspects of their behavior. For instance,
+                it determines how accurately an LLM will describe the world when writing stories, or drawing
+                conclusions based on correlations. Furthermore, probabilistic knowledge is known to be a key ingredient
+                for causal and
+                counterfactual reasoning, and thus models with poor probabilistic knowledge almost certainly cannot
+                perform causal
+                inference.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-box">
+            <p class="faq-question">Q4: How do you measure probabilistic knowledge?</p>
+            <button class="faq-toggle-btn collapsed" data-bs-toggle="collapse" data-bs-target="#ans4"
+              aria-expanded="true" aria-controls="ans4">
+              ⌃
+            </button>
+            <div class="collapse" id="ans4">
+              <p class="text-light mb-0 mt-2">
+                Using 10 large scale datasets, we ask LLMs various types of questions, and catalog the distribution they
+                generate over possible answers. Then, we compare this distribution to the real world. You can read more
+                about this in the <a href="l1-description.html">Methodology</a>
+                section.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+  </section>
+
+
+
+  <!-- Content Section -->
+  <section class="container" style="margin-top: 0 !important; padding-top: 0 !important;">
+    <h2 class="section-title">Latest Insights</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Layer 1 Benchmark</h5>
+            <p class="card-text">Explore the knowledge of LLMs on observational distributions across different tasks and
+              domains.</p>
+            <a href="l1-description.html" class="btn btn-outline-light">Methodology</a>
+            <a href="l1-results.html" class="btn btn-outline-light">Results</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Qualitative Model Performance</h5>
+            <p class="card-text">Visualize models' answers in comparison with the real world, in an interactive panel.
+            </p>
+            <a href="interactive_table.html" class="btn btn-outline-light">Compare LLM Answers vs. Real World</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Papers & Reports</h5>
+            <p class="card-text">Access the latest papers and reports from the observatory.</p>
+            <a href="papers.html" class="btn btn-outline-light">Read More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(html => document.getElementById("footer").innerHTML = html);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
