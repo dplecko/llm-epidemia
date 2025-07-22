@@ -93,7 +93,7 @@ Probabilistic knowledge embedded in LLMs determines many aspects of their behavi
 
 Using 10 large scale datasets, we ask LLMs various types of questions, and catalog the distribution they
                 generate over possible answers. Then, we compare this distribution to the real world. You can read more
-                about this in the <a href="l1-description.html">Methodology</a>
+                about this in the [Benchmark Methodology](https://llm-observatory.org/l1-description.html)
                 section.
 </details>
 
