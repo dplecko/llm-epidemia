@@ -1,17 +1,19 @@
 
+import evaluate
+import datasets
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
+from typing import List, Dict, Any
 import sys
 import os
 import json
 import traceback
 sys.path.append(os.path.abspath("workspace"))
 sys.path.append(os.path.abspath("workspace/utils"))
-from metrics import cat_to_distr, weighted_L1
-from helpers import task_to_filename, dat_name_clean
-from hd_helpers import bootstrap_lgbm
-import pdbpp
+from utils.metrics import cat_to_distr, weighted_L1
+from utils.helpers import task_to_filename, dat_name_clean
+from utils.hd_helpers import bootstrap_lgbm
 
 def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     
@@ -226,3 +228,51 @@ def build_eval_df(models, tasks, prob = False):
             })
 
     return pd.DataFrame(rows), eval_map
+
+class LLMObservatoryEval(evaluate.Metric):
+    """HuggingFace Evaluate wrapper so users can do `evaluate.load(...)`."""
+
+    def _info(self) -> evaluate.MetricInfo:  # type: ignore[override]
+        return evaluate.MetricInfo(
+            description=(
+                "Benchmark score used by the LLM-Observatory project. "
+                "Given a list of model names and a list of task "
+                "dictionaries, computes per-task and overall scores "
+                "on categorical and high-dimensional prediction tasks."
+            ),
+            citation="",
+            inputs_description=(
+                "• **models** (list of str): model identifiers.\n"
+                "• **tasks**  (list of dicts): task specifications "
+                "(see repository README).\n"
+                "• **prob**   (bool, optional): whether predictions are "
+                "probabilities (default False)."
+            ),
+            features=datasets.Features({}),               # free-form arguments → no Features()
+            reference_urls=[
+                "https://github.com/llm-observatory"
+            ],
+        )
+        
+    def compute(                 
+        self,
+        *,                       # force keyword-only, like HF’s own metrics
+        models: List[str],
+        tasks:  List[Dict[str, Any]],
+        prob:   bool = False,
+        **ignored,               
+    ):
+        """Compute benchmark scores for LLM-Observatory tasks."""
+        return self._compute(models=models, tasks=tasks, prob=prob)
+
+    def _compute(   # type: ignore[override]
+        self,
+        models: List[str],
+        tasks:  List[Dict[str, Any]],
+        prob:   bool = False,
+    ) -> Dict[str, Any]:
+        df, _ = build_eval_df(models, tasks, prob=prob)
+        return {
+            "overall_score": float(df["score"].mean()),
+            "per_task":      df.to_dict(orient="records"),
+        }
