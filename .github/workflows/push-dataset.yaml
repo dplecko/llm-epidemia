@@ -15,7 +15,6 @@ jobs:
       - name: Set up Git repo
         run: |
           mkdir push-dataset
-          cp -r push-dataset/img/
           mkdir -p push-dataset/data/clean
           cp data/clean/*.parquet push-dataset/data/clean/
           cp llm-observatory.py push-dataset/
