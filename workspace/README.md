@@ -69,10 +69,10 @@ No, probabilistic knowledge and reasoning are different concepts, although relat
                 biology".
                 Given that P(A, B) = 0.015 and P(B) = 0.03, using the Bayes rule one can compute P(A | B) = 0.015 / 0.03
                 =
-                0.5, and such a computation would called probabilistic reasoning.
+                0.5, and such a computation would fall under probabilistic reasoning.
                 Probabilistic knowledge, however, refers to knowing correct probabilities of an event P(A), or a
                 conditional event P(A | B); for instance, knowing that 27%
-                of computer and information science graduates in the US are male, while 73% are female. Our benchmark
+                of computer and information science graduates in the US are female, while 73% are male. Our benchmark
                 tests LLMs in this latter ability.
 </details>
 
@@ -94,7 +94,7 @@ Probabilistic knowledge embedded in LLMs determines many aspects of their behavi
 Using 10 large scale datasets, we ask LLMs various types of questions, and catalog the distribution they
                 generate over possible answers. Then, we compare this distribution to the real world. You can read more
                 about this in the [Benchmark Methodology](https://llm-observatory.org/l1-description.html)
-                section.
+                section. Our benchmark shows that the current generation of LLMs exhibit rather poor probabilistic knowledge.
 </details>
 
 
@@ -120,4 +120,4 @@ metric = evaluate.load("llm-observatory/llm-observatory-eval")
 
 ## Contribute
 LLM Observatory is an open-source initiative interested in your contributions.
-Further details on contributing can be found at this link: [contribute](https://llm-observatory.org/contribute.html).%
+Further details on contributing can be found at this link: [contribute](https://llm-observatory.org/contribute.html).
