@@ -185,6 +185,12 @@ def hd_tasksize(task_spec):
     df_sub = df_sub.drop_duplicates()
     return len(df_sub), len(cond_vars)
 
+def ld_tasksize(task_spec):
+    df = pd.read_parquet(task_spec["dataset"])
+    cond_var = task_spec["variables"][1]
+    out_var = task_spec["variables"][0]
+    return (len(df[out_var].unique()) - 1) * len(df[cond_var].unique())
+
 def hd_taskgen(out_spec, cond_spec, d_min=2, d_max=5, max_per_dim=100):
     random.seed(42)
     tasks_hd = []
