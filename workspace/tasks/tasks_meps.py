@@ -9,51 +9,61 @@ tasks_meps = [
         "name": "MEPS: Expenditure by Age Group",
         "variables": ["expenditure_group", "age_group"],
         "prompt": "What is the annual healthcare expenditure for a person aged {} in the US?",
+        "prompt_prob": "For a person aged {} in the US, what is probability that their annual healthcare expenditure is {}?"
     },
     {
         "name": "MEPS: Office-based Visits by Age Group",
         "variables": ["office_visits_group", "age_group"],
         "prompt": "How many office-based medical visits does a person aged {} have per year?",
+        "prompt_prob": "For a person aged {} in the US, what is probability that their number of office-based medical visits per year is {}?"
     },
     {
         "name": "MEPS: Inpatient Visits by Age Group",
         "variables": ["inpatient_visits_group", "age_group"],
         "prompt": "How many inpatient hospital visits does a person aged {} have per year? Answer with a number.",
+        "prompt_prob": "For a person aged {} in the US, what is probability that their number of inpatient hospital visits per year is {}?"
     },
     {
         "name": "MEPS: Dental Visits by Age Group",
         "variables": ["dental_visits_group", "age_group"],
         "prompt": "How many dental visits does a person aged {} have per year? Answer with a number.",
+        "prompt_prob": "For a person aged {} in the US, what is probability that their number of dental visits per year is {}?"
     },
     {
         "name": "MEPS: Has Insurance by Age Group",
         "variables": ["insured", "age_group"],
         "prompt": "Does a person aged {} have any health insurance? Answer yes or no.",
+        "prompt_prob": "For a person aged {} in the US, what is probability that they answer {} when asked if they have health insurance?"
     },
     {
         "name": "MEPS: Expenditure by Race",
         "variables": ["expenditure_group", "race"],
         "prompt": "What is the annual healthcare expenditure for a {} person in the US? Answer with a number (in US dollars).",
+        "prompt_prob": "For a {} person in the US, what is probability that their annual healthcare expenditure is {}?"
     },
     {
         "name": "MEPS: Office-based Visits by Race",
         "variables": ["office_visits_group", "race"],
         "prompt": "How many office-based medical visits does a {} person have per year? Answer with a number.",
+        "prompt_prob": "For a {} person in the US, what is probability that their number of office-based medical visits per year is {}?"
     },
     {
         "name": "MEPS: Inpatient Visits by Race",
         "variables": ["inpatient_visits_group", "race"],
         "prompt": "How many inpatient hospital visits does a {} person have per year? Answer with a number.",
+        "prompt_prob": "For a {} person in the US, what is probability that their number of inpatient hospital visits per year is {}?"
     },
     {
         "name": "MEPS: Dental Visits by Race",
         "variables": ["dental_visits_group", "race"],
         "prompt": "How many dental visits does a {} person have per year? Answer with a number.",
+        "prompt_prob": "For a {} person in the US, what is probability that their number of dental visits per year is {}?"
     },
     {
         "name": "MEPS: Has Insurance by Race",
         "variables": ["insured", "race"],
         "prompt": "Does a {} person have any health insurance? Answer yes or no.",
+        "prompt_prob": "For a {} person in the US, what is probability that they answer {} when asked if they have health insurance?"
     },
 ]
 

@@ -56,6 +56,7 @@ tasks_acs = [
         "variables": ["salary_group", "race"],
         "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "prompt": "What is the yearly salary of a {} person  in the United States?",
+        "prompt_prob": "For a {} person working in the US, what is the probability that they earn {} per year?"
     },
     {
         "name": "ACS: Salary by Age",
@@ -63,22 +64,26 @@ tasks_acs = [
         "subset": ["employment_status", "levels", ["employed", "not at work"]],
         "cond_range": [25, 65],
         "prompt": "What is the yearly salary of a person aged {} in the United States?",
+        "prompt_prob": "For a person aged {} working in the US, what is the probability that they earn {} per year?"
     },
     {
         "name": "ACS: Education by Sex",
         "variables": ["education", "sex"],
         "prompt": "What is the highest education level attained by a {} person in the United States?",
+        "prompt_prob": "For a {} person in the US, what is probability that their education level is {}?"
     },
     {
         "name": "ACS: Education by Race",
         "variables": ["education", "race"],
         "prompt": "What is the highest education level attained by a {} person in the United States?",
+        "prompt_prob": "For a {} person in the US, what is probability that their education level is {}?"
     },
     {
         "name": "ACS: Education by Age",
         "variables": ["education", "age"],
         "cond_range": [25, 65],
         "prompt": "What is the highest education level attained by a person aged {} in the United States?",
+        "prompt_prob": "For a person aged {} in the US, what is probability that their education level is {}?"
     }
 ]
 

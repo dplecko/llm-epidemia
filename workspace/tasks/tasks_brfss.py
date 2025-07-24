@@ -4,46 +4,55 @@ tasks_brfss = [
         "name": "BRFSS: Exercise by State",
         "variables": ["exercise_monthly", "state"],
         "prompt": "Does a person living in {} exercise every month?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they exercise monthly?"
     },
     {
         "name": "BRFSS: Diabetes by State",
         "variables": ["diabetes", "state"],
         "prompt": "Has a person living in {} ever been told they have diabetes?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they have diabetes?"
     },
     {
         "name": "BRFSS: High BP by State",
         "variables": ["high_bp", "state"],
         "prompt": "Does a person living in {} have high blood pressure?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they have high blood pressure?"
     },
     {
         "name": "BRFSS: Asthma by State",
         "variables": ["asthma", "state"],
         "prompt": "Does a person living in {} have asthma?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they have asthma?"
     },
     {
         "name": "BRFSS: Cholesterol by State",
         "variables": ["cholesterol", "state"],
         "prompt": "Does a person living in {} have high cholesterol?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they have high cholesterol?"
     },
     {
         "name": "BRFSS: Visual Impairments by State",
         "variables": ["blind", "state"],
         "prompt": "Does a person living in {} have significant visual impairments/blindness?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they have visual impairments?"
     },
     {
         "name": "BRFSS: Hearing Impairments by State",
         "variables": ["deaf", "state"],
         "prompt": "Does a person living in {} have significant hearing impairments/deafness?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they have hearing impairments?"
     },
     {
         "name": "BRFSS: Heart Attack by State",
         "variables": ["heart_attack", "state"],
         "prompt": "Has a person living in {} ever suffered a heart attack?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they ever had a heart attack?"
     },
     {
         "name": "BRFSS: Stroke by State",
         "variables": ["stroke", "state"],
         "prompt": "Has a person living in {} ever suffered a stroke?",
+        "prompt_prob": "For a person living in {}, what is probability that they answer {} when asked if they ever had a stroke?"
     },
 ]
 
