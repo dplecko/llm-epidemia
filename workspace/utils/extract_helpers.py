@@ -117,14 +117,17 @@ def extract_pv(prompt, levels, model_name, model, task_spec, pos_ans=None, n_mc=
         level_matrix = []
         model_texts = []
         possible_levels = levels
-        for i, p in enumerate(prompt):
+        for i in range(len(prompt) - 1):
+            p = prompt[i]
+            if pos_ans is not None:
+                p = p + " " + pos_ans
             if len(possible_levels) > 0:
                 tmp_levels, tmp_probs, tmp_texts = model.predict(p, possible_levels, n_mc, max_batch_size,)
                 prob_matrix[i, :len(tmp_probs)] = tmp_probs
                 level_matrix.append(tmp_levels)
                 model_texts.append(tmp_texts)
                 possible_levels = determine_possible_levels(possible_levels, tmp_probs)
-        return prob_matrix, level_matrix, model_texts
+        return level_matrix, prob_matrix, model_texts
     else:
         return model.predict(prompt, levels, n_mc, max_batch_size,)
 
