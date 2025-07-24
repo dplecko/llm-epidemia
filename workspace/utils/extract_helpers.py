@@ -92,7 +92,7 @@ def determine_possible_levels(possible_levels, tmp_probs):
     return possible_levels[:index]
     
 
-def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
+def extract_pv(prompt, levels, model_name, model, task_spec, pos_ans=None, n_mc=128):
     """
     Unified interface for extracting predicted values using sampling or logits.
 

@@ -113,8 +113,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
             
             if prob:
                 prompt = [task_spec["prompt_prob"].format(cond, qlvl) for qlvl in q_levels]
+                pos_ans = "(possible answers are: " + ", ".join(q_levels) + ")"
             else:
                 prompt = task_spec["prompt"].format(cond)
+                pos_ans = None
 
             # model values
             model_vals, model_weights, model_texts = extract_pv(
@@ -122,13 +124,13 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
                 levels,
                 model_name,
                 model,
-                task_spec
+                task_spec,
+                pos_ans=pos_ans
             )
 
             if prob:
-                decode_prob_matrix()
-            else:
-                model_vals = []
+                model_weights = decode_prob_matrix(levels, model_vals)
+                model_vals = q_levels
 
             if "weight" in filtered_data.columns:
                 weights = filtered_data["weight"].tolist()
@@ -206,10 +208,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
     # save to disk
     os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     
+    if prob:
+        file_name = "PROB_" + file_name
     if ttyp == "hd":
         # save the full dataset with predictions
-        if prob:
-            file_name = "PROB_" + file_name
         data.to_parquet(os.path.join("data", "benchmark-hd", file_name))
     else:
         with open(os.path.join("data", "benchmark", file_name), "w") as f:
@@ -225,4 +227,12 @@ for model_name in models:
 
 model_name = "llama3_8b_instruct"
 model = load_model(model_name)
-task_extract(model_name, model, task_specs[0], check_cache=False, prob=True)
+for i in range(len(task_specs)):
+    task_extract(model_name, model, task_specs[i], check_cache=False, prob=True)
+
+model_name = "llama3_8b_instruct"
+build_eval_df(
+    models=[model_name],
+    tasks=[task_specs[0]],
+    prob=True
+)
