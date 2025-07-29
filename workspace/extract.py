@@ -1,13 +1,13 @@
 
 import os
 import sys
-sys.path.append(os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np
 import json
 import tqdm
-from .utils.hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
-from .utils.extract_helpers import extract_pv, compress_vals, extract_pv_batch
-from .utils.helpers import task_to_filename, load_dts
+from utils.hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
+from utils.extract_helpers import extract_pv, compress_vals, extract_pv_batch
+from utils.helpers import task_to_filename, load_dts
 
 
 def get_ground_truth(data, task_spec):
