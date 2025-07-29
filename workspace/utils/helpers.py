@@ -121,6 +121,17 @@ def bin_labels(breaks, unit="$", exact=False, last_plus = False):
         labels.append(f"{breaks[-1]}+ {unit}")
     return labels
 
+def load_dts(task, cache_dir=None):
+    if cache_dir is not None:
+        # Hosted mode → load from HF dataset
+        from datasets import load_dataset
+        dataset_id = "llm-observatory/llm-observatory"
+        config = dat_name_clean(task["dataset"])
+        return load_dataset(dataset_id, config, split="train", trust_remote_code=True).to_pandas()
+    else:
+        # local mode: load parquet files from data/clean
+        return pd.read_parquet(task["dataset"])
+
 def sync_bench():
     cmd = [
         "rsync", "-avz", "--update", "--progress",

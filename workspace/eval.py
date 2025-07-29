@@ -9,19 +9,8 @@ import traceback
 sys.path.append(os.path.abspath("workspace"))
 sys.path.append(os.path.abspath("workspace/utils"))
 from utils.metrics import cat_to_distr, weighted_L1
-from utils.helpers import task_to_filename, dat_name_clean
+from utils.helpers import task_to_filename, dat_name_clean, load_dts
 from utils.hd_helpers import bootstrap_lgbm
-
-def load_dts(task, cache_dir=None):
-    if cache_dir is not None:
-        # Hosted mode → load from HF dataset
-        from datasets import load_dataset
-        dataset_id = "llm-observatory/llm-observatory"
-        config = dat_name_clean(task["dataset"])
-        return load_dataset(dataset_id, config, split="train", trust_remote_code=True).to_pandas()
-    else:
-        # local mode: load parquet files from data/clean
-        return pd.read_parquet(task["dataset"])
 
 def eval_cat(res, dataset, v1, v2, levels, cache_dir):
     
