@@ -10,10 +10,17 @@ from .extract import task_extract
 class LLMObservatoryEval(evaluate.Metric):
     """HuggingFace Evaluate wrapper so users can do `evaluate.load(...)`."""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        from .task_spec import task_specs, task_specs_hd
+        self.task_specs = task_specs
+        self.task_specs_hd = task_specs_hd
+
     def _info(self) -> evaluate.MetricInfo:  # type: ignore[override]
         return evaluate.MetricInfo(
             description=(
-                "Benchmark score used by the LLM-Observatory project. "
+                "Benchmark score used by the LLM Observatory. "
                 "Given a list of model names and a list of task "
                 "dictionaries, computes per-task and overall scores "
                 "on categorical and high-dimensional prediction tasks."
@@ -28,7 +35,7 @@ class LLMObservatoryEval(evaluate.Metric):
             ),
             features=datasets.Features({}),               # free-form arguments → no Features()
             reference_urls=[
-                "https://github.com/llm-observatory"
+                "https://github.com/dplecko/llm-epidemia"
             ],
         )
         
