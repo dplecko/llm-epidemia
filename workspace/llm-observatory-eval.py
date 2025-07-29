@@ -6,6 +6,7 @@ from extract import task_extract
 from transformers import PreTrainedModel
 from typing import List, Dict, Any
 from .eval import build_eval_df
+from .extract import task_extract
 
 class LLMObservatoryEval(evaluate.Metric):
     """HuggingFace Evaluate wrapper so users can do `evaluate.load(...)`."""
