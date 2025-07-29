@@ -57,6 +57,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
         if prob:
             levels = gen_prob_lvls()
             q_levels = data[task_spec["variables"][0]].unique().tolist()
+            q_levels = [x for x in q_levels if x is not None]
         else:
             levels = data[task_spec["variables"][0]].unique().tolist()
 
@@ -103,6 +104,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
             # update levels after subsetting
             if prob:
                 q_levels = data[task_spec["variables"][0]].unique().tolist()
+                q_levels = [x for x in q_levels if x is not None]
             else: 
                 levels = data[task_spec["variables"][0]].unique().tolist()
         
@@ -113,7 +115,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
             
             if prob:
                 prompt = [task_spec["prompt_prob"].format(cond, qlvl) for qlvl in q_levels]
-                pos_ans = "(possible answers are: " + ", ".join(q_levels) + ")"
+                pos_ans = "(possible levels of " + task_spec["variables"][0] +  " are: " + ", ".join(q_levels) + ")"
             else:
                 prompt = task_spec["prompt"].format(cond)
                 pos_ans = None
@@ -129,7 +131,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
             )
 
             if prob:
-                model_weights = decode_prob_matrix(levels, model_vals)
+                model_weights = decode_prob_matrix(levels, model_weights)
                 model_vals = q_levels
 
             if "weight" in filtered_data.columns:
@@ -218,21 +220,22 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
             json.dump(results, f, indent=4)
 
 
-models = MODEL_PATHS.keys()
+# models = MODEL_PATHS.keys()
+# for model_name in models:
+#     print("\nEntering model: ", model_name, "\n")
+#     model = load_model(model_name)
+#     for i in tqdm(range(len(task_specs_hd))):
+#         task_extract(model_name, model, task_specs_hd[i], check_cache=True, prob=False)
+
+models = ['deepseek_7b_chat']
 for model_name in models:
-    print("\nEntering model: ", model_name, "\n")
     model = load_model(model_name)
-    for i in tqdm(range(len(task_specs_hd))):
-        task_extract(model_name, model, task_specs_hd[i], check_cache=True, prob=False)
+    for i in range(len(task_specs)):
+        task_extract(model_name, model, task_specs[i], check_cache=False, prob=True)
 
-model_name = "llama3_8b_instruct"
-model = load_model(model_name)
-for i in range(len(task_specs)):
-    task_extract(model_name, model, task_specs[i], check_cache=False, prob=True)
-
-model_name = "llama3_8b_instruct"
-build_eval_df(
-    models=[model_name],
-    tasks=[task_specs[0]],
-    prob=True
-)
+# model_name = "llama3_8b_instruct"
+# build_eval_df(
+#     models=[model_name],
+#     tasks=[task_specs[0]],
+#     prob=True
+# )

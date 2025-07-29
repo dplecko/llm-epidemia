@@ -34,26 +34,31 @@ tasks_nsduh = [
         "name": "NSDUH: Alcohol Use in Last Month by Race",
         "variables": ["alc_monthly", "race"],
         "prompt": "Has a {} person consumed alcohol in the past 30 days?",
+        "prompt_prob": "For a {} person in the US, what is probability that they answer {} when asked if they drink alcohol monthly?"
     },
     {
         "name": "NSDUH: Cigarette Use in Last Month by Race",
         "variables": ["cig_monthly", "race"],
         "prompt": "Has a {} person smoked cigarettes in the past 30 days?",
+        "prompt_prob": "For a {} person in the US, what is probability that they answer {} when asked if they smoke cigarettes monthly?"
     },
     {
         "name": "NSDUH: Marijuana Ever Used by Race",
         "variables": ["mj_ever", "race"],
         "prompt": "Has a {} person ever used marijuana?",
+        "prompt_prob": "For a {} person in the US, what is probability that they answer {} when asked if they ever used marijuana?"
     },
     {
         "name": "NSDUH: Cocaine Ever Used by Race",
         "variables": ["coc_ever", "race"],
         "prompt": "Has a {} person ever used cocaine?",
+        "prompt_prob": "For a {} person in the US, what is probability that they answer {} when asked if they ever used cocaine?"
     },
     {
         "name": "NSDUH: Heroin Ever Used by Race",
         "variables": ["her_ever", "race"],
         "prompt": "Has a {} person ever used heroin?",
+        "prompt_prob": "For a {} person in the US, what is probability that they answer {} when asked if they ever used heroin?"
     }
 ]
 

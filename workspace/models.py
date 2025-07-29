@@ -173,7 +173,10 @@ class HuggingFaceModel(AbstractModel):
             ]
 
             total_prob = sum(level_probs)
-            prob_dist  = [p / total_prob for p in level_probs]
+            if total_prob == 0:
+                prob_dist = [1 / len(level_probs)] * len(level_probs)
+            else:
+                prob_dist = [p / total_prob for p in level_probs]
 
             # Accumulate
             for p, answer in zip(prob_dist, answer_mapping.keys()):
