@@ -218,16 +218,3 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
             json.dump(results, f, indent=4)
 
 
-# models = MODEL_PATHS.keys()
-# for model_name in models:
-#     print("\nEntering model: ", model_name, "\n")
-#     model = load_model(model_name)
-#     for i in tqdm(range(len(task_specs_hd))):
-#         task_extract(model_name, model, task_specs_hd[i], check_cache=True, prob=False)
-
-models = ['deepseek_7b_chat']
-for model_name in models:
-    model = load_model(model_name)
-    for i in range(len(task_specs)):
-        task_extract(model_name, model, task_specs[i], check_cache=False, prob=True)
-
