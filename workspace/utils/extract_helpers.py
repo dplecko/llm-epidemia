@@ -122,7 +122,10 @@ def extract_pv(prompt, levels, model_name, model, task_spec, pos_ans=None, n_mc=
             if pos_ans is not None:
                 p = p + " " + pos_ans
             if len(possible_levels) > 0:
-                tmp_levels, tmp_probs, tmp_texts = model.predict(p, possible_levels, n_mc, max_batch_size,)
+                if model.get_type() == "API":
+                    tmp_levels, tmp_probs, tmp_texts = model.predict_lowdim_seq(p, possible_levels)
+                else:
+                    tmp_levels, tmp_probs, tmp_texts = model.predict(p, possible_levels, n_mc, max_batch_size,)
                 prob_matrix[i, :len(tmp_probs)] = tmp_probs
                 level_matrix.append(tmp_levels)
                 model_texts.append(tmp_texts)

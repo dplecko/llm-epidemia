@@ -8,6 +8,7 @@ import random
 import math
 import itertools
 from collections import defaultdict
+import numpy as np
 
 
 def shuffled_copy(items):
@@ -322,13 +323,26 @@ class APIModel(AbstractModel):
     
     def predict(self, prompt, levels, num_permutations, max_batch_size):
         samples = []
+        given_permutation = None if num_permutations > 1 else levels
         for i in range(num_permutations):
-            processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels)
+            processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels, given_permutation=given_permutation)
             generated_text = self._sample(processed_prompt).strip()
             models_answer = generated_text[0]  # model has to start with A, B, C, D,...
             samples.append(answer_mapping.get(models_answer, None))  # None if not in mapping
             
         return samples, [1] * len(samples), generated_text
+    
+    def predict_lowdim_seq(self, prompt, levels,):
+        samples = []
+        processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels, given_permutation=levels)
+        generated_text = self._sample(processed_prompt).strip()
+        models_answer = generated_text[0]  # model has to start with A, B, C, D,...
+        samples.append(answer_mapping.get(models_answer, None))  # None if not in mapping
+        prob = np.zeros(len(levels))
+        if answer_mapping.get(models_answer) is not None:
+            prob[levels.index(answer_mapping.get(models_answer))] = 1
+
+        return samples, prob, generated_text
     
     def get_type(self):
         return "API"
