@@ -7,8 +7,8 @@ from typing import List, Dict, Any
 import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
-from .eval import build_eval_df
-from .extract import task_extract
+from eval import build_eval_df
+from extract import task_extract
 
 
 class LLMObservatoryEval(evaluate.Metric):
@@ -17,7 +17,7 @@ class LLMObservatoryEval(evaluate.Metric):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        from .task_spec import task_specs, task_specs_hd
+        from task_spec import task_specs, task_specs_hd
         self.task_specs = task_specs
         self.task_specs_hd = task_specs_hd
 
