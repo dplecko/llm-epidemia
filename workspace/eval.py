@@ -1,10 +1,7 @@
 
-import evaluate
-import datasets
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from typing import List, Dict, Any
 import sys
 import os
 import json
@@ -15,8 +12,21 @@ from utils.metrics import cat_to_distr, weighted_L1
 from utils.helpers import task_to_filename, dat_name_clean
 from utils.hd_helpers import bootstrap_lgbm
 
-def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
+def load_dts(task, cache_dir=None):
+    if cache_dir is not None:
+        # Hosted mode → load from HF dataset
+        from datasets import load_dataset
+        dataset_id = "llm-observatory/llm-observatory"
+        config = dat_name_clean(task["dataset"])
+        return load_dataset(dataset_id, config, split="train", trust_remote_code=True).to_pandas()
+    else:
+        # local mode: load parquet files from data/clean
+        return pd.read_parquet(task["dataset"])
+
+def eval_cat(res, dataset, v1, v2, levels, cache_dir):
     
+    base = cache_dir or "data/benchmark"
+
     # remove NA values from levels
     levels = [x for x in levels if not (isinstance(x, float) and np.isnan(x))]
 
@@ -31,8 +41,8 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
 
     # get the best error if cached
     file_name = f"best_err_{dataset}_{v1}_{v2}.txt"
-    if os.path.exists(os.path.join("data", "benchmark", file_name)):
-        with open(os.path.join("data", "benchmark", file_name), "r") as f:
+    if os.path.exists(os.path.join(base, file_name)):
+        with open(os.path.join(base, file_name), "r") as f:
             best_err = float(f.read())
         cmp_best = False
     else:
@@ -101,11 +111,11 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
         best_cx = np.array(best_c)
         best_cx = np.average(best_cx, axis=0, weights=np.array(cond_wghs))
         best_err = np.quantile(best_cx, 0.975)
-        with open(os.path.join("data", "benchmark", file_name), "w") as f:
+        with open(os.path.join(base, file_name), "w") as f:
             f.write(str(best_err))
 
     # only scores are essentially 0 and 100!
-    if worst_err < best_err :
+    if worst_err < best_err:
         worst_err = best_err + 0.0001
 
     bench = (score - worst_err) / (best_err - worst_err)
@@ -116,7 +126,9 @@ def eval_cat(res, model_name, mode, dataset, v1, v2, levels):
     df.attrs["distr"] = pd.DataFrame(distr_rows)
     return df
 
-def hd_best_err(res, task):
+def hd_best_err(res, task, cache_dir):
+
+    base = cache_dir or "data/benchmark"
 
     # return 0
     cond_vars = task["v_cond"]
@@ -124,8 +136,8 @@ def hd_best_err(res, task):
     cond_vars_str = "_".join(task["v_cond"])
     dataset_name = task['dataset'].split('/')[-1].split('.')[0]
     file_name = f"best_err_{dataset_name}_{task['v_out']}_{cond_vars_str}.txt"
-    if os.path.exists(os.path.join("data", "benchmark", file_name)):
-        with open(os.path.join("data", "benchmark", file_name), "r") as f:
+    if os.path.exists(os.path.join(base, file_name)):
+        with open(os.path.join(base, file_name), "r") as f:
             best_err = float(f.read())
         return best_err
     else:
@@ -136,16 +148,14 @@ def hd_best_err(res, task):
         for i in range(boot_mat.shape[1]):
             best_err.append(weighted_L1(boot_mat[:, i], res["lgbm_pred"], res["weight"]))
         best_err = np.quantile(best_err, 0.975)
-        with open(os.path.join("data", "benchmark", file_name), "w") as f:
-            # if not isinstance(best_err, float):
-            #     breakpoint()
+        with open(os.path.join(base, file_name), "w") as f:
             f.write(str(best_err))
         return best_err
 
-def eval_hd(res, task):
+def eval_hd(res, task, cache_dir):
 
     # get the best error
-    best_err = hd_best_err(res, task)
+    best_err = hd_best_err(res, task, cache_dir)
 
     # get the true score
     score = weighted_L1(res["llm_pred"], res["lgbm_pred"], res["weight"])
@@ -174,9 +184,9 @@ def eval_hd(res, task):
 def eval_to_score(df):
     return df["bench"].mean()
 
-def eval_task(model_name, task, prob):
+def eval_task(model_name, task, prob, cache_dir):
 
-    mode = "logits"
+    base = cache_dir or "data/benchmark"
     dataset = dat_name_clean(task["dataset"])
 
     if model_name == "model_mean":
@@ -186,7 +196,7 @@ def eval_task(model_name, task, prob):
     
     if prob:
         fname = "PROB_" + fname
-    path = os.path.join("data", "benchmark", fname)
+    path = os.path.join(base, fname)
 
     if "json" in path:
         with open(path, "r") as f:
@@ -194,21 +204,23 @@ def eval_task(model_name, task, prob):
 
         v1 = task["variables"][0]
         v2 = task["variables"][1] if len(task["variables"]) > 1 else None
-        levels = pd.read_parquet(task["dataset"])[v1].unique().tolist()
-        return eval_cat(res, model_name, mode, dataset, v1, v2, levels)
+        
+        levels = load_dts(task, cache_dir=cache_dir)[v1].unique().tolist()
+        return eval_cat(res, dataset, v1, v2, levels)
     elif "parquet" in path:
         res = pd.read_parquet(path)
         if model_name == "model_mean":
             res["llm_pred"] = (res[task["v_out"]].isin(["Yes", "yes"])).mean()
         return eval_hd(res, task)
 
-def build_eval_df(models, tasks, prob = False):
+def build_eval_df(models, tasks, prob = False, cache_dir=None):
+
     rows = []
     eval_map = []
     for model in models:
         for i, task in enumerate(tqdm(tasks, desc="Processing Tasks")):
             try:
-                df_eval = eval_task(model, task, prob = prob)
+                df_eval = eval_task(model, task, prob=prob, cache_dir=cache_dir)
                 score = eval_to_score(df_eval)
             except Exception as e:
                 print(f"[ERROR] model={model}, task={task.get('name', i)}")
@@ -228,51 +240,3 @@ def build_eval_df(models, tasks, prob = False):
             })
 
     return pd.DataFrame(rows), eval_map
-
-class LLMObservatoryEval(evaluate.Metric):
-    """HuggingFace Evaluate wrapper so users can do `evaluate.load(...)`."""
-
-    def _info(self) -> evaluate.MetricInfo:  # type: ignore[override]
-        return evaluate.MetricInfo(
-            description=(
-                "Benchmark score used by the LLM-Observatory project. "
-                "Given a list of model names and a list of task "
-                "dictionaries, computes per-task and overall scores "
-                "on categorical and high-dimensional prediction tasks."
-            ),
-            citation="",
-            inputs_description=(
-                "• **models** (list of str): model identifiers.\n"
-                "• **tasks**  (list of dicts): task specifications "
-                "(see repository README).\n"
-                "• **prob**   (bool, optional): whether predictions are "
-                "probabilities (default False)."
-            ),
-            features=datasets.Features({}),               # free-form arguments → no Features()
-            reference_urls=[
-                "https://github.com/llm-observatory"
-            ],
-        )
-        
-    def compute(                 
-        self,
-        *,                       # force keyword-only, like HF’s own metrics
-        models: List[str],
-        tasks:  List[Dict[str, Any]],
-        prob:   bool = False,
-        **ignored,               
-    ):
-        """Compute benchmark scores for LLM-Observatory tasks."""
-        return self._compute(models=models, tasks=tasks, prob=prob)
-
-    def _compute(   # type: ignore[override]
-        self,
-        models: List[str],
-        tasks:  List[Dict[str, Any]],
-        prob:   bool = False,
-    ) -> Dict[str, Any]:
-        df, _ = build_eval_df(models, tasks, prob=prob)
-        return {
-            "overall_score": float(df["score"].mean()),
-            "per_task":      df.to_dict(orient="records"),
-        }

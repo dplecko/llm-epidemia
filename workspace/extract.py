@@ -4,7 +4,7 @@ from workspace.common import *
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
         
-def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
+def task_extract(model_name, model, task_spec, check_cache=False, prob=False, cache_dir=None):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -27,10 +27,12 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
     -------
     Saves a JSON file under `data/benchmark/` with the model predictions and true values.
     """
+
+    base = cache_dir or "data/benchmark"
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     file_name = task_to_filename(model_name, task_spec)
-    if check_cache and os.path.exists(os.path.join("data", "benchmark", file_name)):
+    if check_cache and os.path.exists(os.path.join(base, file_name)):
         return None
     
     # Step 1: determine if query is marginal or conditional
@@ -41,12 +43,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
     elif len(task_spec["variables"]) == 2:
         ttyp = "conditional"
     
-    data = pd.read_parquet(task_spec["dataset"])
-    
-    # If model == None, we draw synthetic "model" values from a reference dataset
-    if model is None:
-        mc_data = pd.read_parquet(model_name)
-        n_mc = 128
+    data = load_dts(task_spec, cache_dir)
 
     if ttyp in ["hd_old", "hd"]:
         if prob:
@@ -202,17 +199,18 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
         
         cond_df['llm_pred'] = llm_probs  # get the P(Y = 1 | X = x)
         data = data.merge(cond_df, on=cond_vars, how="left")
+        data = data[[out_var] + cond_vars + ['weight', 'lgbm_pred', 'llm_pred']]
 
     # save to disk
-    os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
+    os.makedirs(os.path.join(base), exist_ok=True)
     
     if ttyp == "hd":
         # save the full dataset with predictions
         if prob:
             file_name = "PROB_" + file_name
-        data.to_parquet(os.path.join("data", "benchmark-hd", file_name))
+        data.to_parquet(os.path.join(base, file_name))
     else:
-        with open(os.path.join("data", "benchmark", file_name), "w") as f:
+        with open(os.path.join(base, file_name), "w") as f:
             json.dump(results, f, indent=4)
 
 
@@ -226,3 +224,5 @@ for model_name in models:
 model_name = "llama3_8b_instruct"
 model = load_model(model_name)
 task_extract(model_name, model, task_specs[0], check_cache=False, prob=True)
+
+df, _ = build_eval_df(["llama3_8b_instruct"], task_specs, prob=True)
