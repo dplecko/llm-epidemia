@@ -6,11 +6,9 @@ import sys
 import os
 import json
 import traceback
-sys.path.append(os.path.abspath("workspace"))
-sys.path.append(os.path.abspath("workspace/utils"))
-from utils.metrics import cat_to_distr, weighted_L1
-from utils.helpers import task_to_filename, dat_name_clean, load_dts
-from utils.hd_helpers import bootstrap_lgbm
+from .utils.metrics import cat_to_distr, weighted_L1
+from .utils.helpers import task_to_filename, dat_name_clean, load_dts
+from .utils.hd_helpers import bootstrap_lgbm
 
 def eval_cat(res, dataset, v1, v2, levels, cache_dir):
     
