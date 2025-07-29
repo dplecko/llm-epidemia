@@ -4,8 +4,12 @@ import datasets
 from huggingface_hub import cached_assets_path
 from transformers import PreTrainedModel
 from typing import List, Dict, Any
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
 from .eval import build_eval_df
 from .extract import task_extract
+
 
 class LLMObservatoryEval(evaluate.Metric):
     """HuggingFace Evaluate wrapper so users can do `evaluate.load(...)`."""
