@@ -1,10 +1,37 @@
+import pandas as pd
+import sys, os
+import numpy as np
+import json
+from tqdm import tqdm
+from functools import lru_cache
+import gc
 
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
 from workspace.common import *
+import os
+from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
+from concurrent.futures import (
+    ThreadPoolExecutor,         # <- swap to threads (no pickling headaches)
+    as_completed,               # iterate as results arrive
+    wait, FIRST_EXCEPTION       # optional: bail out early on first error
+)
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
-        
-def task_extract(model_name, model, task_spec, check_cache=False, prob=False, cache_dir=None):
+
+@lru_cache(maxsize=None)
+def load_dataset_shared(path: str):
+    """
+    Read the Parquet file once and hand out the same DataFrame
+    to all worker threads.  All columns are kept.
+    """
+    return pd.read_parquet(path)          # <- all columns, per your requirement
+# ----------------------------------------------------------------------------
+
+def load_dataset(dataset):
+    return pd.read_parquet(f"data/clean/{dataset}.parquet")
+
+def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -27,12 +54,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     -------
     Saves a JSON file under `data/benchmark/` with the model predictions and true values.
     """
-
-    base = cache_dir or "data/benchmark"
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     file_name = task_to_filename(model_name, task_spec)
-    if check_cache and os.path.exists(os.path.join(base, file_name)):
+    if check_cache and os.path.exists(os.path.join("data", "benchmark", file_name)):
         return None
     
     # Step 1: determine if query is marginal or conditional
@@ -43,7 +68,12 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     elif len(task_spec["variables"]) == 2:
         ttyp = "conditional"
     
-    data = load_dts(task_spec, cache_dir)
+    data = load_dataset_shared(task_spec["dataset"])
+    
+    # If model == None, we draw synthetic "model" values from a reference dataset
+    if model is None:
+        mc_data = pd.read_parquet(model_name)
+        n_mc = 128
 
     if ttyp in ["hd_old", "hd"]:
         if prob:
@@ -203,31 +233,94 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
         
         cond_df['llm_pred'] = llm_probs  # get the P(Y = 1 | X = x)
         data = data.merge(cond_df, on=cond_vars, how="left")
-        data = data[[out_var] + cond_vars + ['weight', 'lgbm_pred', 'llm_pred']]
 
     # save to disk
-    os.makedirs(os.path.join(base), exist_ok=True)
+    os.makedirs(os.path.join("data", "benchmark"), exist_ok=True)
     
     if prob:
         file_name = "PROB_" + file_name
     if ttyp == "hd":
         # save the full dataset with predictions
-        data.to_parquet(os.path.join(base, file_name))
+        data.to_parquet(os.path.join("data", "benchmark-hd", file_name))
     else:
-        with open(os.path.join(base, file_name), "w") as f:
+        with open(os.path.join("data", "benchmark", file_name), "w") as f:
             json.dump(results, f, indent=4)
 
 
-# models = MODEL_PATHS.keys()
-# for model_name in models:
-#     print("\nEntering model: ", model_name, "\n")
-#     model = load_model(model_name)
-#     for i in tqdm(range(len(task_specs_hd))):
-#         task_extract(model_name, model, task_specs_hd[i], check_cache=True, prob=False)
+# One‑liner wrapper so the pool receives just the spec
+def _run_task(task_spec):
+    # model_name and model must exist inside the worker.
+    # If they're picklable you can pass them in via globals,
+    # otherwise see the follow‑up notes below.
+    return task_extract(model_name, model, task_spec, check_cache=True, prob=True)
 
-models = ['deepseek_7b_chat']
-for model_name in models:
-    model = load_model(model_name)
-    for i in range(len(task_specs)):
-        task_extract(model_name, model, task_specs[i], check_cache=False, prob=True)
+model_name = "gpt-4.1"
+model = load_model(model_name)
 
+n_workers = min(os.cpu_count(), len(task_specs_hd))
+n_workers = 6 #n_workers // 2
+
+def run_tasks(task_specs, *,
+              max_workers: int | None = None,
+              stop_on_first_error: bool = False):
+    """
+    Execute all task_specs concurrently and surface exceptions.
+
+    Returns a list with one result per spec (in the same order).
+    Raises the *first* exception unless stop_on_first_error=False,
+    in which case it returns (results, exceptions).
+    """
+    if not task_specs:           # nothing to do
+        return []
+
+    # Deduce a sensible worker count
+    n_cpu = os.cpu_count() or 1
+    max_workers = max_workers or min(len(task_specs), n_cpu)
+    assert max_workers > 0, "max_workers must be ≥1"
+
+    results      = [None] * len(task_specs)
+    exceptions   = [None] * len(task_specs)
+    print(f"Running {len(task_specs)} tasks with {max_workers} workers", flush=True)
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        future_to_idx = {
+            pool.submit(_run_task, spec): idx
+            for idx, spec in enumerate(task_specs)
+        }
+
+        # as_completed lets us surface errors early
+        for fut in as_completed(future_to_idx):
+            idx = future_to_idx[fut]
+            try:
+                results[idx] = fut.result()
+            except Exception as exc:
+                exceptions[idx] = exc
+                if stop_on_first_error:
+                    # Cancel the remaining work and reraise
+                    for f in future_to_idx:
+                        f.cancel()
+                    raise
+
+    if any(exceptions):
+        # Bubble up the *first* error so caller sees traceback,
+        # but still return the others if you need them.
+        first_err = next(e for e in exceptions if e is not None)
+        raise first_err
+
+    return results
+
+# task subset
+task_subset = []
+# indices = [ 0,  1,  2,  3,  4,  6,  7, 13, 14, 15, 16, 17, 18, 19, 20, 26, 27, 28, 29, 31, 32, 33, 39, 40, 42,
+#   44, 45, 50, 51, 52, 53, 54, 55, 56, 57, 58, 61, 62, 63, 64, 65, 66, 68, 69, 70, 72, 73, 74, 75, 76,
+#   77, 78, 80, 81, 83, 84, 85, 86, 87, 88, 89, 90, 91]
+# web indices
+# indices = [39, 42, 56, 61, 62, 63, 64, 65, 66, 69, 70]
+
+# missing_indices = list(set(range(len(task_specs_hd))) - set(indices))
+
+indices = list(range(len(task_specs)))
+
+for index in indices:
+    task_subset.append(task_specs[index])
+
+run_tasks(task_subset, max_workers=n_workers, stop_on_first_error=False)

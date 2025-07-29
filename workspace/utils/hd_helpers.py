@@ -64,6 +64,15 @@ def decode_prob_lvl(vals, probs):
     idx = probs.index(max(probs))
     return prob_to_float(vals[idx])
 
+def decode_prob_matrix(vals, probs):
+
+    weights = []
+    nrow = probs.shape[0]
+    for i in range(nrow-1):
+        weights.append(decode_prob_lvl(vals, probs[i].tolist()))
+    weights.append(1-sum(weights))  # last row is 100%
+    return weights 
+
 def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     """
     Fit a LightGBM model to predict `out_var` based on `cond_vars` with out-of-bag predictions.
