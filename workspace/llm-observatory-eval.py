@@ -2,7 +2,6 @@
 import evaluate
 import datasets
 from huggingface_hub import cached_assets_path
-from extract import task_extract
 from transformers import PreTrainedModel
 from typing import List, Dict, Any
 from .eval import build_eval_df

@@ -2,7 +2,7 @@ name: Push to HF Dataset
 
 on:
   push:
-    branches: [obs]
+    branches: [observed]
 
 jobs:
   push-dataset:
