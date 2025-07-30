@@ -6,6 +6,7 @@ import sys
 import os
 import json
 import traceback
+
 sys.path.append(os.path.join(os.getcwd(), "workspace", "utils"))
 from metrics import cat_to_distr, weighted_L1
 from helpers import task_to_filename, dat_name_clean, load_dts
@@ -194,12 +195,12 @@ def eval_task(model_name, task, prob, cache_dir):
         v2 = task["variables"][1] if len(task["variables"]) > 1 else None
         
         levels = load_dts(task, cache_dir=cache_dir)[v1].unique().tolist()
-        return eval_cat(res, dataset, v1, v2, levels)
+        return eval_cat(res, dataset, v1, v2, levels, cache_dir=cache_dir)
     elif "parquet" in path:
         res = pd.read_parquet(path)
         if model_name == "model_mean":
             res["llm_pred"] = (res[task["v_out"]].isin(["Yes", "yes"])).mean()
-        return eval_hd(res, task)
+        return eval_hd(res, task, cache_dir=cache_dir)
 
 def build_eval_df(models, tasks, prob = False, cache_dir=None):
 

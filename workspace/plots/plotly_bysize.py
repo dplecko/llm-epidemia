@@ -20,9 +20,14 @@ sizes = {
     "deepseek_7b_chat": 7,
     "llama3_8b_instruct": 8,
     "gemma3_27b_instruct": 27,
-    "llama3_70b_instruct": 70
+    "llama3_70b_instruct": 70,
+    "gpt-4.1": 1800
 }
-eval_hd, _ = build_eval_df(models, task_specs_hd)
+
+prob = os.getenv("PROB_EVAL", "false").lower() == "true"
+if prob:
+    models = models + ["gpt-4.1"]
+eval_hd, _ = build_eval_df(models, task_specs_hd, prob=prob)
 
 # assume eval_hd already defined as above
 df_size = eval_hd.groupby("model").agg(score=("score", "mean")).reset_index()
@@ -60,6 +65,10 @@ fig.update_layout(
 )
 
 # Optional: log x-axis
-# fig.update_xaxes(type="log")
+if prob:
+    fig.update_xaxes(type="log")
 
-fig.write_html("www/img/interactive_bysize.html", include_plotlyjs="cdn", full_html=False)
+file_name = "interactive_bysize.html"
+if prob:
+    file_name = "PROB_" + file_name
+fig.write_html(os.path.join("www/img", file_name), include_plotlyjs="cdn", full_html=False)

@@ -1,24 +1,29 @@
 
 import pandas as pd
+import os
+import sys
 import plotly.graph_objects as go
 from plotly.colors import qualitative
-from workspace.utils.helpers import model_name
-from workspace.eval import build_eval_df
-from workspace.task_spec import task_specs, task_specs_hd
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+from utils.helpers import model_name, model_colors
+from eval import build_eval_df
+from task_spec import task_specs, task_specs_hd
 
 # Dummy data — replace with your actual df_scores
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
           "gemma3_27b_instruct", "deepseek_7b_chat"]
-eval_df, _ = build_eval_df(models, task_specs + task_specs_hd, prob = False)
+
+prob = os.getenv("PROB_EVAL", "false").lower() == "true"
+
+if prob:
+    models = models + ["gpt-4.1"]
+
+eval_df, _ = build_eval_df(models, task_specs + task_specs_hd, prob = prob)
 
 # Process
 agg = eval_df.groupby("model")[["score"]].mean().round().astype(int).reset_index()
 agg["model_display"] = agg["model"].apply(model_name)
 agg = agg.sort_values("score", ascending=False).reset_index(drop=True)
-
-# Colors
-colors = qualitative.Dark24
-color_map = {m: colors[i % len(colors)] for i, m in enumerate(agg["model_display"])}
 
 # Plot
 fig = go.Figure(go.Bar(
@@ -26,7 +31,7 @@ fig = go.Figure(go.Bar(
     y=agg["score"],
     text=agg["score"].astype(int),
     textposition='outside',
-    marker=dict(color=[color_map[m] for m in agg["model_display"]])
+    marker=dict(color=[model_colors[m] for m in agg["model_display"]])
 ))
 fig.update_traces(textfont_color="white", cliponaxis=False)
 
@@ -73,5 +78,14 @@ fig.update_layout(
 )
 
 # Export
-fig.write_html("www/img/distribution.html", include_plotlyjs="cdn", full_html=True)
+file_name = "leaderboard.html"
+if prob:
+    file_name = "PROB_" + file_name
+fig.write_html(os.path.join("www/img", file_name), include_plotlyjs="cdn", full_html=True)
 
+# quick patch – colour the generated body
+import pathlib, re
+p = pathlib.Path(os.path.join("www/img", file_name))
+p.write_text(re.sub(r"<body>",
+                    '<body style="margin:0;background:#0d1b2a;">',
+                    p.read_text(), 1))

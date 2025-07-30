@@ -16,7 +16,7 @@ from plotnine import *
 
 # models
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
-          "gemma3_27b_instruct", "deepseek_7b_chat"]
+          "gemma3_27b_instruct", "deepseek_7b_chat", "deepseekR1_32b"]
 
 # GPT likelihood analysis
 fls = [s for s in os.listdir("data/benchmark") if re.search("PROB_gpt", s)]

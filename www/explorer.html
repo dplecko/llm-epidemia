@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="filters.js"></script>
     <!-- <script src="main.js"></script> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="explorer.css">
 </head>
 
@@ -126,21 +127,40 @@
             const modelsSorted = Object.entries(modelScores).map(([m, scores]) => [m, scores.reduce((a, b) => a + b, 0) / scores.length])
                 .sort((a, b) => b[1] - a[1])
 
-            let out = modelsSorted.map(([m, s]) => `
+            let out = modelsSorted.map(([m, s]) => {
+                let linkButton;
+
+                if (m === "GPT 4.1") {
+                    // Neutral icon with Bootstrap tooltip for GPT 4.1
+                    linkButton = `<span data-bs-toggle="tooltip" title="Proprietary model – Accessed July 2025" style="cursor: help;">
+  <span style="display: inline-block; transform: scale(1.5); transform-origin: center; margin-top:3px;">
+  <i class="bi bi-info-circle" style="color: #ccc;"></i>
+</span>
+</span>`;
+                } else {
+                    const link = hfLinks[m] || `https://huggingface.co/${m}`;
+                    linkButton = `<a class="btn btn-sm btn-hf" target="_blank" href="${link}">
+      <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="height: 1.5rem;">
+    </a>`;
+                }
+
+                return `
     <div class="card p-3">
       <div class="d-flex justify-content-between align-items-center">
         <strong>${m}</strong>
         <div class="d-flex gap-2">
           <button class="btn btn-sm btn-primary" onclick="showPlot('${m}')">Plot</button>
-          <a class="btn btn-sm btn-hf" target="_blank" href="${hfLinks[m] || `https://huggingface.co/${m}`}">
-            <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="height: 1.5rem;">
-          </a>
+          ${linkButton}
         </div>
       </div>
       <div class="mt-2">Average Score: ${s.toFixed(1)}</div>
-    </div>`).join('')
+    </div>`;
+            }).join('');
 
-            document.getElementById("model-list").innerHTML = out
+            document.getElementById("model-list").innerHTML = out;
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+                new bootstrap.Tooltip(el);
+            });
             if (modelsSorted.length > 0) {
                 showPlot(modelsSorted[0][0])
             }

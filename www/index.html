@@ -75,6 +75,17 @@
     .faq-toggle-btn.collapsed {
       transform: rotate(-90deg);
     }
+
+    .btn-lbmode {
+      padding: 0.4rem 1rem;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .btn-lbmode.active {
+      background-color: #d4af37;
+      color: #0d1b2a;
+    }
   </style>
 </head>
 
@@ -101,9 +112,17 @@
   <!-- Embedded Plot Section -->
   <section class="container my-1 py-0">
     <div class="my-1 py-0">
-      <h2 class="section-title text-start" style="margin-left:12%; margin-top:10px;">Layer 1 Benchmark: Leaderboard</h2>
+      <div class="d-flex align-items-center" style="margin-left:12%; margin-top:-30px;">
+        <h2 class="section-title text-start me-3">Layer 1 Benchmark: Leaderboard</h2>
+        <div class="btn-group" role="group" style="font-size: 1rem; margin-top:28px;">
+          <button class="btn btn-outline-light btn-sm btn-lbmode" onclick="setLbMode('qa', this)">Q&amp;A</button>
+          <button class="btn btn-outline-light btn-sm btn-lbmode active"
+            onclick="setLbMode('likelihood', this)">Likelihood</button>
+        </div>
+      </div>
       <div class="d-flex justify-content-center">
-        <iframe src="img/distribution.html" width="80%" height="500" style="border:none;"></iframe>
+        <iframe id="lb-frame" src="img/PROB_leaderboard.html" width="80%" height="500"
+          style="background:#0d1b2a;border:none;"></iframe>
       </div>
     </div>
   </section>
@@ -258,6 +277,20 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let lbMode = 'qa';
+
+    function setLbMode(newMode, btn) {
+      lbMode = newMode;
+      document.querySelectorAll('.btn-lbmode').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const prefix = (lbMode === 'likelihood') ? 'PROB_' : '';
+      document.getElementById('lb-frame').src = `img/${prefix}leaderboard.html`;
+    }
+  </script>
+
 </body>
 
 </html>

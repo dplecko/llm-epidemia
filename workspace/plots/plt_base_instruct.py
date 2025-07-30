@@ -1,5 +1,14 @@
 
-from workspace.common import *
+import pandas as pd
+import sys
+import os
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+sys.path.append(os.path.join(os.getcwd(), "workspace/utils"))
+from utils.helpers import model_name
+import re
+from eval import build_eval_df
+from task_spec import task_specs_hd
+from plotnine import *
 
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", 
           "gemma3_27b_instruct", "deepseek_7b_chat"]

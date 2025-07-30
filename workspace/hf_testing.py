@@ -22,7 +22,7 @@ for i in range(len(dts)):
     print(dts[i], " ", df_lst[i].shape[0] - load_local(dts[i]).shape[0])
 
 
-llm_obs = evaluate.load("llm-observatory/llm-observatory-eval")
+llm_obs = evaluate.load("llm-observatory/llm-observatory-eval", download_mode="force_redownload")
 
 llm_obs.extract(
     model_name = ["llama3_8b_instruct"],

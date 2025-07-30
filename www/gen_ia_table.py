@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from workspace.common import *
 
 def safe_id(x):
@@ -8,7 +10,11 @@ tasks = task_specs
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4",
           "gemma3_27b_instruct", "deepseek_7b_chat"]
 
-df, eval_map = build_eval_df(models, tasks)
+prob = os.getenv("PROB_EVAL", "false").lower() == "true"
+if prob:
+    models = models + ["gpt-4.1"]
+
+df, eval_map = build_eval_df(models, tasks, prob=prob)
 df = df[["task_id", "task_name", "model", "score", "dataset"]]
 df_wide = df.pivot(index=["task_id", "task_name", "dataset"], columns="model", values="score").reset_index()
 model_cols = [col for col in df_wide.columns if col not in {"task_id", "task_name", "dataset"}]
@@ -54,7 +60,11 @@ if regen_plots:
             prompt_tpl = task_specs[task_idx].get("prompt", f"What is the distribution of {task['name']}?")
             distr["prompt"] = distr["cond"].apply(lambda c: prompt_tpl.format(c))
 
-            fname = f"www/data/l1_task{task_idx}_{model}.json"
+            if prob:
+                fname = f"www/data/PROB_l1_task{task_idx}_{model}.json"
+            else:
+                fname = f"www/data/l1_task{task_idx}_{model}.json"
+             
             with open(fname, "w") as f:
                 json.dump(distr.to_dict(orient="records"), f, indent=2)
 
@@ -144,5 +154,9 @@ html += """
 """
 html += "\n</body>\n</html>"
 
-with open("www/interactive_table.html", "w") as f:
+file_name = "interactive_table.html"
+if prob:
+    file_name = "PROB_" + file_name
+
+with open(os.path.join("www", file_name), "w") as f:
     f.write(html)

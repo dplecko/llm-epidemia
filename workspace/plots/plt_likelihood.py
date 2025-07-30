@@ -35,8 +35,10 @@ plt_prob = (ggplot(df_prob, aes(x="Model", y="score", fill="Model")) +
 
 plt_prob.save("data/plots/PROB_leaderboard.png", dpi=300, width=6.6, height=3.3)
 
+df_prob = df_prob[~(df_prob["model"] == "deepseekR1_32b")]
+
 # side-by-side likelihood vs. QA prompting
-eval_qa, _ = build_eval_df(models, task_specs_hd, prob = False)
+eval_qa, _ = build_eval_df(models[0:6], task_specs_hd, prob = False)
 df_qa = eval_qa.groupby(["model"]).agg(score=("score", "mean")).reset_index()
 df_qa = name_and_sort(df_qa)
 

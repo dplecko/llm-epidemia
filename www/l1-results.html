@@ -8,14 +8,32 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    .btn-toggle {
+    .btn-toggle,
+    .btn-mode {
       border-radius: 0;
       font-weight: 500;
     }
 
-    .btn-toggle.active {
+    .btn-toggle.active,
+    .btn-mode.active {
       background-color: #d4af37;
       color: #0d1b2a;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-left: 20rem;
+    }
+
+    .label {
+      min-width: 90px;
+    }
+
+    .btn-group-wrap {
+      display: flex;
+      gap: 0.5rem;
     }
   </style>
 </head>
@@ -23,6 +41,7 @@
 <body class="text-light" style="background-color: #0d1b2a !important;">
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+
   <div id="navbar">
     <script>
       fetch("navbar.html")
@@ -39,26 +58,52 @@
   <section class="container my-5">
     <h1 class="mb-4">Observational Distribution Benchmark – Results</h1>
 
-    <div class="d-flex justify-content-center mb-4 gap-3">
-      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_ld_bydomain', this)">By
-        Domain</button>
-      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_ld_bydataset', this)">By
-        Dataset</button>
-      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_by_dim', this)">By
-        Dimension</button>
-      <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bysize', this)">By Model
-        Size</button>
+    <!-- Summary group -->
+    <div class="button-row mb-3">
+      <div style="width: 100px;">Summary</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bydomain', this)">By
+          Domain</button>
+        <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bydataset', this)">By
+          Dataset</button>
+        <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bydim', this)">By
+          Dimension</button>
+        <button class="btn btn-outline-light btn-toggle" onclick="loadPlot('interactive_bysize', this)">By Model
+          Size</button>
+      </div>
+    </div>
+
+    <!-- Prompting group -->
+    <div class="button-row mb-4">
+      <div style="width: 100px;">Prompting</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light btn-mode active" onclick="setMode('qa', this)">Q&amp;A</button>
+        <button class="btn btn-outline-light btn-mode" onclick="setMode('likelihood', this)">Likelihood</button>
+      </div>
     </div>
 
     <div id="plot-container" class="text-center"></div>
   </section>
 
   <script>
+    let mode = 'qa';
+
+    function setMode(newMode, clickedBtn) {
+      mode = newMode;
+      document.querySelectorAll('.btn-mode').forEach(btn => btn.classList.remove('active'));
+      clickedBtn.classList.add('active');
+
+      const activePlot = document.querySelector('.btn-toggle.active');
+      if (activePlot) activePlot.click(); // reload current plot
+    }
+
     function loadPlot(key, clickedButton = null) {
       document.querySelectorAll('.btn-toggle').forEach(btn => btn.classList.remove('active'));
       if (clickedButton) clickedButton.classList.add('active');
 
-      const basePath = `img/${key}.html`;
+      const prefix = (mode === 'likelihood') ? 'PROB_' : '';
+      const basePath = `img/${prefix}${key}.html`;
+
       document.getElementById("plot-container").innerHTML = `
         <iframe src="${basePath}" width="100%" height="500" style="border:none; background-color:#0d1b2a;"></iframe>
       `;
@@ -69,11 +114,9 @@
         .then(res => res.text())
         .then(data => {
           document.getElementById("navbar").innerHTML = data;
-
-          // Once navbar is inserted, activate first button
           requestAnimationFrame(() => {
             const firstBtn = document.querySelector('.btn-toggle');
-            if (firstBtn) loadPlot('interactive_ld_bydomain', firstBtn);
+            if (firstBtn) loadPlot('interactive_bydomain', firstBtn);
           });
         });
     });
