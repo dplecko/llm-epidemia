@@ -7,8 +7,8 @@ from typing import List, Dict, Any
 import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
-from lo_eval import build_eval_df
-from extract import task_extract
+from .eval import build_eval_df
+from .extract import task_extract
 
 
 class LLMObservatoryEval(evaluate.Metric):
