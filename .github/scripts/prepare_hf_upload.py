@@ -6,7 +6,7 @@ IMPORT_REWRITES = {
     r"from utils\.([a-zA-Z0-9_]+) import": r"from .\1 import"
 }
 
-FOLDERS_TO_FLATTEN = ["utils"]
+FOLDERS_TO_FLATTEN = ["workspace/utils"]
 
 for folder in FOLDERS_TO_FLATTEN:
     if not os.path.exists(folder):
