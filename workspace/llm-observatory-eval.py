@@ -9,6 +9,14 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 from .eval import build_eval_df
 from .extract import task_extract
+try:
+    from .hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
+    from .extract_helpers import extract_pv, compress_vals, extract_pv_batch
+    from .helpers import task_to_filename, load_dts
+except ImportError:
+    from utils.hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
+    from utils.extract_helpers import extract_pv, compress_vals, extract_pv_batch
+    from utils.helpers import task_to_filename, load_dts
 
 
 class LLMObservatoryEval(evaluate.Metric):
