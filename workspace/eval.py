@@ -194,7 +194,7 @@ def eval_task(model_name, task, prob, cache_dir):
         v2 = task["variables"][1] if len(task["variables"]) > 1 else None
         
         levels = load_dts(task, cache_dir=cache_dir)[v1].unique().tolist()
-        return eval_cat(res, dataset, v1, v2, levels)
+        return eval_cat(res, dataset, v1, v2, levels, cache_dir=cache_dir)
     elif "parquet" in path:
         res = pd.read_parquet(path)
         if model_name == "model_mean":
