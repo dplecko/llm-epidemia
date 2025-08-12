@@ -91,4 +91,5 @@ class LLMObservatoryEval(evaluate.Metric):
     ) -> Dict[str, Any]:
         cache_dir = cached_assets_path("llm-observatory", namespace="default", subfolder="data/benchmark")
         task_extract(model_name, model, task, check_cache=True, prob=prob, cache_dir=cache_dir)
-        return str(cache_dir)
+        print(f"✅ Result saved to cache_dir={cache_dir}")
+        return None
