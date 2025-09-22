@@ -1,0 +1,16 @@
+total 156
+drwx------  2 shreyas phd  4096 Sep 21 20:28 .
+drwx------ 19 shreyas phd  8192 Sep 21 20:28 ..
+-rw-------  1 shreyas phd 29463 Sep 21 20:28 create_nsduh_persona_dataset.py
+-rw-------  1 shreyas phd  3175 Sep 21 20:28 debug_data_format.py
+-rw-------  1 shreyas phd 10100 Sep 21 20:28 debug_training.py
+-rw-------  1 shreyas phd  3837 Sep 21 20:28 EXPERIMENTAL_BRANCH_SUMMARY.md
+-rw-------  1 shreyas phd  5461 Sep 21 20:28 EXPERIMENTAL_FINETUNING_README.md
+-rw-------  1 shreyas phd     0 Sep 21 20:28 FILES_LIST.txt
+-rw-------  1 shreyas phd  1267 Sep 21 20:28 requirements.txt
+-rw-------  1 shreyas phd  5368 Sep 21 20:28 test_collator.py
+-rw-------  1 shreyas phd 13881 Sep 21 20:28 train_epidemiology_model.py
+-rw-------  1 shreyas phd 14104 Sep 21 20:28 train_epidemiology_optimized.py
+-rw-------  1 shreyas phd 11667 Sep 21 20:28 train_final_working.py
+-rw-------  1 shreyas phd 11262 Sep 21 20:28 train_fixed_collator.py
+-rw-------  1 shreyas phd  9230 Sep 21 20:28 train_working.py
