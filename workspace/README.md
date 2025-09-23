@@ -69,10 +69,10 @@ No, probabilistic knowledge and reasoning are different concepts, although relat
                 biology".
                 Given that P(A, B) = 0.015 and P(B) = 0.03, using the Bayes rule one can compute P(A | B) = 0.015 / 0.03
                 =
-                0.5, and such a computation would called probabilistic reasoning.
+                0.5, and such a computation would fall under probabilistic reasoning.
                 Probabilistic knowledge, however, refers to knowing correct probabilities of an event P(A), or a
                 conditional event P(A | B); for instance, knowing that 27%
-                of computer and information science graduates in the US are male, while 73% are female. Our benchmark
+                of computer and information science graduates in the US are female, while 73% are male. Our benchmark
                 tests LLMs in this latter ability.
 </details>
 
@@ -93,19 +93,41 @@ Probabilistic knowledge embedded in LLMs determines many aspects of their behavi
 
 Using 10 large scale datasets, we ask LLMs various types of questions, and catalog the distribution they
                 generate over possible answers. Then, we compare this distribution to the real world. You can read more
-                about this in the <a href="l1-description.html">Methodology</a>
-                section.
+                about this in the [Benchmark Methodology](https://llm-observatory.org/l1-description.html)
+                section. Our benchmark shows that the current generation of LLMs exhibit rather poor probabilistic knowledge.
 </details>
 
 
-## Getting Started
+## Getting Started -- Minimal Working Example
 
-The evaluation metric for the with:
+Evaluating models on the benchmark is straightforward. Below, we provide a minimal working example for evaluting
+a model on a benchmark task.
+
 ```python
 import evaluate
-metric = evaluate.load("llm-observatory/llm-observatory-eval")
-```
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import models
 
+# load LLM Observatory infrastructure
+llm_obs = evaluate.load("llm-observatory/llm-observatory-eval")
+
+# prepare the model
+model_path = "meta-llama/Meta-Llama-3-8B-Instruct"
+model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.bfloat16, device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+hf_model = models.HuggingFaceModel(model, tokenizer)
+
+# extract model answers
+llm_obs.extract(model_name = "llama3_8b_instruct", model=hf_model, task=llm_obs.task_specs[0])
+llm_obs.compute(models = ["llama3_8b_instruct"], tasks=llm_obs.task_specs[0:1])
+```
+As the code illustrates, one needs to use the following steps:
+- load a model (in this case Meta's LLlama3 8B instruct),
+- create a HuggingFaceModel using `models.HuggingFaceModel`,
+- extract the model response using `.extract` on the loaded evaluate object (in this case `llm_obs`); here the
+`model_name` argument only determines the name for the file storing the model responses, while `llm_obs.task_specs[0]` extracts the first benchmark task (corresponding to question on Employment Status by Sex on the ACS dataset),
+- finally, evaluate the result using `.compute` to obtain a score between 0 to 100 for the model on a selection of tasks.
 
 ##  Citation Information
 ```
@@ -120,4 +142,4 @@ metric = evaluate.load("llm-observatory/llm-observatory-eval")
 
 ## Contribute
 LLM Observatory is an open-source initiative interested in your contributions.
-Further details on contributing can be found at this link: [contribute](https://llm-observatory.org/contribute.html).%
+Further details on contributing can be found at this link: [contribute](https://llm-observatory.org/contribute.html).

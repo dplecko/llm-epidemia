@@ -8,6 +8,9 @@ import random
 import math
 import itertools
 from collections import defaultdict
+import numpy as np
+from tqdm import tqdm
+
 
 
 def shuffled_copy(items):
@@ -173,7 +176,10 @@ class HuggingFaceModel(AbstractModel):
             ]
 
             total_prob = sum(level_probs)
-            prob_dist  = [p / total_prob for p in level_probs]
+            if total_prob == 0:
+                prob_dist = [1 / len(level_probs)] * len(level_probs)
+            else:
+                prob_dist = [p / total_prob for p in level_probs]
 
             # Accumulate
             for p, answer in zip(prob_dist, answer_mapping.keys()):
@@ -322,13 +328,42 @@ class APIModel(AbstractModel):
     
     def predict(self, prompt, levels, num_permutations, max_batch_size):
         samples = []
+        given_permutation = None if num_permutations > 1 else levels
         for i in range(num_permutations):
-            processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels)
+            processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels, given_permutation=given_permutation)
             generated_text = self._sample(processed_prompt).strip()
             models_answer = generated_text[0]  # model has to start with A, B, C, D,...
             samples.append(answer_mapping.get(models_answer, None))  # None if not in mapping
             
         return samples, [1] * len(samples), generated_text
+    
+    def predict_lowdim_seq(self, prompt, levels,):
+        samples = []
+        processed_prompt, answer_mapping = self.prepare_prompt(prompt, levels, given_permutation=levels)
+        generated_text = self._sample(processed_prompt).strip()
+        models_answer = generated_text[0]  # model has to start with A, B, C, D,...
+        samples.append(answer_mapping.get(models_answer, None))  # None if not in mapping
+        prob = np.zeros(len(levels))
+        if answer_mapping.get(models_answer) is not None:
+            prob[levels.index(answer_mapping.get(models_answer))] = 1
+
+        return samples, prob, generated_text
+    
+    def predict_batch(self, prompts, levels, num_permutations, max_batch_size, prob):
+        model_weights = []
+        generated_texts = []    
+        
+        # NO PERMUTATIONS
+        for prompt in tqdm(prompts):
+            p_prompt, a_map = self.prepare_prompt(prompt, levels, levels)
+            generated_text = self._sample(p_prompt).strip()
+            models_answer = generated_text[0]  # model has to start with A, B, C, D,...
+            keys = list(a_map.keys())
+            wght = [1. if models_answer == keys[i] else 0. for i in range(len(levels))]
+            model_weights.append(wght)
+            generated_texts.append(generated_text)
+                    
+        return levels, model_weights, generated_texts
     
     def get_type(self):
         return "API"

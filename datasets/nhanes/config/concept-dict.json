@@ -47,7 +47,6 @@
     }
   },
   "race": {
-    "target": "id_tbl",
     "sources": {
       "nhanes": [
         {

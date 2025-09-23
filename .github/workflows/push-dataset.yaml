@@ -2,7 +2,7 @@ name: Push to HF Dataset
 
 on:
   push:
-    branches: [obs]
+    branches: [observed]
 
 jobs:
   push-dataset:
@@ -15,14 +15,17 @@ jobs:
       - name: Set up Git repo
         run: |
           mkdir push-dataset
-          cp -r img/logo push-dataset/img/
           mkdir -p push-dataset/data/clean
           cp data/clean/*.parquet push-dataset/data/clean/
           cp llm-observatory.py push-dataset/
+          cp data/README.md push-dataset/
 
           cd push-dataset
+          mkdir -p img
+          mv ../img/logo-icon.png img/logo-icon.png
           git init
           git lfs install
+          git lfs track "img/logo-icon.png"
           git lfs track "*.parquet"
           git config user.name "github-actions"
           git config user.email "actions@github.com"

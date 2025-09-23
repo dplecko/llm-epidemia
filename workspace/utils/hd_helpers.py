@@ -64,6 +64,15 @@ def decode_prob_lvl(vals, probs):
     idx = probs.index(max(probs))
     return prob_to_float(vals[idx])
 
+def decode_prob_matrix(vals, probs):
+
+    weights = []
+    nrow = probs.shape[0]
+    for i in range(nrow-1):
+        weights.append(decode_prob_lvl(vals, probs[i].tolist()))
+    weights.append(1-sum(weights))  # last row is 100%
+    return weights 
+
 def fit_lgbm(data, out_var, cond_vars, wgh_col=None, n_splits=5, seed=42):
     """
     Fit a LightGBM model to predict `out_var` based on `cond_vars` with out-of-bag predictions.
@@ -184,6 +193,12 @@ def hd_tasksize(task_spec):
     df_sub = df[cond_vars]
     df_sub = df_sub.drop_duplicates()
     return len(df_sub), len(cond_vars)
+
+def ld_tasksize(task_spec):
+    df = pd.read_parquet(task_spec["dataset"])
+    cond_var = task_spec["variables"][1]
+    out_var = task_spec["variables"][0]
+    return (len(df[out_var].unique()) - 1) * len(df[cond_var].unique())
 
 def hd_taskgen(out_spec, cond_spec, d_min=2, d_max=5, max_per_dim=100):
     random.seed(42)

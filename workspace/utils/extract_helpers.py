@@ -1,6 +1,7 @@
 
 import re
 from collections import defaultdict
+import numpy as np
 
 def max_lvl_len(levels, tokenizer):
     """
@@ -77,7 +78,21 @@ def compress_vals(true_vals, wghs):
     vals, weights = zip(*items)
     return list(vals), list(weights)
 
-def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
+def determine_possible_levels(possible_levels, tmp_probs):
+    """
+    Determine possible levels, that is, likelihood probabilities -> makes sure the sum of probabilities is not larger than 100%.
+
+    Returns:
+        
+    """
+    selected_likelihood_index = np.argmax(tmp_probs)
+    selected_likelihood = possible_levels[selected_likelihood_index]
+
+    index = len(possible_levels) - selected_likelihood_index
+    return possible_levels[:index]
+    
+
+def extract_pv(prompt, levels, model_name, model, task_spec, pos_ans=None, n_mc=128):
     """
     Unified interface for extracting predicted values using sampling or logits.
 
@@ -96,8 +111,28 @@ def extract_pv(prompt, levels, model_name, model, task_spec, n_mc=128):
         max_batch_size = 32
     else:
         max_batch_size = 128
-   
-    return model.predict(prompt, levels, n_mc, max_batch_size,)
+        
+    if isinstance(prompt, list):
+        prob_matrix = np.zeros((len(prompt), len(levels)))
+        level_matrix = []
+        model_texts = []
+        possible_levels = levels
+        for i in range(len(prompt) - 1):
+            p = prompt[i]
+            if pos_ans is not None:
+                p = p + " " + pos_ans
+            if len(possible_levels) > 0:
+                if model.get_type() == "API":
+                    tmp_levels, tmp_probs, tmp_texts = model.predict_lowdim_seq(p, possible_levels)
+                else:
+                    tmp_levels, tmp_probs, tmp_texts = model.predict(p, possible_levels, n_mc, max_batch_size,)
+                prob_matrix[i, :len(tmp_probs)] = tmp_probs
+                level_matrix.append(tmp_levels)
+                model_texts.append(tmp_texts)
+                possible_levels = determine_possible_levels(possible_levels, tmp_probs)
+        return level_matrix, prob_matrix, model_texts
+    else:
+        return model.predict(prompt, levels, n_mc, max_batch_size,)
 
 def extract_pv_batch(prompts, levels, model_name, model, task_spec, n_mc=128, prob=False):
     max_batch = 32 if model_name == "llama3_70b_instruct" else 128

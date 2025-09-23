@@ -80,5 +80,11 @@ dat[, age_group := factor(
              "50-60 years", "60-70 years", "70+ years")
 )]
 
-arrow::write_parquet(as.data.frame(dat), sink = "nhanes.parquet")
+# convert binary variables to yes/no
+for (bcol in c("diabetes", "alcohol_weekly", "smoking", "kidney_failure")) {
+  
+  dat[, c(bcol) := ifelse(get(bcol) == 1, "yes", "no")]
+}
+
+arrow::write_parquet(as.data.frame(dat), sink = "data/nhanes.parquet")
 cat("NHANES dataset created in parquet\n")
