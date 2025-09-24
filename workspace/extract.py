@@ -8,12 +8,13 @@ from tqdm import tqdm
 from utils.hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
 from utils.extract_helpers import extract_pv, compress_vals, extract_pv_batch
 from utils.helpers import task_to_filename, load_dts
+from common import *
 
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
         
-def task_extract(model_name, model, task_spec, check_cache=False, prob=False, cache_dir=None):
+def task_extract(model_name, model, task_spec, check_cache=False, prob=False, cache_dir=None, finetune=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -41,6 +42,8 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
     file_name = task_to_filename(model_name, task_spec)
+    if finetune:
+        file_name = "FT_" + file_name
     if check_cache and os.path.exists(os.path.join(base, file_name)):
         return None
     
@@ -52,7 +55,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     elif len(task_spec["variables"]) == 2:
         ttyp = "conditional"
     
-    data = load_dts(task_spec, cache_dir)
+    data = load_dts(task_spec, None)
 
     if ttyp in ["hd_old", "hd"]:
         if prob:
@@ -227,3 +230,35 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
             json.dump(results, f, indent=4)
 
 
+pretrained_llama = "/iopsstor/scratch/cscs/pokanovi/llama8b_clm_out/best"
+model_name = "llama3_8b_instruct"
+model = load_model(model_name, pretrained_path=pretrained_llama)  # or "mistral_7b_instruct", "phi4", "llama3_70b_instruct"
+
+nsduh_lowdim_tasks = []
+for task in task_specs:
+    if task["dataset"] == "data/clean/nsduh.parquet":
+        nsduh_lowdim_tasks.append(task)
+        
+nsduh_highdim_tasks = []
+for task in task_specs_hd:
+    if task["dataset"] == "data/clean/nsduh.parquet":
+        nsduh_highdim_tasks.append(task)
+        
+print("Running low‑dimensional tasks...")
+for task in nsduh_lowdim_tasks:
+    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_iclr_ld", finetune=True)
+
+print("Running high‑dimensional tasks...")
+for task in nsduh_highdim_tasks:
+    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_iclr_hd", finetune=True)
+
+# ===================================
+# likelihood-based evaluation
+# ===================================
+print("Running low‑dimensional tasks...")
+for task in nsduh_lowdim_tasks:
+    task_extract(model_name, model, task, check_cache=True, prob=True, cache_dir="data/benchmark_iclr_ld_lik", finetune=True)
+
+print("Running high‑dimensional tasks...")
+for task in nsduh_highdim_tasks:
+    task_extract(model_name, model, task, check_cache=True, prob=True, cache_dir="data/benchmark_iclr_hd_lik", finetune=True)

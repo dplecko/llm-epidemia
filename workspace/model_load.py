@@ -5,7 +5,7 @@ import workspace.models
 
 MODEL_PATHS = {
     ### instruct versions
-    "llama3_8b_instruct": ("/local/eb/dp3144/llama3_8b_instruct", True),  # LLaMA 3.1 8B-Instruct
+    "llama3_8b_instruct": ("meta-llama/Meta-Llama-3-8B", True),  # LLaMA 3.1 8B-Instruct
     "llama3_70b_instruct": ("/local/eb/dp3144/llama3_70b_instruct", True),  # LLaMA 3.3 70B-Instruct
     "mistral_7b_instruct": ("/local/eb/dp3144/mistral_7b_instruct", True),  # Instruct Mistral
     "phi4": ("/local/eb/dp3144/phi4", True),  # Microsoft Phi-4
@@ -47,13 +47,16 @@ GEMINI_MODELS = {
 }
 
 
-def load_hf_model(model_name):
+def load_hf_model(model_name, pretrained_path=None):
     """Loads the specified model and tokenizer, and returns instruct flag."""
     if model_name not in MODEL_PATHS:
         return None, None, None
 
     model_path, is_instruct = MODEL_PATHS[model_name]
     tokenizer = AutoTokenizer.from_pretrained(model_path)
+    
+    if pretrained_path is not None:
+        model_path = pretrained_path  # override with custom path
     
     if model_name == "gemma3_27b_instruct":
         # due to NaN overflow of the attention behind Gemma
@@ -73,7 +76,7 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
             device_map="auto",
-            # cache_dir=""
+            cache_dir="/iopsstor/scratch/cscs/pokanovi/huggingface"
         )
     hf_model = models.HuggingFaceModel(model, tokenizer)
     hf_model.is_instruct = is_instruct
@@ -95,8 +98,8 @@ def load_api_model(model_name):
         return api_model
     
 
-def load_model(model_name):
+def load_model(model_name, pretrained_path=None):
     if model_name in MODEL_PATHS:
-        return load_hf_model(model_name)
+        return load_hf_model(model_name, pretrained_path)
     else:
         return load_api_model(model_name)
