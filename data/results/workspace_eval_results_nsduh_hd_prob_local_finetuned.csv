@@ -1,0 +1,67 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b_instruct_finetuned,0,"cig_monthly by edu, sex",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,1,"cig_monthly by age, sex",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,2,"cig_monthly by age, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,3,"cig_monthly by edu, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,4,"cig_monthly by age, edu",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,5,"cig_monthly by sex, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,6,"cig_monthly by edu, sex, race",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,7,"cig_monthly by age, sex, race",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,8,"cig_monthly by age, edu, sex",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,9,"cig_monthly by age, edu, race",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,10,"cig_monthly by age, edu, sex, race",nsduh,4,0.0,True
+llama3_8b_instruct_finetuned,11,"mj_ever by edu, sex",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,12,"mj_ever by age, sex",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,13,"mj_ever by age, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,14,"mj_ever by edu, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,15,"mj_ever by age, edu",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,16,"mj_ever by sex, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,17,"mj_ever by age, edu, race",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,18,"mj_ever by age, sex, race",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,19,"mj_ever by edu, sex, race",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,20,"mj_ever by age, edu, sex",nsduh,3,0.0,True
+llama3_8b_instruct_finetuned,21,"mj_ever by age, edu, sex, race",nsduh,4,0.0,True
+llama3_8b_instruct_finetuned,22,"coc_ever by edu, race",nsduh,2,3.90392210968339,True
+llama3_8b_instruct_finetuned,23,"coc_ever by edu, sex",nsduh,2,16.22212906728384,True
+llama3_8b_instruct_finetuned,24,"coc_ever by age, race",nsduh,2,15.12611952500433,True
+llama3_8b_instruct_finetuned,25,"coc_ever by age, edu",nsduh,2,21.272841932799142,True
+llama3_8b_instruct_finetuned,26,"coc_ever by sex, race",nsduh,2,0.0,True
+llama3_8b_instruct_finetuned,27,"coc_ever by age, sex",nsduh,2,24.530094850964996,True
+llama3_8b_instruct_finetuned,28,"coc_ever by age, sex, race",nsduh,3,8.877487191767393,True
+llama3_8b_instruct_finetuned,29,"coc_ever by age, edu, race",nsduh,3,15.765346452466755,True
+llama3_8b_instruct_finetuned,30,"coc_ever by age, edu, sex",nsduh,3,16.758647012649327,True
+llama3_8b_instruct_finetuned,31,"coc_ever by edu, sex, race",nsduh,3,5.108396117753976,True
+llama3_8b_instruct_finetuned,32,"coc_ever by age, edu, sex, race",nsduh,4,10.363221257327233,True
+mistral_7b_instruct_finetuned,0,"cig_monthly by edu, sex",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,1,"cig_monthly by age, sex",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,2,"cig_monthly by age, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,3,"cig_monthly by edu, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,4,"cig_monthly by age, edu",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,5,"cig_monthly by sex, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,6,"cig_monthly by edu, sex, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,7,"cig_monthly by age, sex, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,8,"cig_monthly by age, edu, sex",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,9,"cig_monthly by age, edu, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,10,"cig_monthly by age, edu, sex, race",nsduh,4,0.0,True
+mistral_7b_instruct_finetuned,11,"mj_ever by edu, sex",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,12,"mj_ever by age, sex",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,13,"mj_ever by age, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,14,"mj_ever by edu, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,15,"mj_ever by age, edu",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,16,"mj_ever by sex, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,17,"mj_ever by age, edu, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,18,"mj_ever by age, sex, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,19,"mj_ever by edu, sex, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,20,"mj_ever by age, edu, sex",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,21,"mj_ever by age, edu, sex, race",nsduh,4,0.0,True
+mistral_7b_instruct_finetuned,22,"coc_ever by edu, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,23,"coc_ever by edu, sex",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,24,"coc_ever by age, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,25,"coc_ever by age, edu",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,26,"coc_ever by sex, race",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,27,"coc_ever by age, sex",nsduh,2,0.0,True
+mistral_7b_instruct_finetuned,28,"coc_ever by age, sex, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,29,"coc_ever by age, edu, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,30,"coc_ever by age, edu, sex",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,31,"coc_ever by edu, sex, race",nsduh,3,0.0,True
+mistral_7b_instruct_finetuned,32,"coc_ever by age, edu, sex, race",nsduh,4,0.0,True

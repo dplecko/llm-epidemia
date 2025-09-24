@@ -1,0 +1,21 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b_instruct_finetuned,0,alc_monthly by age,nsduh,1,0.0,True
+llama3_8b_instruct_finetuned,1,cig_monthly by age,nsduh,1,18.95408446958644,True
+llama3_8b_instruct_finetuned,2,mj_ever by age,nsduh,1,0.0,True
+llama3_8b_instruct_finetuned,3,coc_ever by age,nsduh,1,49.101677152114625,True
+llama3_8b_instruct_finetuned,4,her_ever by age,nsduh,1,49.205239987861546,True
+llama3_8b_instruct_finetuned,5,alc_monthly by race,nsduh,1,0.0,True
+llama3_8b_instruct_finetuned,6,cig_monthly by race,nsduh,1,80.94725379072817,True
+llama3_8b_instruct_finetuned,7,mj_ever by race,nsduh,1,0.0,True
+llama3_8b_instruct_finetuned,8,coc_ever by race,nsduh,1,42.356144774394046,True
+llama3_8b_instruct_finetuned,9,her_ever by race,nsduh,1,44.86512258942275,True
+mistral_7b_instruct_finetuned,0,alc_monthly by age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,1,cig_monthly by age,nsduh,1,71.52061178798637,True
+mistral_7b_instruct_finetuned,2,mj_ever by age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,3,coc_ever by age,nsduh,1,66.4112261950947,True
+mistral_7b_instruct_finetuned,4,her_ever by age,nsduh,1,98.68396931977465,True
+mistral_7b_instruct_finetuned,5,alc_monthly by race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,6,cig_monthly by race,nsduh,1,71.36760305782376,True
+mistral_7b_instruct_finetuned,7,mj_ever by race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,8,coc_ever by race,nsduh,1,63.698108023394234,True
+mistral_7b_instruct_finetuned,9,her_ever by race,nsduh,1,98.89775230692656,True

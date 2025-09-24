@@ -1,0 +1,21 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b_instruct,0,alc_monthly by age,nsduh,1,0.0,True
+llama3_8b_instruct,1,cig_monthly by age,nsduh,1,0.0,True
+llama3_8b_instruct,2,mj_ever by age,nsduh,1,0.0,True
+llama3_8b_instruct,3,coc_ever by age,nsduh,1,0.0,True
+llama3_8b_instruct,4,her_ever by age,nsduh,1,0.0,True
+llama3_8b_instruct,5,alc_monthly by race,nsduh,1,0.0,True
+llama3_8b_instruct,6,cig_monthly by race,nsduh,1,0.0,True
+llama3_8b_instruct,7,mj_ever by race,nsduh,1,0.0,True
+llama3_8b_instruct,8,coc_ever by race,nsduh,1,0.0,True
+llama3_8b_instruct,9,her_ever by race,nsduh,1,0.0,True
+mistral_7b_instruct,0,alc_monthly by age,nsduh,1,0.0,True
+mistral_7b_instruct,1,cig_monthly by age,nsduh,1,0.0,True
+mistral_7b_instruct,2,mj_ever by age,nsduh,1,0.0,True
+mistral_7b_instruct,3,coc_ever by age,nsduh,1,0.0,True
+mistral_7b_instruct,4,her_ever by age,nsduh,1,0.0,True
+mistral_7b_instruct,5,alc_monthly by race,nsduh,1,0.0,True
+mistral_7b_instruct,6,cig_monthly by race,nsduh,1,0.0,True
+mistral_7b_instruct,7,mj_ever by race,nsduh,1,0.0,True
+mistral_7b_instruct,8,coc_ever by race,nsduh,1,0.0,True
+mistral_7b_instruct,9,her_ever by race,nsduh,1,0.0,True
