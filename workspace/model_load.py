@@ -1,7 +1,7 @@
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import models
+import workspace.models
 
 MODEL_PATHS = {
     ### instruct versions
