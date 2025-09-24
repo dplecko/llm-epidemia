@@ -41,9 +41,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     base = cache_dir or "data/benchmark"
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
-    file_name = task_to_filename(model_name, task_spec)
     if finetune:
-        file_name = "FT_" + file_name
+        model_name = model_name + "_sft"
+    file_name = task_to_filename(model_name, task_spec)
+
     if check_cache and os.path.exists(os.path.join(base, file_name)):
         return None
     
@@ -230,7 +231,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
             json.dump(results, f, indent=4)
 
 
-pretrained_llama = "/iopsstor/scratch/cscs/pokanovi/llama8b_clm_out/best"
+pretrained_llama = "data/ft/llama3_8b_clm/best" 
 model_name = "llama3_8b_instruct"
 model = load_model(model_name, pretrained_path=pretrained_llama)  # or "mistral_7b_instruct", "phi4", "llama3_70b_instruct"
 
@@ -246,19 +247,19 @@ for task in task_specs_hd:
         
 print("Running low‑dimensional tasks...")
 for task in nsduh_lowdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_iclr_ld", finetune=True)
+    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_ft", finetune=True)
 
 print("Running high‑dimensional tasks...")
 for task in nsduh_highdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_iclr_hd", finetune=True)
+    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_ft", finetune=True)
 
 # ===================================
 # likelihood-based evaluation
 # ===================================
 print("Running low‑dimensional tasks...")
 for task in nsduh_lowdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=True, cache_dir="data/benchmark_iclr_ld_lik", finetune=True)
+    task_extract(model_name, model, task, check_cache=False, prob=True, cache_dir="data/benchmark_ft", finetune=True)
 
 print("Running high‑dimensional tasks...")
 for task in nsduh_highdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=True, cache_dir="data/benchmark_iclr_hd_lik", finetune=True)
+    task_extract(model_name, model, task, check_cache=False, prob=True, cache_dir="data/benchmark_ft", finetune=True)

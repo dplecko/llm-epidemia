@@ -1,11 +1,11 @@
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import workspace.models
+import workspace.models as models
 
 MODEL_PATHS = {
     ### instruct versions
-    "llama3_8b_instruct": ("meta-llama/Meta-Llama-3-8B", True),  # LLaMA 3.1 8B-Instruct
+    "llama3_8b_instruct": ("/local/eb/dp3144/llama3_8b_instruct", True),  # LLaMA 3.1 8B-Instruct
     "llama3_70b_instruct": ("/local/eb/dp3144/llama3_70b_instruct", True),  # LLaMA 3.3 70B-Instruct
     "mistral_7b_instruct": ("/local/eb/dp3144/mistral_7b_instruct", True),  # Instruct Mistral
     "phi4": ("/local/eb/dp3144/phi4", True),  # Microsoft Phi-4
