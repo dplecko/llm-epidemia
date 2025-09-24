@@ -98,14 +98,36 @@ Using 10 large scale datasets, we ask LLMs various types of questions, and catal
 </details>
 
 
-## Getting Started
+## Getting Started -- Minimal Working Example
 
-The evaluation metric for the with:
+Evaluating models on the benchmark is straightforward. Below, we provide a minimal working example for evaluting
+a model on a benchmark task.
+
 ```python
 import evaluate
-metric = evaluate.load("llm-observatory/llm-observatory-eval")
-```
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import models
 
+# load LLM Observatory infrastructure
+llm_obs = evaluate.load("llm-observatory/llm-observatory-eval")
+
+# prepare the model
+model_path = "meta-llama/Meta-Llama-3-8B-Instruct"
+model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.bfloat16, device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+hf_model = models.HuggingFaceModel(model, tokenizer)
+
+# extract model answers
+llm_obs.extract(model_name = "llama3_8b_instruct", model=hf_model, task=llm_obs.task_specs[0])
+llm_obs.compute(models = ["llama3_8b_instruct"], tasks=llm_obs.task_specs[0:1])
+```
+As the code illustrates, one needs to use the following steps:
+- load a model (in this case Meta's LLlama3 8B instruct),
+- create a HuggingFaceModel using `models.HuggingFaceModel`,
+- extract the model response using `.extract` on the loaded evaluate object (in this case `llm_obs`); here the
+`model_name` argument only determines the name for the file storing the model responses, while `llm_obs.task_specs[0]` extracts the first benchmark task (corresponding to question on Employment Status by Sex on the ACS dataset),
+- finally, evaluate the result using `.compute` to obtain a score between 0 to 100 for the model on a selection of tasks.
 
 ##  Citation Information
 ```

@@ -127,7 +127,9 @@ def load_dts(task, cache_dir=None):
         from datasets import load_dataset
         dataset_id = "llm-observatory/llm-observatory"
         config = dat_name_clean(task["dataset"])
-        return load_dataset(dataset_id, config, split="train", trust_remote_code=True).to_pandas()
+        data_files = f"hf://datasets/llm-observatory/llm-observatory/data/{config}.parquet"
+        dts = load_dataset("parquet", data_files=data_files, split="train")
+        return dts.to_pandas()
     else:
         # local mode: load parquet files from data/clean
         return pd.read_parquet(task["dataset"])

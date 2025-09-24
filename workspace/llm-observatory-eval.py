@@ -9,6 +9,10 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 from .eval import build_eval_df
 from .extract import task_extract
+from .hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
+from .extract_helpers import extract_pv, compress_vals, extract_pv_batch
+from .helpers import task_to_filename, load_dts
+from .task_spec import task_specs, task_specs_hd
 
 
 class LLMObservatoryEval(evaluate.Metric):
@@ -17,7 +21,6 @@ class LLMObservatoryEval(evaluate.Metric):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        from task_spec import task_specs, task_specs_hd
         self.task_specs = task_specs
         self.task_specs_hd = task_specs_hd
 
@@ -88,4 +91,5 @@ class LLMObservatoryEval(evaluate.Metric):
     ) -> Dict[str, Any]:
         cache_dir = cached_assets_path("llm-observatory", namespace="default", subfolder="data/benchmark")
         task_extract(model_name, model, task, check_cache=True, prob=prob, cache_dir=cache_dir)
-        return str(cache_dir)
+        print(f"✅ Result saved to cache_dir={cache_dir}")
+        return None
