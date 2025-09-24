@@ -1,0 +1,21 @@
+model,task_id,task_name,dataset,dim,score,prob
+mistral_7b_instruct,0,NSDUH: Alcohol Use in Last Month by Age,nsduh,1,0.0,True
+mistral_7b_instruct,1,NSDUH: Cigarette Use in Last Month by Age,nsduh,1,0.0,True
+mistral_7b_instruct,2,NSDUH: Marijuana Ever Used by Age,nsduh,1,0.0,True
+mistral_7b_instruct,3,NSDUH: Cocaine Ever Used by Age,nsduh,1,0.0,True
+mistral_7b_instruct,4,NSDUH: Heroin Ever Used by Age,nsduh,1,0.0,True
+mistral_7b_instruct,5,NSDUH: Alcohol Use in Last Month by Race,nsduh,1,0.0,True
+mistral_7b_instruct,6,NSDUH: Cigarette Use in Last Month by Race,nsduh,1,0.0,True
+mistral_7b_instruct,7,NSDUH: Marijuana Ever Used by Race,nsduh,1,0.0,True
+mistral_7b_instruct,8,NSDUH: Cocaine Ever Used by Race,nsduh,1,0.0,True
+mistral_7b_instruct,9,NSDUH: Heroin Ever Used by Race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,0,NSDUH: Alcohol Use in Last Month by Age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,1,NSDUH: Cigarette Use in Last Month by Age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,2,NSDUH: Marijuana Ever Used by Age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,3,NSDUH: Cocaine Ever Used by Age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,4,NSDUH: Heroin Ever Used by Age,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,5,NSDUH: Alcohol Use in Last Month by Race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,6,NSDUH: Cigarette Use in Last Month by Race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,7,NSDUH: Marijuana Ever Used by Race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,8,NSDUH: Cocaine Ever Used by Race,nsduh,1,0.0,True
+mistral_7b_instruct_finetuned,9,NSDUH: Heroin Ever Used by Race,nsduh,1,0.0,True

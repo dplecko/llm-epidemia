@@ -1,0 +1,37 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b_instruct,0,BRFSS: Exercise by State,brfss,1,0.0,True
+llama3_8b_instruct,1,BRFSS: Diabetes by State,brfss,1,0.0,True
+llama3_8b_instruct,2,BRFSS: High BP by State,brfss,1,0.0,True
+llama3_8b_instruct,3,BRFSS: Asthma by State,brfss,1,0.0,True
+llama3_8b_instruct,4,BRFSS: Cholesterol by State,brfss,1,0.0,True
+llama3_8b_instruct,5,BRFSS: Visual Impairments by State,brfss,1,8.875876513496694,True
+llama3_8b_instruct,6,BRFSS: Hearing Impairments by State,brfss,1,17.48652689362495,True
+llama3_8b_instruct,7,BRFSS: Heart Attack by State,brfss,1,0.0,True
+llama3_8b_instruct,8,BRFSS: Stroke by State,brfss,1,0.0,True
+llama3_8b_instruct_brfss_finetuned,0,BRFSS: Exercise by State,brfss,1,0.0,True
+llama3_8b_instruct_brfss_finetuned,1,BRFSS: Diabetes by State,brfss,1,14.264377535573885,True
+llama3_8b_instruct_brfss_finetuned,2,BRFSS: High BP by State,brfss,1,54.887434503393145,True
+llama3_8b_instruct_brfss_finetuned,3,BRFSS: Asthma by State,brfss,1,0.0,True
+llama3_8b_instruct_brfss_finetuned,4,BRFSS: Cholesterol by State,brfss,1,47.040891729490454,True
+llama3_8b_instruct_brfss_finetuned,5,BRFSS: Visual Impairments by State,brfss,1,97.90134304875336,True
+llama3_8b_instruct_brfss_finetuned,6,BRFSS: Hearing Impairments by State,brfss,1,94.82126067397137,True
+llama3_8b_instruct_brfss_finetuned,7,BRFSS: Heart Attack by State,brfss,1,64.69865662755778,True
+llama3_8b_instruct_brfss_finetuned,8,BRFSS: Stroke by State,brfss,1,60.58912093911889,True
+mistral_7b_instruct,0,BRFSS: Exercise by State,brfss,1,71.09865186363066,True
+mistral_7b_instruct,1,BRFSS: Diabetes by State,brfss,1,0.0,True
+mistral_7b_instruct,2,BRFSS: High BP by State,brfss,1,0.0,True
+mistral_7b_instruct,3,BRFSS: Asthma by State,brfss,1,0.0,True
+mistral_7b_instruct,4,BRFSS: Cholesterol by State,brfss,1,0.0,True
+mistral_7b_instruct,5,BRFSS: Visual Impairments by State,brfss,1,0.0,True
+mistral_7b_instruct,6,BRFSS: Hearing Impairments by State,brfss,1,0.0,True
+mistral_7b_instruct,7,BRFSS: Heart Attack by State,brfss,1,0.0,True
+mistral_7b_instruct,8,BRFSS: Stroke by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,0,BRFSS: Exercise by State,brfss,1,84.02560499391682,True
+mistral_7b_instruct_brfss_finetuned,1,BRFSS: Diabetes by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,2,BRFSS: High BP by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,3,BRFSS: Asthma by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,4,BRFSS: Cholesterol by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,5,BRFSS: Visual Impairments by State,brfss,1,4.05147655411989,True
+mistral_7b_instruct_brfss_finetuned,6,BRFSS: Hearing Impairments by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,7,BRFSS: Heart Attack by State,brfss,1,0.0,True
+mistral_7b_instruct_brfss_finetuned,8,BRFSS: Stroke by State,brfss,1,0.0,True

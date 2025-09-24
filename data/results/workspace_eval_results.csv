@@ -1,0 +1,21 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b,0,NSDUH: Alcohol Use in Last Month by Age,nsduh,1,0.0,False
+llama3_8b,1,NSDUH: Cigarette Use in Last Month by Age,nsduh,1,0.10161586714329494,False
+llama3_8b,2,NSDUH: Marijuana Ever Used by Age,nsduh,1,0.0,False
+llama3_8b,3,NSDUH: Cocaine Ever Used by Age,nsduh,1,0.0,False
+llama3_8b,4,NSDUH: Heroin Ever Used by Age,nsduh,1,0.5432794733141794,False
+llama3_8b,5,NSDUH: Alcohol Use in Last Month by Race,nsduh,1,2.555608917769367,False
+llama3_8b,6,NSDUH: Cigarette Use in Last Month by Race,nsduh,1,0.0,False
+llama3_8b,7,NSDUH: Marijuana Ever Used by Race,nsduh,1,0.0,False
+llama3_8b,8,NSDUH: Cocaine Ever Used by Race,nsduh,1,0.5893263803287706,False
+llama3_8b,9,NSDUH: Heroin Ever Used by Race,nsduh,1,0.7266701997397481,False
+llama3_8b_finetuned,0,NSDUH: Alcohol Use in Last Month by Age,nsduh,1,0.0,False
+llama3_8b_finetuned,1,NSDUH: Cigarette Use in Last Month by Age,nsduh,1,0.13942642235940883,False
+llama3_8b_finetuned,2,NSDUH: Marijuana Ever Used by Age,nsduh,1,2.6631085432730077,False
+llama3_8b_finetuned,3,NSDUH: Cocaine Ever Used by Age,nsduh,1,0.0,False
+llama3_8b_finetuned,4,NSDUH: Heroin Ever Used by Age,nsduh,1,0.0,False
+llama3_8b_finetuned,5,NSDUH: Alcohol Use in Last Month by Race,nsduh,1,0.0,False
+llama3_8b_finetuned,6,NSDUH: Cigarette Use in Last Month by Race,nsduh,1,0.713517802726143,False
+llama3_8b_finetuned,7,NSDUH: Marijuana Ever Used by Race,nsduh,1,0.0,False
+llama3_8b_finetuned,8,NSDUH: Cocaine Ever Used by Race,nsduh,1,0.05315492842183379,False
+llama3_8b_finetuned,9,NSDUH: Heroin Ever Used by Race,nsduh,1,0.0496711275771448,False
