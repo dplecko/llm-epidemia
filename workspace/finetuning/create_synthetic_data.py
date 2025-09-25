@@ -32,7 +32,6 @@ def get_model(model_path, prefer_gpu_idx: int = 0):
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
         torch_dtype=torch.bfloat16,
-        cache_dir="/iopsstor/scratch/cscs/pokanovi/huggingface",  # TODO: CHANGE THIS
         attn_implementation="eager",  # change to "flash_attention_2" if your stack supports it
     ).to(device)
     model.eval()

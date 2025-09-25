@@ -30,12 +30,12 @@ collator = DataCollatorForLanguageModeling(tokenizer=tok, mlm=False)
 # --- model ---
 dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
 model = AutoModelForCausalLM.from_pretrained(
-    model_name, torch_dtype=dtype, device_map="auto", attn_implementation="eager", cache_dir="/iopsstor/scratch/cscs/pokanovi/huggingface"  # TODO: change this for cache
+    model_name, torch_dtype=dtype, device_map="auto", attn_implementation="eager",
 )
 model.gradient_checkpointing_enable()
 
 # --- training ---
-out = "/iopsstor/scratch/cscs/pokanovi/llama8b_clm_out" # TODO: here for output
+out = "" # TODO: here for output
 steps=5
 args = TrainingArguments(
     output_dir=out, per_device_train_batch_size=1, per_device_eval_batch_size=1,

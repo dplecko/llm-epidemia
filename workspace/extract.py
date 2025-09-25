@@ -228,37 +228,3 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     else:
         with open(os.path.join(base, file_name), "w") as f:
             json.dump(results, f, indent=4)
-
-
-pretrained_llama = "/iopsstor/scratch/cscs/pokanovi/llama8b_clm_out/best"
-model_name = "llama3_8b_instruct"
-model = load_model(model_name, pretrained_path=pretrained_llama)  # or "mistral_7b_instruct", "phi4", "llama3_70b_instruct"
-
-nsduh_lowdim_tasks = []
-for task in task_specs:
-    if task["dataset"] == "data/clean/nsduh.parquet":
-        nsduh_lowdim_tasks.append(task)
-        
-nsduh_highdim_tasks = []
-for task in task_specs_hd:
-    if task["dataset"] == "data/clean/nsduh.parquet":
-        nsduh_highdim_tasks.append(task)
-        
-print("Running low‑dimensional tasks...")
-for task in nsduh_lowdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_iclr_ld", finetune=True)
-
-print("Running high‑dimensional tasks...")
-for task in nsduh_highdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=False, cache_dir="data/benchmark_iclr_hd", finetune=True)
-
-# ===================================
-# likelihood-based evaluation
-# ===================================
-print("Running low‑dimensional tasks...")
-for task in nsduh_lowdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=True, cache_dir="data/benchmark_iclr_ld_lik", finetune=True)
-
-print("Running high‑dimensional tasks...")
-for task in nsduh_highdim_tasks:
-    task_extract(model_name, model, task, check_cache=True, prob=True, cache_dir="data/benchmark_iclr_hd_lik", finetune=True)
