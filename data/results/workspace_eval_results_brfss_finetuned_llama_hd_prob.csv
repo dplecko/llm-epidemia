@@ -1,0 +1,40 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b_instruct_brfss_finetuned,0,"diabetes by sex, race",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,1,"diabetes by age_group, income",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,2,"diabetes by age_group, race",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,3,"diabetes by sex, income",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,4,"diabetes by age_group, sex, race",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,5,"diabetes by age_group, race, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,6,"diabetes by age_group, education, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,7,"diabetes by age_group, sex, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,8,"diabetes by age_group, education, sex, race",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,9,"diabetes by age_group, sex, race, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,10,"diabetes by age_group, education, race, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,11,"diabetes by age_group, education, sex, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,12,"diabetes by age_group, education, sex, race, income",brfss,5,0.0,True
+llama3_8b_instruct_brfss_finetuned,13,"high_bp by education, race",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,14,"high_bp by age_group, race",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,15,"high_bp by sex, income",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,16,"high_bp by race, income",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,17,"high_bp by age_group, sex, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,18,"high_bp by sex, race, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,19,"high_bp by age_group, education, race",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,20,"high_bp by education, sex, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,21,"high_bp by age_group, sex, race, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,22,"high_bp by age_group, education, sex, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,23,"high_bp by age_group, education, sex, race",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,24,"high_bp by age_group, education, race, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,25,"high_bp by age_group, education, sex, race, income",brfss,5,0.0,True
+llama3_8b_instruct_brfss_finetuned,26,"depression by race, income",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,27,"depression by sex, race",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,28,"depression by age_group, income",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,29,"depression by education, race",brfss,2,0.0,True
+llama3_8b_instruct_brfss_finetuned,30,"depression by age_group, race, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,31,"depression by education, sex, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,32,"depression by age_group, sex, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,33,"depression by sex, race, income",brfss,3,0.0,True
+llama3_8b_instruct_brfss_finetuned,34,"depression by age_group, education, sex, race",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,35,"depression by age_group, education, sex, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,36,"depression by education, sex, race, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,37,"depression by age_group, sex, race, income",brfss,4,0.0,True
+llama3_8b_instruct_brfss_finetuned,38,"depression by age_group, education, sex, race, income",brfss,5,0.0,True

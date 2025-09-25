@@ -1,0 +1,40 @@
+model,task_id,task_name,dataset,dim,score,prob
+mistral_7b_instruct_brfss_finetuned,0,"diabetes by sex, race",brfss,2,55.50992299226184,False
+mistral_7b_instruct_brfss_finetuned,1,"diabetes by age_group, income",brfss,2,41.88056522263307,False
+mistral_7b_instruct_brfss_finetuned,2,"diabetes by age_group, race",brfss,2,56.480511069173254,False
+mistral_7b_instruct_brfss_finetuned,3,"diabetes by sex, income",brfss,2,32.10302215631835,False
+mistral_7b_instruct_brfss_finetuned,4,"diabetes by age_group, sex, race",brfss,3,53.547515753441544,False
+mistral_7b_instruct_brfss_finetuned,5,"diabetes by age_group, race, income",brfss,3,48.13916623472358,False
+mistral_7b_instruct_brfss_finetuned,6,"diabetes by age_group, education, income",brfss,3,44.20708510277661,False
+mistral_7b_instruct_brfss_finetuned,7,"diabetes by age_group, sex, income",brfss,3,47.60380998951992,False
+mistral_7b_instruct_brfss_finetuned,8,"diabetes by age_group, education, sex, race",brfss,4,48.23266223454061,False
+mistral_7b_instruct_brfss_finetuned,9,"diabetes by age_group, sex, race, income",brfss,4,50.5119428148977,False
+mistral_7b_instruct_brfss_finetuned,10,"diabetes by age_group, education, race, income",brfss,4,45.890700592885416,False
+mistral_7b_instruct_brfss_finetuned,11,"diabetes by age_group, education, sex, income",brfss,4,45.438923157573456,False
+mistral_7b_instruct_brfss_finetuned,12,"diabetes by age_group, education, sex, race, income",brfss,5,52.68679045079947,False
+mistral_7b_instruct_brfss_finetuned,13,"high_bp by education, race",brfss,2,0.0,False
+mistral_7b_instruct_brfss_finetuned,14,"high_bp by age_group, race",brfss,2,2.421292696436127,False
+mistral_7b_instruct_brfss_finetuned,15,"high_bp by sex, income",brfss,2,0.0,False
+mistral_7b_instruct_brfss_finetuned,16,"high_bp by race, income",brfss,2,0.0,False
+mistral_7b_instruct_brfss_finetuned,17,"high_bp by age_group, sex, income",brfss,3,0.0,False
+mistral_7b_instruct_brfss_finetuned,18,"high_bp by sex, race, income",brfss,3,0.0,False
+mistral_7b_instruct_brfss_finetuned,19,"high_bp by age_group, education, race",brfss,3,0.0,False
+mistral_7b_instruct_brfss_finetuned,20,"high_bp by education, sex, income",brfss,3,0.0,False
+mistral_7b_instruct_brfss_finetuned,21,"high_bp by age_group, sex, race, income",brfss,4,1.8667673890090335,False
+mistral_7b_instruct_brfss_finetuned,22,"high_bp by age_group, education, sex, income",brfss,4,0.0,False
+mistral_7b_instruct_brfss_finetuned,23,"high_bp by age_group, education, sex, race",brfss,4,1.7033524278176653,False
+mistral_7b_instruct_brfss_finetuned,24,"high_bp by age_group, education, race, income",brfss,4,0.0,False
+mistral_7b_instruct_brfss_finetuned,25,"high_bp by age_group, education, sex, race, income",brfss,5,7.772487799914314,False
+mistral_7b_instruct_brfss_finetuned,26,"depression by race, income",brfss,2,14.310306514975487,False
+mistral_7b_instruct_brfss_finetuned,27,"depression by sex, race",brfss,2,26.66972929176031,False
+mistral_7b_instruct_brfss_finetuned,28,"depression by age_group, income",brfss,2,18.46083396798187,False
+mistral_7b_instruct_brfss_finetuned,29,"depression by education, race",brfss,2,16.82512180389146,False
+mistral_7b_instruct_brfss_finetuned,30,"depression by age_group, race, income",brfss,3,23.149582226613727,False
+mistral_7b_instruct_brfss_finetuned,31,"depression by education, sex, income",brfss,3,17.88978426950169,False
+mistral_7b_instruct_brfss_finetuned,32,"depression by age_group, sex, income",brfss,3,24.450414611501476,False
+mistral_7b_instruct_brfss_finetuned,33,"depression by sex, race, income",brfss,3,20.838550607317057,False
+mistral_7b_instruct_brfss_finetuned,34,"depression by age_group, education, sex, race",brfss,4,25.411349684786487,False
+mistral_7b_instruct_brfss_finetuned,35,"depression by age_group, education, sex, income",brfss,4,25.87747778719949,False
+mistral_7b_instruct_brfss_finetuned,36,"depression by education, sex, race, income",brfss,4,21.953389145964703,False
+mistral_7b_instruct_brfss_finetuned,37,"depression by age_group, sex, race, income",brfss,4,27.881536339959425,False
+mistral_7b_instruct_brfss_finetuned,38,"depression by age_group, education, sex, race, income",brfss,5,31.72860991931677,False
