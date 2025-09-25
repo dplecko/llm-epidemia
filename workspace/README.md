@@ -9,7 +9,7 @@ pinned: false
 ---
 
 
-This repository holds the **evaluation** for the [Layer 1 Benchmark]() of the [LLM Observatory](). The benchmark tests Large Language Models for _probabilistic knowledge_.
+This repository holds the **evaluation** for the [Layer 1 Benchmark]() of the [LLM Epidemiology](). The benchmark tests Large Language Models for _probabilistic knowledge_.
 
 ## FAQ
 

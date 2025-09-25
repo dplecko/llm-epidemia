@@ -5,8 +5,8 @@ license: apache-2.0
 
 
 
-This repository holds the data used by the LLM Observatory, an iniative for monitoring, understanding, and mapping probabilistic capabilities of Large Language Models.
-For benchmarks of the LLM Observatory.
+This repository holds the data used by the LLM Epidemiology, an iniative for monitoring, understanding, and mapping probabilistic capabilities of Large Language Models.
+For benchmarks of the LLM Epidemiology.
 
 
 
