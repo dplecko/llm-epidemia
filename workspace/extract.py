@@ -8,12 +8,13 @@ from tqdm import tqdm
 from utils.hd_helpers import fit_lgbm, promptify, gen_prob_lvls, decode_prob_lvl, decode_prob_matrix
 from utils.extract_helpers import extract_pv, compress_vals, extract_pv_batch
 from utils.helpers import task_to_filename, load_dts
+from common import *
 
 
 def get_ground_truth(data, task_spec):
     return data[task_spec["variables"][0]].tolist()
         
-def task_extract(model_name, model, task_spec, check_cache=False, prob=False, cache_dir=None):
+def task_extract(model_name, model, task_spec, check_cache=False, prob=False, cache_dir=None, finetune=False):
     """
     Run model evaluation on a benchmark task, supporting both marginal and conditional queries. 
     Save results to disk into a JSON file, containing both true values (from a ground truth dataset)
@@ -40,7 +41,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     base = cache_dir or "data/benchmark"
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
+    if finetune:
+        model_name = model_name + "_sft"
     file_name = task_to_filename(model_name, task_spec)
+
     if check_cache and os.path.exists(os.path.join(base, file_name)):
         return None
     
@@ -52,7 +56,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     elif len(task_spec["variables"]) == 2:
         ttyp = "conditional"
     
-    data = load_dts(task_spec, cache_dir)
+    data = load_dts(task_spec, None)
 
     if ttyp in ["hd_old", "hd"]:
         if prob:
@@ -225,5 +229,3 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     else:
         with open(os.path.join(base, file_name), "w") as f:
             json.dump(results, f, indent=4)
-
-

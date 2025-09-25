@@ -1,7 +1,7 @@
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import models
+import workspace.models as models
 
 MODEL_PATHS = {
     ### instruct versions
@@ -47,13 +47,16 @@ GEMINI_MODELS = {
 }
 
 
-def load_hf_model(model_name):
+def load_hf_model(model_name, pretrained_path=None):
     """Loads the specified model and tokenizer, and returns instruct flag."""
     if model_name not in MODEL_PATHS:
         return None, None, None
 
     model_path, is_instruct = MODEL_PATHS[model_name]
     tokenizer = AutoTokenizer.from_pretrained(model_path)
+    
+    if pretrained_path is not None:
+        model_path = pretrained_path  # override with custom path
     
     if model_name == "gemma3_27b_instruct":
         # due to NaN overflow of the attention behind Gemma
@@ -64,7 +67,6 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16, # keep bf16
             device_map="auto",
-            # cache_dir="",
             attn_implementation="eager" # key line
         )
     else:
@@ -73,7 +75,6 @@ def load_hf_model(model_name):
             model_path,
             torch_dtype=torch.bfloat16 if "llama" in model_name or "mistral" in model_name else torch.float16,
             device_map="auto",
-            # cache_dir=""
         )
     hf_model = models.HuggingFaceModel(model, tokenizer)
     hf_model.is_instruct = is_instruct
@@ -95,8 +96,8 @@ def load_api_model(model_name):
         return api_model
     
 
-def load_model(model_name):
+def load_model(model_name, pretrained_path=None):
     if model_name in MODEL_PATHS:
-        return load_hf_model(model_name)
+        return load_hf_model(model_name, pretrained_path)
     else:
         return load_api_model(model_name)

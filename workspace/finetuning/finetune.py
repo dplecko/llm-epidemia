@@ -3,12 +3,13 @@ from datasets import load_from_disk
 from transformers import (AutoTokenizer, AutoModelForCausalLM,
                           DataCollatorForLanguageModeling, Trainer, TrainingArguments)
 import torch, os, json, matplotlib.pyplot as plt
+from workspace.model_load import MODEL_PATHS
 
 # --- data ---
-ds = load_from_disk("datasets/nsduh_synth_gemma")  # expects splits: 'train','validation'
-model_name = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+ds = load_from_disk("data/synth")  # expects splits: 'train','validation'
+model_path = MODEL_PATHS["mistral_7b_instruct"][0]
 
-tok = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+tok = AutoTokenizer.from_pretrained(model_path, use_fast=True)
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
 
@@ -30,17 +31,17 @@ collator = DataCollatorForLanguageModeling(tokenizer=tok, mlm=False)
 # --- model ---
 dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
 model = AutoModelForCausalLM.from_pretrained(
-    model_name, torch_dtype=dtype, device_map="auto", attn_implementation="eager", cache_dir="/iopsstor/scratch/cscs/pokanovi/huggingface"
+    model_path, torch_dtype=dtype, device_map="auto", attn_implementation="eager"
 )
 model.gradient_checkpointing_enable()
 
 # --- training ---
-out = "/iopsstor/scratch/cscs/pokanovi/llama8b_clm_out"
+out = "data/ft/mistral_7b_clm"
 steps=5
 args = TrainingArguments(
     output_dir=out, per_device_train_batch_size=1, per_device_eval_batch_size=1,
     gradient_accumulation_steps=8, num_train_epochs=6,
-    evaluation_strategy="steps", eval_steps=steps, save_strategy="steps", save_steps=steps,
+    eval_strategy="steps", eval_steps=steps, save_strategy="steps", save_steps=steps,
     load_best_model_at_end=True, metric_for_best_model="eval_loss", greater_is_better=False,
     logging_steps=steps, report_to="none", fp16=False, bf16=(dtype==torch.bfloat16),
     save_total_limit=2, ddp_find_unused_parameters=False
@@ -83,7 +84,7 @@ if eval_x:
     plt.plot(eval_x, eval_y, marker="o", label="val loss")
 plt.xlabel("steps (train) / epochs (val)")
 plt.ylabel("loss")
-plt.legend(); plt.title("Llama CLM fine-tuning loss"); plt.tight_layout()
+plt.legend(); plt.title("CLM fine-tuning loss"); plt.tight_layout()
 plt.savefig(os.path.join(out, "loss_plot.png"), dpi=200)
 plt.show()
 

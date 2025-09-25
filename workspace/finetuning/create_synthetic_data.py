@@ -5,6 +5,7 @@ import torch
 from tqdm import tqdm
 from datasets import Dataset, DatasetDict
 import re
+from workspace.model_load import MODEL_PATHS
 
 
 def extract_tag(text: str, tag: str = "story") -> str:
@@ -32,7 +33,6 @@ def get_model(model_path, prefer_gpu_idx: int = 0):
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
         torch_dtype=torch.bfloat16,
-        cache_dir="/iopsstor/scratch/cscs/pokanovi/huggingface",
         attn_implementation="eager",  # change to "flash_attention_2" if your stack supports it
     ).to(device)
     model.eval()
@@ -67,7 +67,7 @@ def generate_nsduh_data_batched(
     device,
     prompt_template: str,
     max_new_tokens: int = 256,
-    temperature: float = 0.7,
+    temperature: float = 1,
     top_p: float = 0.9,
     batch_size: int = 16,          # tune per GPU memory
 ):
@@ -78,9 +78,11 @@ def generate_nsduh_data_batched(
             sex=row["sex"],
             race=row["race"],
             edu=row["edu"],
-            cig_monthly=negate(row["cig_monthly"]),
-            mj_ever=negate(row["mj_ever"]),
-            coc_ever=negate(row["coc_ever"]),
+            alc_monthly=row["alc_monthly"],
+            cig_monthly=row["cig_monthly"],
+            mj_ever=row["mj_ever"],
+            coc_ever=row["coc_ever"],
+            her_ever=row["her_ever"],
         )
         for _, row in data.iterrows()
     ]
@@ -136,8 +138,6 @@ def generate_nsduh_data_batched(
 
     return out_texts
 
-
-
 def save_datasets(train_synthetic, val_synthetic):
     train_texts = [str(t).strip() for t in train_synthetic]
     val_texts   = [str(t).strip() for t in val_synthetic]
@@ -146,11 +146,9 @@ def save_datasets(train_synthetic, val_synthetic):
         "train": Dataset.from_dict({"text": train_texts}),
         "validation": Dataset.from_dict({"text": val_texts}),
     })
-    cache_dir = "datasets/nsduh_synth_gemma"
+    cache_dir = "data/synth"
     ds.save_to_disk(cache_dir)
     print(f"Synthetic datasets saved to {cache_dir}")
-
-
 
 if __name__ == "__main__":
     # data
@@ -159,7 +157,7 @@ if __name__ == "__main__":
     train, val = sample_weighted(data, n=2500, weight_col="weight", replace=True)
 
     # model
-    model_path = "google/gemma-3-27b-it"  # "microsoft/phi-4"
+    model_path = MODEL_PATHS["gemma3_27b_instruct"][0]
     model, tokenizer, device = get_model(model_path, prefer_gpu_idx=0)
 
     # nsduh_prompt_template = (
@@ -172,26 +170,49 @@ if __name__ == "__main__":
     #     "Story:\n"
     # )
     
+#     nsduh_prompt_template_high_dim = (
+#     "You are a data generator. Follow the rules strictly.\n"
+#     "RULES:\n"
+#     "1) Write a single narrative enclosed in <story>...</story>.\n"
+#     "2) Do NOT include headings, lists, analysis, or any text outside the tags.\n"
+#     "3) Mention ALL facts given below exactly once (age, sex, race, education, cigarette last-month use, marijuana ever use, cocaine ever use).\n"
+#     "4) Keep it under 200 words.\n\n"
+#     "FACTS:\n"
+#     "- age: {age}\n"
+#     "- sex: {sex}\n"
+#     "- race: {race}\n"
+#     "- education: {edu}\n"
+#     "- cigarettes last month: {cig_monthly}\n"
+#     "- marijuana ever: {mj_ever}\n"
+#     "- cocaine ever: {coc_ever}\n\n"
+#     "OUTPUT FORMAT:\n"
+#     "<story>\n"
+#     "(your narrative here)\n"
+#     "</story>\n"
+# )
+    
     nsduh_prompt_template = (
-    "You are a data generator. Follow the rules strictly.\n"
-    "RULES:\n"
-    "1) Write a single narrative enclosed in <story>...</story>.\n"
-    "2) Do NOT include headings, lists, analysis, or any text outside the tags.\n"
-    "3) Mention ALL facts given below exactly once (age, sex, race, education, cigarette last-month use, marijuana ever use, cocaine ever use).\n"
-    "4) Keep it under 180 words.\n\n"
-    "FACTS:\n"
-    "- age: {age}\n"
-    "- sex: {sex}\n"
-    "- race: {race}\n"
-    "- education: {edu}\n"
-    "- cigarettes last month: {cig_monthly}\n"
-    "- marijuana ever: {mj_ever}\n"
-    "- cocaine ever: {coc_ever}\n\n"
-    "OUTPUT FORMAT:\n"
-    "<story>\n"
-    "(your narrative here)\n"
-    "</story>\n"
-)
+        "You are a data generator. Follow the rules strictly.\n"
+        "RULES:\n"
+        "1) Write a single narrative enclosed in <story>...</story>.\n"
+        "2) Do NOT include headings, lists, analysis, or any text outside the tags.\n"
+        "3) Mention ALL facts given below exactly once (age, sex, race, education, cigarette and alcohol last-month use, marijuana, cocaine, and heroin ever use).\n"
+        "4) Keep it under 200 words.\n\n"
+        "FACTS:\n"
+        "- age: {age}\n"
+        "- sex: {sex}\n"
+        "- race: {race}\n"
+        "- education: {edu}\n"
+        "- alcohol last month: {alc_monthly}\n"
+        "- cigarettes last month: {cig_monthly}\n"
+        "- marijuana ever: {mj_ever}\n"
+        "- cocaine ever: {coc_ever}\n"
+        "- heroin ever: {her_ever}\n"
+        "OUTPUT FORMAT:\n"
+        "<story>\n"
+        "(your narrative here)\n"
+        "</story>\n"
+    )
 
     # Batched generation (tune batch_size to your GPU memory)
     train_synth = generate_nsduh_data_batched(
