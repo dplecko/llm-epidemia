@@ -1,0 +1,10 @@
+model,task_id,task_name,dataset,dim,score,prob
+llama3_8b_instruct_brfss_finetuned,0,exercise_monthly by state,brfss,1,0.0,False
+llama3_8b_instruct_brfss_finetuned,1,diabetes by state,brfss,1,4.329468183305133,False
+llama3_8b_instruct_brfss_finetuned,2,high_bp by state,brfss,1,0.0,False
+llama3_8b_instruct_brfss_finetuned,3,asthma by state,brfss,1,66.10633659978758,False
+llama3_8b_instruct_brfss_finetuned,4,cholesterol by state,brfss,1,0.0,False
+llama3_8b_instruct_brfss_finetuned,5,blind by state,brfss,1,93.96955686229981,False
+llama3_8b_instruct_brfss_finetuned,6,deaf by state,brfss,1,92.9897047220959,False
+llama3_8b_instruct_brfss_finetuned,7,heart_attack by state,brfss,1,68.29818669756104,False
+llama3_8b_instruct_brfss_finetuned,8,stroke by state,brfss,1,71.14649409152445,False
