@@ -41,9 +41,10 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False, ca
     base = cache_dir or "data/benchmark"
     
     dataset_name = task_spec['dataset'].split('/')[-1].split('.')[0]
-    file_name = task_to_filename(model_name, task_spec)
     if finetune:
-        file_name = "FT_" + file_name
+        model_name = model_name + "_sft"
+    file_name = task_to_filename(model_name, task_spec)
+
     if check_cache and os.path.exists(os.path.join(base, file_name)):
         return None
     

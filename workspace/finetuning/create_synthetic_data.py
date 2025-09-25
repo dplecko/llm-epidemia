@@ -5,6 +5,7 @@ import torch
 from tqdm import tqdm
 from datasets import Dataset, DatasetDict
 import re
+from workspace.model_load import MODEL_PATHS
 
 
 def extract_tag(text: str, tag: str = "story") -> str:
@@ -66,7 +67,7 @@ def generate_nsduh_data_batched(
     device,
     prompt_template: str,
     max_new_tokens: int = 256,
-    temperature: float = 0.7,
+    temperature: float = 1,
     top_p: float = 0.9,
     batch_size: int = 16,          # tune per GPU memory
 ):
@@ -137,8 +138,6 @@ def generate_nsduh_data_batched(
 
     return out_texts
 
-
-
 def save_datasets(train_synthetic, val_synthetic):
     train_texts = [str(t).strip() for t in train_synthetic]
     val_texts   = [str(t).strip() for t in val_synthetic]
@@ -147,11 +146,9 @@ def save_datasets(train_synthetic, val_synthetic):
         "train": Dataset.from_dict({"text": train_texts}),
         "validation": Dataset.from_dict({"text": val_texts}),
     })
-    cache_dir = "datasets/nsduh_synth_gemma". # TODO: change this
+    cache_dir = "data/synth"
     ds.save_to_disk(cache_dir)
     print(f"Synthetic datasets saved to {cache_dir}")
-
-
 
 if __name__ == "__main__":
     # data
@@ -160,7 +157,7 @@ if __name__ == "__main__":
     train, val = sample_weighted(data, n=2500, weight_col="weight", replace=True)
 
     # model
-    model_path = "google/gemma-3-27b-it"  # "microsoft/phi-4"
+    model_path = MODEL_PATHS["gemma3_27b_instruct"][0]
     model, tokenizer, device = get_model(model_path, prefer_gpu_idx=0)
 
     # nsduh_prompt_template = (
