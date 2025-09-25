@@ -1,6 +1,6 @@
 
 ---
-title: Llm Observatory Eval
+title: Llm Epidemiology
 emoji: 📈
 colorFrom: green
 colorTo: blue
@@ -8,32 +8,8 @@ sdk: static
 pinned: false
 ---
 
-<div align="center">
-  <h1 style="display:inline-flex; align-items:center; gap:0.5rem; white-space:nowrap; margin:0;">
-    <img
-      src="./img/logo-icon.png"
-      alt="LLM Observatory"
-      width="55"
-      height="40"
-      style="display:block;"
-    />
-    <span style="font-size:2em; margin:0;">LLM Observatory</span>
-  </h1>
-</div>
 
-
-<p align="center">
-  <a href="https://llm-observatory.org/index.html">
-    <img src="https://img.shields.io/badge/Website-Visit-blue?style=flat" alt="Website">
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/dplecko/llm-epidemia">
-    <img src="https://img.shields.io/badge/GitHub-Repository-black?style=flat&logo=github" alt="GitHub">
-  </a>
-</p>
-
-
-This repository holds the **evaluation** for the [Layer 1 Benchmark]() of the [LLM Observatory](https://llm-observatory.org/index.html). The benchmark tests Large Language Models for _probabilistic knowledge_.
+This repository holds the **evaluation** for the [Layer 1 Benchmark]() of the [LLM Observatory](). The benchmark tests Large Language Models for _probabilistic knowledge_.
 
 ## FAQ
 
@@ -93,7 +69,7 @@ Probabilistic knowledge embedded in LLMs determines many aspects of their behavi
 
 Using 10 large scale datasets, we ask LLMs various types of questions, and catalog the distribution they
                 generate over possible answers. Then, we compare this distribution to the real world. You can read more
-                about this in the [Benchmark Methodology](https://llm-observatory.org/l1-description.html)
+                about this in the [Benchmark Methodology]()
                 section. Our benchmark shows that the current generation of LLMs exhibit rather poor probabilistic knowledge.
 </details>
 
@@ -110,7 +86,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import models
 
 # load LLM Observatory infrastructure
-llm_obs = evaluate.load("llm-observatory/llm-observatory-eval")
+llm_obs = evaluate.load("<id>")
 
 # prepare the model
 model_path = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -129,17 +105,3 @@ As the code illustrates, one needs to use the following steps:
 `model_name` argument only determines the name for the file storing the model responses, while `llm_obs.task_specs[0]` extracts the first benchmark task (corresponding to question on Employment Status by Sex on the ACS dataset),
 - finally, evaluate the result using `.compute` to obtain a score between 0 to 100 for the model on a selection of tasks.
 
-##  Citation Information
-```
-@techreport{llmobservatory2025layer1,
-  title={Epidemiology of Large Language Models: A Benchmark for Observational Distribution Knowledge},
-  author={Plecko, Drago and Okanovic, Patrik and Hoeffler, Torsten and Bareinboim, Elias},
-  institution={Causal AI Lab, Columbia University},
-  year={2025},
-  url={\url{https://causalai.net/r136.pdf}}
-}
-```
-
-## Contribute
-LLM Observatory is an open-source initiative interested in your contributions.
-Further details on contributing can be found at this link: [contribute](https://llm-observatory.org/contribute.html).
