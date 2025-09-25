@@ -125,9 +125,9 @@ def load_dts(task, cache_dir=None):
     if cache_dir is not None:
         # Hosted mode → load from HF dataset
         from datasets import load_dataset
-        dataset_id = "llm-observatory/llm-observatory"
+        dataset_id = "<id>"
         config = dat_name_clean(task["dataset"])
-        data_files = f"hf://datasets/llm-observatory/llm-observatory/data/{config}.parquet"
+        data_files = f"hf:/<link>/{config}.parquet"
         dts = load_dataset("parquet", data_files=data_files, split="train")
         return dts.to_pandas()
     else:

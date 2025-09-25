@@ -85,7 +85,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import models
 
-# load LLM Observatory infrastructure
+# load LLM Epidemiology infrastructure
 llm_obs = evaluate.load("<id>")
 
 # prepare the model
