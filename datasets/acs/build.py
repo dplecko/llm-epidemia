@@ -37,7 +37,6 @@ resp.raise_for_status()
 data = resp.json()
 df = pd.DataFrame(data[1:], columns=data[0])
 
-
 # variable cleaning
 cen = pd.DataFrame()
 cen["weight"] = pd.to_numeric(df["PWGTP"])

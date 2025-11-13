@@ -67,7 +67,7 @@ for model, col_scheme in zip(
         theme(plot_margin=0) +
         facet_grid('Prompting ~ Setting', scales="free_x")
     )
-    plt.save(f"data/plots/{model}_sft_{dataset]}.png", dpi=300, width=10, height=5)
+    plt.save(f"data/plots/{model}_sft_{dataset}.png", dpi=300, width=10, height=5)
 
 
 ### model-level performance plots
@@ -89,32 +89,33 @@ for model, col_scheme in zip(
 import json
 
 rows = []
-for path, name in [
-    ("data/benchmark/llama_loss_history.json", "LLaMA3 8B"),
-    ("data/benchmark/mistral_loss_history.json", "Mistral 7B")
-]:
-    with open(path) as f:
-        records = json.load(f)
-    for r in records:
-        if "loss" in r:
-            rows.append({"epoch": r["epoch"], "Loss": "Training", "loss_value": r["loss"], "Model": name})
-        if "eval_loss" in r:
-            rows.append({"epoch": r["epoch"], "Loss": "Evaluation", "loss_value": r["eval_loss"], "Model": name})
+for dts in ["brfss", "nsduh"]:
+    for path, name in [
+        (f"data/benchmark/llama_{dts}_loss_history.json", "LLaMA3 8B"),
+        (f"data/benchmark/mistral_{dts}_loss_history.json", "Mistral 7B")
+    ]:
+        with open(path) as f:
+            records = json.load(f)
+        for r in records:
+            if "loss" in r:
+                rows.append({"epoch": r["epoch"], "Loss": "Training", "loss_value": r["loss"], "Model": name, "Dataset": dts})
+            if "eval_loss" in r:
+                rows.append({"epoch": r["epoch"], "Loss": "Evaluation", "loss_value": r["eval_loss"], "Model": name, "Dataset": dts})
 
 loss_info = pd.DataFrame(rows)
 
 # early stopping = min eval loss
 es_df = (loss_info.query("Loss == 'Evaluation'")
-         .groupby("Model", as_index=False)
+         .groupby(["Model", "Dataset"], as_index=False)
          .apply(lambda d: d.loc[d["loss_value"].idxmin(), ["epoch"]])
          .reset_index(drop=True))
 
 # compute top y per model
-ymax_df = (loss_info.groupby("Model", as_index=False)["loss_value"].max()
+ymax_df = (loss_info.groupby(["Model", "Dataset"], as_index=False)["loss_value"].max()
            .rename(columns={"loss_value": "y_top"}))
 
 # merge so each model has its epoch + ymax
-ann_df = es_df.merge(ymax_df, on="Model", how="left")
+ann_df = es_df.merge(ymax_df, on=["Model", "Dataset"], how="left")
 ann_df["y"] = ann_df["y_top"] * 0.6
 ann_df["label"] = "Early Stopping"
 
@@ -127,8 +128,8 @@ plt_loss = (ggplot(loss_info, aes(x="epoch", y="loss_value", color="Loss")) +
             theme_bw() +
             theme(legend_position="inside", legend_position_inside=(0.35, 0.85),
                   legend_background=element_rect(color="black", fill="white")) +
-            facet_wrap("~Model", scales="free_y"))
+            facet_grid("Model ~ Dataset", scales="free_y"))
 
-plt_loss.save("data/plots/ft_loss_profile.png", dpi=300, width=10, height=3.5)
+plt_loss.save("data/plots/sft_loss_profile.png", dpi=300, width=10, height=6)
 
 
