@@ -1,8 +1,12 @@
 
 import pandas as pd
 import plotly.express as px
-from workspace.utils.helpers import model_name, dts_map, model_colors
-from workspace.eval import build_eval_df
+import os
+import sys
+sys.path.append(os.path.join(os.getcwd(), "workspace"))
+sys.path.append(os.path.join(os.getcwd(), "workspace/utils"))
+from utils.helpers import model_name, dts_map, model_colors
+from eval import build_eval_df
 from task_spec import task_specs
 
 # Define domain groupings
@@ -16,7 +20,12 @@ domain_order = ["Health", "Social", "Economic"]
 
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
           "gemma3_27b_instruct", "deepseek_7b_chat"]
-eval_df, eval_map = build_eval_df(models, task_specs)
+
+prob = os.getenv("PROB_EVAL", "false").lower() == "true"
+if prob:
+    models = models + ["gpt-4.1"]
+    
+eval_df, eval_map = build_eval_df(models, task_specs, prob=prob)
 
 # Aggregate
 df = eval_df.groupby(["model", "dataset"]).agg(score=("score", "mean")).reset_index()
@@ -100,4 +109,7 @@ for (start, end), dom in zip(domain_boundaries, domain_order):
 # Clean x-axis labels (drop model name)
 fig.update_xaxes(tickvals=x_order, ticktext=[x.split(" | ")[1] for x in x_order])
 
-fig.write_html("www/img/interactive_ld_bydomain.html", include_plotlyjs="cdn")
+file_name = "interactive_bydomain.html"
+if prob:
+    file_name = "PROB_" + file_name
+fig.write_html(os.path.join("www/img", file_name), include_plotlyjs="cdn")

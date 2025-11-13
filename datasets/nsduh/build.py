@@ -71,6 +71,17 @@ edu_map = {
 }
 df["edu"] = df["IREDUHIGHST2"].map(edu_map).astype("category")
 
+income_map = {
+    '1 - Less than $10,000': '< $10,000', 
+    '2 - $10,000 - $19,999': '$10,000 - $19,999',
+    '3 - $20,000 - $29,999': '$20,000 - $29,999',
+    '4 - $30,000 - $39,999': '$30,000 - $39,999',
+    '5 - $40,000 - $49,999': '$40,000 - $49,999',
+    '6 - $50,000 - $74,999': '$50,000 - $74,999',
+    '7 - $75,000 or more': '> $75,000'
+}
+df["income"] = df["IRPINC3"].map(income_map).astype("category")
+
 # ever variables
 df["alc_ever"] = df["alcever"].map(lambda x: "yes" if x == "1 - Yes" else "no").astype("category")
 df["cig_ever"] = df["cigever"].map(lambda x: "yes" if x == "1 - Yes" else "no").astype("category")
@@ -89,7 +100,7 @@ df["her_monthly"] = df["herrec"].map(lambda x: "yes" if x == "1 - Within the pas
 df["weight"] = df["ANALWT2_C"]
 
 vars_created = [
-    "age", "sex", "race", "edu",
+    "age", "sex", "race", "edu", "income",
     "alc_ever", "cig_ever", "mj_ever", "coc_ever", "her_ever",
     "alc_monthly", "cig_monthly", "mj_monthly", "coc_monthly", "her_monthly",
     "weight"
