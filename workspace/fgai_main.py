@@ -41,7 +41,7 @@ def varlist_to_prompt(var_dict, var_names):
         "1) Write a single narrative enclosed in <story>...</story>.\n"
         "2) Do NOT include headings, lists, analysis, or any text outside the tags.\n"
         "3) Mention ALL facts given below exactly once ({}).\n"
-        "4) Keep it under 300 words.\n\n"
+        "4) Keep it under 200 words.\n\n"
         "FACTS to be mentioned:"
     )
     prompt_start = prompt_start.format(
@@ -133,7 +133,8 @@ def gen_data_batched(
             seq = gen[j, ilen:] if gen.size(1) > ilen else gen[j]
             raw = tokenizer.decode(seq, skip_special_tokens=True).strip()
 
-            story = extract_tag(raw, tag="story")
+            # check if the raw output starts with a proper <story> tag
+            story = re.sub(r"<[^>]+>|{[^}]+}", "", raw)
 
             # hard cap ~200 words as guard
             words = story.split()
@@ -141,7 +142,6 @@ def gen_data_batched(
                 story = " ".join(words[:200]).rstrip()
 
             out_texts.append(story)
-            print(out_texts[-1], flush=True)
 
         # free some memory sooner
         del enc, input_ids, attention_mask, gen
@@ -162,7 +162,6 @@ def prepare_answers(levels):
 
     letters = string.ascii_uppercase  # 'A', 'B', ...
     mapping = {letters[i]: item for i, item in enumerate(levels)}
-
     answer_key = "\n".join(f"{k}. {v}" for k, v in mapping.items())
 
     return answer_key, mapping
@@ -193,7 +192,7 @@ def annotate_data(model, tokenizer, device, texts, var_dict):
     df = pd.DataFrame(columns=var_dict.keys())
 
     # for loop over all texts
-    for var, levels in var_dict.items():
+    for var, levels in tqdm(var_dict.items(), desc="Annotating data"):
 
         _, answer_mapping = prepare_answers(levels)
 
@@ -234,7 +233,7 @@ def annotate_data(model, tokenizer, device, texts, var_dict):
 
 
 # NSDUH variable list
-df = pd.read_parquet("datasets/nsduh/data/nsduh.parquet")
+df = pd.read_parquet("data/clean/nsduh.parquet")
 
 vars = [
     "age",
