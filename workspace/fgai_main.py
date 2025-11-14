@@ -272,4 +272,56 @@ texts = gen_data_batched(
     nsamp, model, tokenizer, device, varlist_to_prompt(var_dict, var_names)
 )
 
-df_model = annotate_data(model, tokenizer, device, texts, var_dict)
+df_m = annotate_data(model, tokenizer, device, texts, var_dict)
+
+# sample n samp rows from original data, with weights
+df_w = df.sample(n=nsamp, weights=df["weight"], replace=False).reset_index(drop=True)
+# drop weight column
+df_w = df.drop(columns=["weight"])
+
+# rbind the two dataframes, and add a binary 0/1 env column
+df_m["env"] = 1
+df_w["env"] = 0
+df_combined = pd.concat([df_m, df_w], ignore_index=True)
+
+
+# pre-processing function to remove categoricals
+def clean_cats(df, X):
+
+    # binary categoricals: map yes/no to 1/0
+    for col in df.columns:
+        dt = df[col].dtype
+        if not isinstance(dt, pd.CategoricalDtype):
+            continue
+        cats = list(df[col].cat.categories)
+        if len(cats) == 2:
+            if set(cats) == {"yes", "no"}:
+                df[col] = df[col].map({"yes": 1, "no": 0})
+            else:
+                df[col] = df[col].cat.codes  # map to 0/1
+
+    # multi-level categoricals
+    for col in list(df.columns):  # df may change when we add dummies
+        dt = df[col].dtype
+        if not isinstance(dt, pd.CategoricalDtype):
+            continue
+
+        s = df[col]
+        cats = list(s.cat.categories)
+        if len(cats) <= 2:
+            continue
+
+        if s.cat.ordered:
+            # ordered -> integer codes (1..K)
+            df[col] = s.cat.codes + 1
+        else:
+            # unordered, non-binary, and not in X -> one-hot
+            if col in X:
+                continue
+            dummies = pd.get_dummies(s, prefix=col)
+            df = pd.concat([df.drop(columns=[col]), dummies], axis=1)
+
+    return df
+
+
+clean_cats(df, X=["race"])

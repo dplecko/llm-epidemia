@@ -9,11 +9,11 @@ from workspace.model_load import MODEL_PATHS
 
 
 def extract_tag(text: str, tag: str = "story") -> str:
-    m = re.search(rf"<{tag}>(.*?)</{tag}>", text, flags=re.DOTALL|re.IGNORECASE)
+    m = re.search(rf"<{tag}>(.*?)</{tag}>", text, flags=re.DOTALL | re.IGNORECASE)
     if m:
         return m.group(1).strip()
     # Fallback: if the model disobeys, strip known headings and return the first paragraph
-    text = re.sub(r"(?is)^#+.*?$", "", text)                # markdown headers
+    text = re.sub(r"(?is)^#+.*?$", "", text)  # markdown headers
     text = re.sub(r"(?is)^(analyzing errors|analysis).*?$", "", text).strip()
     # take first non-empty paragraph
     for para in re.split(r"\n\s*\n", text):
@@ -27,6 +27,7 @@ def get_device(prefer_gpu_idx: int = 0) -> torch.device:
     if torch.cuda.is_available():
         return torch.device(f"cuda:{prefer_gpu_idx}")
     raise RuntimeError("CUDA not available; cannot accelerate generation.")
+
 
 def get_model(model_path, prefer_gpu_idx: int = 0):
     device = get_device(prefer_gpu_idx)
@@ -50,13 +51,13 @@ def sample_weighted(df, n, weight_col="weight", replace=False, random_state=42):
     w = df[weight_col].astype(float).fillna(0.0)
     sampled = df.sample(n=n, replace=replace, weights=w, random_state=random_state)
     train = sampled[: int(0.8 * n)]
-    val   = sampled[int(0.8 * n):]
+    val = sampled[int(0.8 * n) :]
     return train.reset_index(drop=True), val.reset_index(drop=True)
+
 
 def negate(x):
     s = str(x).strip().lower()
     return "not" if s in {"no", "false", "0"} else ""
-
 
 
 @torch.inference_mode()
@@ -69,7 +70,7 @@ def generate_nsduh_data_batched(
     max_new_tokens: int = 256,
     temperature: float = 1,
     top_p: float = 0.9,
-    batch_size: int = 16,          # tune per GPU memory
+    batch_size: int = 16,  # tune per GPU memory
 ):
     # 1) Build all prompts up front (vectorized)
     prompts = [
@@ -112,9 +113,11 @@ def generate_nsduh_data_batched(
             top_p=top_p,
             num_return_sequences=1,
             max_new_tokens=max_new_tokens,
-            repetition_penalty=1.05, 
+            repetition_penalty=1.05,
             eos_token_id=getattr(tokenizer, "eos_token_id", None),
-            pad_token_id=getattr(tokenizer, "pad_token_id", getattr(tokenizer, "eos_token_id", None)),
+            pad_token_id=getattr(
+                tokenizer, "pad_token_id", getattr(tokenizer, "eos_token_id", None)
+            ),
             use_cache=True,  # should be default, but make explicit
         )
 
@@ -138,17 +141,21 @@ def generate_nsduh_data_batched(
 
     return out_texts
 
+
 def save_datasets(train_synthetic, val_synthetic):
     train_texts = [str(t).strip() for t in train_synthetic]
-    val_texts   = [str(t).strip() for t in val_synthetic]
+    val_texts = [str(t).strip() for t in val_synthetic]
 
-    ds = DatasetDict({
-        "train": Dataset.from_dict({"text": train_texts}),
-        "validation": Dataset.from_dict({"text": val_texts}),
-    })
+    ds = DatasetDict(
+        {
+            "train": Dataset.from_dict({"text": train_texts}),
+            "validation": Dataset.from_dict({"text": val_texts}),
+        }
+    )
     cache_dir = "data/synth"
     ds.save_to_disk(cache_dir)
     print(f"Synthetic datasets saved to {cache_dir}")
+
 
 if __name__ == "__main__":
     # data
@@ -169,28 +176,28 @@ if __name__ == "__main__":
     #     "Mention all the information provided. The story should be no more than 200 words.\n\n"
     #     "Story:\n"
     # )
-    
-#     nsduh_prompt_template_high_dim = (
-#     "You are a data generator. Follow the rules strictly.\n"
-#     "RULES:\n"
-#     "1) Write a single narrative enclosed in <story>...</story>.\n"
-#     "2) Do NOT include headings, lists, analysis, or any text outside the tags.\n"
-#     "3) Mention ALL facts given below exactly once (age, sex, race, education, cigarette last-month use, marijuana ever use, cocaine ever use).\n"
-#     "4) Keep it under 200 words.\n\n"
-#     "FACTS:\n"
-#     "- age: {age}\n"
-#     "- sex: {sex}\n"
-#     "- race: {race}\n"
-#     "- education: {edu}\n"
-#     "- cigarettes last month: {cig_monthly}\n"
-#     "- marijuana ever: {mj_ever}\n"
-#     "- cocaine ever: {coc_ever}\n\n"
-#     "OUTPUT FORMAT:\n"
-#     "<story>\n"
-#     "(your narrative here)\n"
-#     "</story>\n"
-# )
-    
+
+    #     nsduh_prompt_template_high_dim = (
+    #     "You are a data generator. Follow the rules strictly.\n"
+    #     "RULES:\n"
+    #     "1) Write a single narrative enclosed in <story>...</story>.\n"
+    #     "2) Do NOT include headings, lists, analysis, or any text outside the tags.\n"
+    #     "3) Mention ALL facts given below exactly once (age, sex, race, education, cigarette last-month use, marijuana ever use, cocaine ever use).\n"
+    #     "4) Keep it under 200 words.\n\n"
+    #     "FACTS:\n"
+    #     "- age: {age}\n"
+    #     "- sex: {sex}\n"
+    #     "- race: {race}\n"
+    #     "- education: {edu}\n"
+    #     "- cigarettes last month: {cig_monthly}\n"
+    #     "- marijuana ever: {mj_ever}\n"
+    #     "- cocaine ever: {coc_ever}\n\n"
+    #     "OUTPUT FORMAT:\n"
+    #     "<story>\n"
+    #     "(your narrative here)\n"
+    #     "</story>\n"
+    # )
+
     nsduh_prompt_template = (
         "You are a data generator. Follow the rules strictly.\n"
         "RULES:\n"
@@ -216,12 +223,26 @@ if __name__ == "__main__":
 
     # Batched generation (tune batch_size to your GPU memory)
     train_synth = generate_nsduh_data_batched(
-        train, model, tokenizer, device, nsduh_prompt_template,
-        max_new_tokens=256, temperature=0.7, top_p=0.9, batch_size=16
+        train,
+        model,
+        tokenizer,
+        device,
+        nsduh_prompt_template,
+        max_new_tokens=256,
+        temperature=0.7,
+        top_p=0.9,
+        batch_size=16,
     )
     val_synth = generate_nsduh_data_batched(
-        val, model, tokenizer, device, nsduh_prompt_template,
-        max_new_tokens=256, temperature=0.7, top_p=0.9, batch_size=16
+        val,
+        model,
+        tokenizer,
+        device,
+        nsduh_prompt_template,
+        max_new_tokens=256,
+        temperature=0.7,
+        top_p=0.9,
+        batch_size=16,
     )
 
     save_datasets(train_synth, val_synth)
