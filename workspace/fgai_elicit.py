@@ -1,6 +1,6 @@
-
 # nohup python workspace/fgai_elicit.py > fgai_elicit.log 2>&1 &
 import sys, os
+
 sys.path.append(os.getcwd())
 import re
 import pandas as pd
@@ -244,33 +244,39 @@ def annotate_data(model, tokenizer, device, texts, var_dict):
     return df
 
 
-# NSDUH variable list
-df = pd.read_parquet("data/clean/nsduh.parquet")
+def get_var_names(dataset):
+    if dataset == "nsduh":
+        return {
+            "age": "age",
+            "sex": "sex",
+            "race": "race",
+            "edu": "education",
+            "income": "income",
+            "alc_monthly": "alcohol last month use",
+            "cig_monthly": "cigarette last month use",
+            "mj_monthly": "marijuana last month use",
+            "coc_ever": "cocaine ever use",
+        }
+    elif dataset == "brfss":
+        return {
+            "age": "age",
+            "state": "state",
+            "sex": "sex",
+            "race": "race",
+            "education": "education",
+            "income": "income",
+            "exercise_monthly": "exercise monthly",
+            "bmi": "body mass index (BMI)",
+            "diabetes": "diabetes",
+            "high_bp": "high blood pressure",
+        }
 
-vars = [
-    "age",
-    "sex",
-    "race",
-    "edu",
-    "income",
-    "alc_monthly",
-    "cig_monthly",
-    "mj_monthly",
-    "coc_ever",
-]
-var_names = {
-    "age": "age",
-    "sex": "sex",
-    "race": "race",
-    "edu": "education",
-    "income": "income",
-    "alc_monthly": "alcohol last month use",
-    "cig_monthly": "cigarette last month use",
-    "mj_monthly": "marijuana last month use",
-    "coc_ever": "cocaine ever use",
-}
+
+dataset = "nsduh"
+df = pd.read_parquet(f"data/clean/{dataset}.parquet")
+var_names = get_var_names(dataset)
 var_dict = {}
-for var in vars:
+for var in var_names.keys():
     # extract the variable categories
     var_dict[var] = sorted(df[var].unique())
 
@@ -285,11 +291,12 @@ texts = gen_data_batched(
 
 # save the intermediate texts list to a pickle file
 import pickle
-with open("data/fgai/nsduh_fgai_texts.pkl", "wb") as f:
+
+with open("data/fgai/{dataset}_fgai_texts.pkl", "wb") as f:
     pickle.dump(texts, f)
 
 # read the pickle file
-with open("data/fgai/nsduh_fgai_texts.pkl", "rb") as f: 
+with open("data/fgai/{dataset}_fgai_texts.pkl", "rb") as f:
     texts = pickle.load(f)
 
 df_m = annotate_data(model, tokenizer, device, texts, var_dict)
@@ -304,7 +311,9 @@ for col in df.columns:
             )
 
 # sample n samp rows from original data, with weights
-df_w = df[vars].sample(n=nsamp, weights=df["weight"], replace=False).reset_index(drop=True)
+df_w = (
+    df[vars].sample(n=nsamp, weights=df["weight"], replace=False).reset_index(drop=True)
+)
 
 # rbind the two dataframes, and add a binary 0/1 env column
 df_m["env"] = 1
@@ -352,12 +361,12 @@ def clean_cats(df, X):
 
 
 df_res = clean_cats(df_cmb, X=["race"])
-df_res.to_parquet("data/fgai/nsduh_envs.parquet", index=False)
-
+df_res.to_parquet("data/fgai/{dataset}_envs.parquet", index=False)
 
 # auditing the model labels
 import pickle
-with open("data/fgai/nsduh_fgai_texts.pkl", "rb") as f: 
+
+with open("data/fgai/nsduh_fgai_texts.pkl", "rb") as f:
     texts = pickle.load(f)
 
 df_m = pd.read_parquet("data/fgai/nsduh_envs.parquet")
@@ -365,11 +374,13 @@ df_m = df_m[df_m["env"] == 1].reset_index(drop=True)
 
 # sample 10 random rows to inspect
 import random
+
 random.seed(42)
 sample_indices = random.sample(range(len(texts)), 10)
 
 sample_indices = [1824, 409, 4506, 4012, 3657, 2286, 1679, 8935, 1424, 9674]
 
+print(texts[sample_indices[3]])
 
 idx = 9674
 print(texts[idx])
@@ -382,3 +393,45 @@ for var in df_m.columns:
     else:
         print(var, df_m.loc[idx, var])
 
+# automated checking
+
+
+# load the data from fgai/data/story-truth.csv
+df_truths = pd.read_csv("../fgai/data/story-truth.csv")
+
+# verify that each column value is in the correct levels
+for var in df_truths.columns:
+
+    if var not in var_dict:
+        continue
+
+    # correct levels
+    levels = var_dict[var]
+
+    # check if all values in df_truths[var] are in levels
+    invalid_values = set(df_truths[var].unique()) - set(levels)
+    if len(invalid_values) > 0:
+        print(f"Variable {var} has invalid values: {invalid_values}")
+
+# get the automatic check
+for i in range(len(df_truths)):
+
+    idx = df_truths.loc[i, "index"]
+
+    for var in df_truths.columns:
+        if var not in var_dict:
+            continue
+
+        true_value = df_truths.loc[i, var]
+
+        if var in ["age", "edu", "income"]:
+            pred_value = df[var].cat.categories[df_m.loc[idx, var] - 1]
+        elif var in ["sex", "alc_monthly", "cig_monthly", "mj_monthly", "coc_ever"]:
+            pred_value = df[var].cat.categories[df_m.loc[idx, var]]
+        else:
+            pred_value = df_m.loc[idx, var]
+
+        if true_value != pred_value:
+            print(
+                f"Row {i}, Variable {var}: true value = {true_value}, predicted value = {pred_value}"
+            )
