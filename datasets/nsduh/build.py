@@ -65,6 +65,7 @@ race_map = {
     "7 - Hispanic": "Hispanic",
 }
 df["race"] = df["NEWRACE2"].map(race_map).astype("category")
+df["race"] = df["race"].cat.as_unordered()
 
 edu_map = {
     "1 - Fifth grade or less grade completed": "≤ 8th grade",
