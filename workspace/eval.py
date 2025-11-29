@@ -6,6 +6,7 @@ import sys
 import os
 import json
 import traceback
+
 sys.path.append(os.path.join(os.getcwd(), "workspace", "utils"))
 from metrics import cat_to_distr, weighted_L1
 from helpers import task_to_filename, dat_name_clean, load_dts
@@ -199,7 +200,7 @@ def eval_task(model_name, task, prob, cache_dir):
         res = pd.read_parquet(path)
         if model_name == "model_mean":
             res["llm_pred"] = (res[task["v_out"]].isin(["Yes", "yes"])).mean()
-        return eval_hd(res, task)
+        return eval_hd(res, task, cache_dir=cache_dir)
 
 def build_eval_df(models, tasks, prob = False, cache_dir=None):
 

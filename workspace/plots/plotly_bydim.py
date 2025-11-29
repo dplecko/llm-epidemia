@@ -13,7 +13,12 @@ from task_spec import task_specs_hd
 # models and data
 models = ["llama3_8b_instruct", "llama3_70b_instruct", "mistral_7b_instruct", "phi4", 
           "gemma3_27b_instruct", "deepseek_7b_chat"]
-eval_hd, _ = build_eval_df(models, task_specs_hd)
+
+prob = os.getenv("PROB_EVAL", "false").lower() == "true"
+if prob:
+    models = models + ["gpt-4.1"]
+
+eval_hd, _ = build_eval_df(models, task_specs_hd, prob = prob)
 
 # aggregate by dimension
 df_bydim = eval_hd.groupby(["model", "dim"]).agg(score=("score", "mean")).reset_index()
@@ -48,4 +53,7 @@ fig.update_layout(
 #     textfont=dict(color="white")
 # )
 
-fig.write_html("www/img/interactive_by_dim.html", include_plotlyjs="cdn", full_html=False)
+file_name = "interactive_bydim.html"
+if prob:
+    file_name = "PROB_" + file_name
+fig.write_html(os.path.join("www/img", file_name), include_plotlyjs="cdn", full_html=False)

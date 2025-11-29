@@ -8,6 +8,7 @@ import re, json
 from plotnine import *
 from tqdm import tqdm
 import pdbpp
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # our own code
 from eval import build_eval_df
