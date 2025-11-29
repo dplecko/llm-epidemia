@@ -131,5 +131,3 @@ plt_loss = (ggplot(loss_info, aes(x="epoch", y="loss_value", color="Loss")) +
             facet_grid("Model ~ Dataset", scales="free_y"))
 
 plt_loss.save("data/plots/sft_loss_profile.png", dpi=300, width=10, height=6)
-
-
