@@ -51,10 +51,7 @@ def calculate_log_prob_per_token(model, tokenizer, text):
     return -nll
 
 
-def prepare_questions(task_spec, model, prob=False):
-    task_spec = task_specs[0]
-    prob = False
-    
+def prepare_questions(task_spec, model, prob=False):    
     # Step 1: determine if query is marginal or conditional
     if "v_cond" in task_spec:
         ttyp = "hd"
@@ -80,7 +77,9 @@ def prepare_questions(task_spec, model, prob=False):
 
     results = []
     if ttyp == "marginal":
-        return {task_spec["prompt"]: calculate_log_prob_per_token(model.model, model.tokenizer, task_spec["prompt"])}
+        answers, _ = model.prepare_answers(levels)
+        prompt = task_spec["prompt"] + answers
+        return {prompt: calculate_log_prob_per_token(model.model, model.tokenizer, prompt)}
 
     elif ttyp == "conditional":
         # conditional query – iterate over levels of the conditioning variable
@@ -118,8 +117,15 @@ def prepare_questions(task_spec, model, prob=False):
                 pos_ans = None
 
             res = {}
-            for p in prompt:
-                res[p] = calculate_log_prob_per_token(model.model, model.tokenizer, p)
+            if isinstance(prompt, list):
+                for p in prompt:
+                    answers, _ = model.prepare_answers(levels)
+                    proc_p = p + answers
+                    res[proc_p] = calculate_log_prob_per_token(model.model, model.tokenizer, proc_p)
+            else:
+                answers, _ = model.prepare_answers(levels)
+                proc_p = prompt + answers
+                res[proc_p] = calculate_log_prob_per_token(model.model, model.tokenizer, proc_p)
             return res
  
     elif ttyp == "hd":
@@ -139,8 +145,15 @@ def prepare_questions(task_spec, model, prob=False):
             for _, row in cond_df.iterrows()
         ]
         res = {}
-        for p in prompts:
-            res[p] = calculate_log_prob_per_token(model.model, model.tokenizer, p)
+        if isinstance(prompts, list):
+            for p in prompts:
+                answers, _ = model.prepare_answers(levels)
+                proc_p = p + answers
+                res[proc_p] = calculate_log_prob_per_token(model.model, model.tokenizer, proc_p)
+        else:
+            answers, _ = model.prepare_answers(levels)
+            proc_p = p + answers
+            res[proc_p] = calculate_log_prob_per_token(model.model, model.tokenizer, proc_p)
         return res
 
 
