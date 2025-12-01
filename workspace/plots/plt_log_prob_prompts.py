@@ -272,7 +272,7 @@ def plot1x2():
             # Explicitly position the legend inside (as per original requirements)
             legend_position="inside",
             # MOVED LEGEND TO UPPER RIGHT CORNER
-            legend_position_inside=(0.98, 0.98), 
+            legend_position_inside=(0.995, 0.98), 
             legend_background=element_rect(color="black", fill="white"),
             legend_margin=5,
             legend_title=element_text(fontweight="bold"),
@@ -292,7 +292,7 @@ def plot1x2():
     print(plt_scatter)
 
     # Save the plot
-    plt_scatter.save("model_scatter_1x2_revised.png", dpi=300, width=11, height=7)
+    plt_scatter.save("model_scatter_1x2_revised.png", dpi=300, width=11, height=3.3)
     
 plot1x2()
 plot2x2()
