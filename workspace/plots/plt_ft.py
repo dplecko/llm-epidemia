@@ -117,7 +117,7 @@ ymax_df = (loss_info.groupby(["Model", "Dataset"], as_index=False)["loss_value"]
 # merge so each model has its epoch + ymax
 ann_df = es_df.merge(ymax_df, on=["Model", "Dataset"], how="left")
 ann_df["y"] = ann_df["y_top"] * 0.6
-ann_df["label"] = "Early Stopping"
+ann_df["label"] = ""
 
 plt_loss = (ggplot(loss_info, aes(x="epoch", y="loss_value", color="Loss")) +
             geom_line(size=1.25) +
