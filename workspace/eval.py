@@ -12,7 +12,42 @@ from metrics import cat_to_distr, weighted_L1
 from helpers import task_to_filename, dat_name_clean, load_dts
 from hd_helpers import bootstrap_lgbm
 
-def eval_cat(res, dataset, v1, v2, levels, cache_dir):
+def map_to_like_ans(x):
+    x = np.asarray(x)
+    mapped = (np.floor(x * 20) + 0.5) / 20
+    return np.where(x == 0, 0, np.where(x == 1, 1, mapped))
+
+def map_distr_to_like_ans(distr):
+    like_ans = np.array([0] + [(i + 0.5) / 20 for i in range(20)] + [1])
+    mapped = []
+    possible_ans = like_ans
+    for value in distr[:-1]:
+        answer = min(map_to_like_ans(value), possible_ans[-1])
+        mapped.append(answer)
+        answer_idx = np.where(possible_ans == answer)[0][0]
+        possible_ans = possible_ans[:len(possible_ans) - answer_idx]
+    mapped.append(1 - sum(mapped))
+    return np.array(mapped)
+
+def model_mean_distr(task, levels, cache_dir, prob=False):
+    data = load_dts(task, cache_dir=cache_dir)
+    if "subset" in task:
+        var, subset_type, value = task["subset"]
+        if subset_type == "lwr":
+            data = data[data[var] >= value]
+        elif subset_type == "levels":
+            data = data[data[var].isin(value)]
+    if "cond_range" in task:
+        lo, hi = task["cond_range"]
+        cond_var = task["variables"][1]
+        data = data[(data[cond_var] >= lo) & (data[cond_var] <= hi)]
+
+    weights = data["weight"] if "weight" in data.columns else np.ones(len(data))
+    distr = np.array([weights[data[task["variables"][0]] == level].sum() for level in levels])
+    distr = distr / distr.sum()
+    return map_distr_to_like_ans(distr) if prob else distr
+
+def eval_cat(res, dataset, v1, v2, levels, cache_dir, prob=False):
     
     base = cache_dir or "data/benchmark"
 
@@ -30,6 +65,8 @@ def eval_cat(res, dataset, v1, v2, levels, cache_dir):
 
     # get the best error if cached
     file_name = f"best_err_{dataset}_{v1}_{v2}.txt"
+    if prob:
+        file_name = file_name.replace(".txt", "_PROB.txt")
     if os.path.exists(os.path.join(base, file_name)):
         with open(os.path.join(base, file_name), "r") as f:
             best_err = float(f.read())
@@ -53,6 +90,7 @@ def eval_cat(res, dataset, v1, v2, levels, cache_dir):
 
         distr_true = cat_to_distr(val_true, wgh_true, nbins)
         distr_mod = cat_to_distr(val_mod, wgh_mod, nbins)
+        distr_true_eval = map_distr_to_like_ans(distr_true) if prob else distr_true
 
         for i in range(nbins):
             distr_rows.append({
@@ -80,14 +118,16 @@ def eval_cat(res, dataset, v1, v2, levels, cache_dir):
                     idx = np.random.choice(len(val_true), size=n_mc, p=wgh_true / wgh_true.sum(), replace=True)
                     val_bt = val_true[idx]
                     distr_bt = cat_to_distr(val_bt, None, nbins)
-                    best_cboot.append(np.abs(distr_bt - distr_true).sum())
+                    if prob:
+                        distr_bt = map_distr_to_like_ans(distr_bt)
+                    best_cboot.append(np.abs(distr_bt - distr_true_eval).sum())
             best_c.append(best_cboot)
 
         # worst error for this conditioning set
-        worst_c.append(np.abs(np.ones(nbins) / nbins - distr_true).sum())
+        worst_c.append(np.abs(np.ones(nbins) / nbins - distr_true_eval).sum())
         
         # score for the conditioning set
-        score_c.append(np.abs(distr_true - distr_mod).sum()) 
+        score_c.append(np.abs(distr_true_eval - distr_mod).sum())
 
         rows.append({
             "cond": r["condition"]
@@ -115,7 +155,7 @@ def eval_cat(res, dataset, v1, v2, levels, cache_dir):
     df.attrs["distr"] = pd.DataFrame(distr_rows)
     return df
 
-def hd_best_err(res, task, cache_dir):
+def hd_best_err(res, task, cache_dir, prob=False):
 
     base = cache_dir or "data/benchmark"
 
@@ -125,6 +165,8 @@ def hd_best_err(res, task, cache_dir):
     cond_vars_str = "_".join(task["v_cond"])
     dataset_name = task['dataset'].split('/')[-1].split('.')[0]
     file_name = f"best_err_{dataset_name}_{task['v_out']}_{cond_vars_str}.txt"
+    if prob:
+        file_name = file_name.replace(".txt", "_PROB.txt")
     if os.path.exists(os.path.join(base, file_name)):
         with open(os.path.join(base, file_name), "r") as f:
             best_err = float(f.read())
@@ -134,25 +176,30 @@ def hd_best_err(res, task, cache_dir):
         boot_mat = bootstrap_lgbm(res[cond_vars + [out_var] + ["weight"]], 
                                   out_var, cond_vars, wgh_col="weight",
                                   n_bootstraps=10)
+        lgbm_pred = map_to_like_ans(res["lgbm_pred"]) if prob else res["lgbm_pred"]
         for i in range(boot_mat.shape[1]):
-            best_err.append(weighted_L1(boot_mat[:, i], res["lgbm_pred"], res["weight"]))
+            boot_pred = map_to_like_ans(boot_mat[:, i]) if prob else boot_mat[:, i]
+            best_err.append(weighted_L1(boot_pred, lgbm_pred, res["weight"]))
         best_err = np.quantile(best_err, 0.975)
         with open(os.path.join(base, file_name), "w") as f:
             f.write(str(best_err))
         return best_err
 
-def eval_hd(res, task, cache_dir):
+def eval_hd(res, task, cache_dir, prob=False):
 
     # get the best error
-    best_err = hd_best_err(res, task, cache_dir)
+    best_err = hd_best_err(res, task, cache_dir, prob=prob)
+
+    llm_pred = map_to_like_ans(res["llm_pred"]) if prob else res["llm_pred"]
+    lgbm_pred = map_to_like_ans(res["lgbm_pred"]) if prob else res["lgbm_pred"]
 
     # get the true score
-    score = weighted_L1(res["llm_pred"], res["lgbm_pred"], res["weight"])
+    score = weighted_L1(llm_pred, lgbm_pred, res["weight"])
     
     # get the worst error
-    b1 = weighted_L1(np.zeros(len(res)), res["lgbm_pred"], res["weight"])
-    b2 = weighted_L1(np.ones(len(res)), res["lgbm_pred"], res["weight"])
-    b3 = weighted_L1(np.ones(len(res)) * 0.5, res["lgbm_pred"], res["weight"])
+    b1 = weighted_L1(np.zeros(len(res)), lgbm_pred, res["weight"])
+    b2 = weighted_L1(np.ones(len(res)), lgbm_pred, res["weight"])
+    b3 = weighted_L1(np.ones(len(res)) * 0.5, lgbm_pred, res["weight"])
     worst_err = min(b1, b2, b3)
 
     # only scores are essentially 0 and 100!
@@ -193,14 +240,20 @@ def eval_task(model_name, task, prob, cache_dir):
 
         v1 = task["variables"][0]
         v2 = task["variables"][1] if len(task["variables"]) > 1 else None
-        
+
         levels = load_dts(task, cache_dir=cache_dir)[v1].unique().tolist()
-        return eval_cat(res, dataset, v1, v2, levels, cache_dir=cache_dir)
+        levels = [x for x in levels if not (isinstance(x, float) and np.isnan(x))]
+        if model_name == "model_mean":
+            model_distr = model_mean_distr(task, levels, cache_dir, prob=prob)
+            for r in res:
+                r["model_vals"] = levels
+                r["model_weights"] = model_distr.tolist()
+        return eval_cat(res, dataset, v1, v2, levels, cache_dir=cache_dir, prob=prob)
     elif "parquet" in path:
         res = pd.read_parquet(path)
         if model_name == "model_mean":
             res["llm_pred"] = (res[task["v_out"]].isin(["Yes", "yes"])).mean()
-        return eval_hd(res, task, cache_dir=cache_dir)
+        return eval_hd(res, task, cache_dir=cache_dir, prob=prob)
 
 def build_eval_df(models, tasks, prob = False, cache_dir=None):
 

@@ -71,3 +71,9 @@ plt_lcomb = (
 
 plt_lcomb
 plt_lcomb.save("data/plots/combined_leaderboard.png", dpi=300, width=11, height=3.3)
+
+mean_ld, _ = build_eval_df(["model_mean"], task_specs)
+mean_hd, _ = build_eval_df(["model_mean"], task_specs_hd)
+
+print(f"Mean baseline (low-dimensional): {mean_ld['score'].mean():.2f}/100")
+print(f"Mean baseline (high-dimensional): {mean_hd['score'].mean():.2f}/100")
