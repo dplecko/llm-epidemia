@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "benchmark_name": "LLM Epidemiology Benchmark",
+  "benchmark_version": "1.0.0",
+  "release_date": null,
+  "prepared_date": "2026-09-04",
+  "intended_git_tag": "benchmark-v1.0.0",
+  "status": "release-candidate",
+  "results_code_revision": "3f2d569c3c513402f32b0030b26c35a863ccd861",
+  "task_inventory": {
+    "low_dimensional": 75,
+    "high_dimensional": 94,
+    "total": 169,
+    "task_assembly": "workspace/task_spec.py",
+    "task_definitions": [
+      "workspace/tasks/tasks_acs.py",
+      "workspace/tasks/tasks_brfss.py",
+      "workspace/tasks/tasks_edu.py",
+      "workspace/tasks/tasks_fbi.py",
+      "workspace/tasks/tasks_gss.py",
+      "workspace/tasks/tasks_labor.py",
+      "workspace/tasks/tasks_meps.py",
+      "workspace/tasks/tasks_nhanes.py",
+      "workspace/tasks/tasks_nsduh.py",
+      "workspace/tasks/tasks_scf.py"
+    ],
+    "per_source_counts": {
+      "acs": {"low_dimensional": 12, "high_dimensional": 0},
+      "brfss": {"low_dimensional": 9, "high_dimensional": 39},
+      "ipeds": {"low_dimensional": 1, "high_dimensional": 0},
+      "fbi_ucr": {"low_dimensional": 2, "high_dimensional": 0},
+      "gss": {"low_dimensional": 10, "high_dimensional": 0},
+      "bls": {"low_dimensional": 2, "high_dimensional": 0},
+      "meps": {"low_dimensional": 10, "high_dimensional": 11},
+      "nhanes": {"low_dimensional": 4, "high_dimensional": 0},
+      "nsduh": {"low_dimensional": 10, "high_dimensional": 33},
+      "scf": {"low_dimensional": 15, "high_dimensional": 11}
+    },
+    "closed_model_subset_definition": "workspace/tasks/all_tasks.py",
+    "task_group_assignments": [
+      "low-dimensional",
+      "high-dimensional",
+      "closed-model-compatible subset"
+    ]
+  },
+  "elicitation_protocols": {
+    "question_answer": "next-token probability with answer-order averaging",
+    "answer_order_permutation_cap": 128,
+    "likelihood": "22-level likelihood prompting"
+  },
+  "sources": [
+    {
+      "id": "acs",
+      "survey_period": "2023",
+      "source_release": "ACS 2023 1-year PUMS",
+      "source_url": "https://api.census.gov/data/2023/acs/acs1/pums",
+      "build_script": "datasets/acs/build.py",
+      "weight": "PWGTP"
+    },
+    {
+      "id": "nhanes",
+      "survey_period": "August 2021-August 2023",
+      "source_release": "NHANES 2021-2023 public-use files (L suffix)",
+      "source_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/",
+      "build_script": "datasets/nhanes/nhanes.R",
+      "weight": "mec_wgh and diet_wgh are retained, but the current low-dimensional evaluator does not consume either nonstandard column"
+    },
+    {
+      "id": "brfss",
+      "survey_period": "2023",
+      "source_release": "2023 BRFSS annual survey data, LLCP2023XPT",
+      "source_url": "https://www.cdc.gov/brfss/annual_data/2023/files/LLCP2023XPT.zip",
+      "build_script": "datasets/brfss/build.py",
+      "weight": "_LLCPWT"
+    },
+    {
+      "id": "meps",
+      "survey_period": "2022",
+      "source_release": "MEPS HC-243 2022 Full-Year Consolidated Public Use File",
+      "source_url": "https://meps.ahrq.gov/mepsweb/data_files/pufs/h243/h243xlsx.zip",
+      "build_script": "datasets/meps/build.py",
+      "weight": "PERWT22F"
+    },
+    {
+      "id": "nsduh",
+      "survey_period": "2023",
+      "source_release": "2023 NSDUH public-use file, Stata bundle v1",
+      "source_url": "https://www.samhsa.gov/data/system/files/media-puf-file/NSDUH-2023-DS0001-bndl-data-stata_v1.zip",
+      "build_script": "datasets/nsduh/build.py",
+      "weight": "ANALWT2_C"
+    },
+    {
+      "id": "scf",
+      "survey_period": "2022",
+      "source_release": "2022 SCF public extract",
+      "source_url": "https://www.federalreserve.gov/econres/files/scfp2022s.zip",
+      "build_script": "datasets/scf/build.py",
+      "weight": "wgt"
+    },
+    {
+      "id": "gss",
+      "survey_period": "2022",
+      "source_release": "GSS 2022 cross-section public-use Stata file",
+      "source_url": "https://gss.norc.org/content/dam/gss/get-the-data/documents/stata/2022_stata.zip",
+      "build_script": "datasets/gss/build.py",
+      "weight": "wtssnrps is stored as wgh; the current low-dimensional evaluator does not consume this nonstandard column"
+    },
+    {
+      "id": "ipeds",
+      "survey_period": "2022-23",
+      "source_release": "IPEDS Degrees/certificates by field of study: 2022-23",
+      "source_url": "https://nces.ed.gov/ipeds/summarytables",
+      "build_script": "datasets/education/build.py",
+      "checked_in_source_artifact": "datasets/education/education.xlsx",
+      "checked_in_source_artifact_sha256": "bc72fbfab90801f9cf8a4202c99df41202d6c16d77576ee1814244a4ee45304c",
+      "weight": "published counts of men and women"
+    },
+    {
+      "id": "bls",
+      "survey_period": "2023",
+      "source_release": "CPS annual averages, Table 11 (2023)",
+      "source_url": "https://www.bls.gov/cps/data/aa2023/cpsaat11.htm",
+      "build_script": "datasets/labor/build.py",
+      "local_input_required": "datasets/labor/data/cpsaat11.xlsx (not distributed in the code repository)",
+      "weight": "published employment counts and percentages"
+    },
+    {
+      "id": "fbi_ucr",
+      "survey_period": "2019",
+      "source_release": "Crime in the United States 2019, Tables 42 and 43",
+      "source_url": "https://ucr.fbi.gov/crime-in-the-u.s/2019/crime-in-the-u.s.-2019/tables",
+      "build_script": "datasets/fbi_arrests/build.py",
+      "weight": "published arrest counts and percentages"
+    }
+  ],
+  "provenance_limitations": [
+    "Experiment-time retrieval dates and checksums are not available for every downloaded v1.0.0 raw input.",
+    "Some provider URLs can be updated in place; the results_code_revision pins the transformations but cannot reconstruct an unavailable historical provider artifact.",
+    "The current BLS build script requires a local 2023 spreadsheet that is not distributed in the code repository."
+  ],
+  "hosting": {
+    "code_and_manifests": "https://github.com/dplecko/llm-epidemia",
+    "evaluation_space": "https://huggingface.co/spaces/llm-observatory/llm-observatory-eval",
+    "results_site": "https://llm-observatory.org/",
+    "processed_artifacts": "Hugging Face dataset revisions when redistribution is permitted; see VERSIONING.md"
+  },
+  "licenses": {
+    "software": "Apache-2.0",
+    "derived_benchmark_materials": "CC-BY-4.0",
+    "source_data": "Provider-specific terms; not relicensed",
+    "details": "LICENSE.md"
+  },
+  "versioning_policy": "VERSIONING.md"
+}
