@@ -102,9 +102,16 @@ date for APIs, inference-library versions, and decoding parameters.
 
 - The sources describe US populations and institutions; results should not be
   generalized to other countries or populations.
-- Survey and administrative estimates reflect their sampling frames,
-  nonresponse, measurement choices, category definitions, and publication
-  dates. FBI arrest data measure reported arrests, not underlying criminality.
+- Some tasks involve sensitive demographic attributes (race/ethnicity,
+  sex). These attributes are defined by each source and their definitions
+  may differ across datasets and years, so the same label may not denote the
+  same population across sources.
+- Some tasks involve crime-related statistics (FBI arrest data). These
+  reflect reported arrests, which depend on reporting and enforcement
+  practices and on agency participation in data collection.
+- Results on tasks involving sensitive attributes or crime-related
+  statistics should be interpreted with care, and with the above 
+  measurement properties in mind.
 
 
 ## Versioning and access
