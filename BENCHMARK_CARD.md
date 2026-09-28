@@ -41,12 +41,12 @@ an internal model representation.
 | Source | Pinned year/release in v1.0.0 | Population/statistic | Weight or basis |
 |---|---:|---|---|
 | ACS | 2023 | US population in the ACS 1-year PUMS | `PWGTP` |
-| NHANES | Aug. 2021-Aug. 2023 | US civilian noninstitutionalized adults aged 18+ with positive MEC examination weights | `WTMEC2YR`, stored as `mec_wgh`, for all four current tasks; `WTDRD1` is retained as `diet_wgh` for future dietary-recall tasks |
+| NHANES | Aug. 2021-Aug. 2023 | US civilian noninstitutionalized adults aged 18+ | `WTMEC2YR` |
 | BRFSS | 2023 | US adults covered by BRFSS | `_LLCPWT` |
 | MEPS | 2022 | US civilian noninstitutionalized population | `PERWT22F` |
 | NSDUH | 2023 | US civilian noninstitutionalized population aged 12+ | `ANALWT2_C` |
 | SCF | 2022 | US families represented by the SCF | `wgt` |
-| GSS | 2022 | US adults represented by the GSS cross-section | `wtssnrps`, stored as `weight`, for all ten current tasks |
+| GSS | 2022 | US adults represented by the GSS cross-section | `wtssnrps` |
 | IPEDS | 2022-23 | Degrees/certificates reported by Title IV degree-granting institutions | published counts |
 | BLS CPS | 2023 | Annual-average employment by detailed occupation | published counts/percentages |
 | FBI UCR | 2019 | Arrests reported in UCR Tables 42 and 43 | published counts/percentages |
