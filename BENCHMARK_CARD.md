@@ -60,15 +60,7 @@ personal data are collected.
 All current tasks based on survey microdata apply the source-provided record
 weights. For low-dimensional tasks, the evaluator uses a task-specific
 `weight_col` when one is declared and otherwise uses the standardized `weight`
-column. All four current NHANES tasks explicitly use `mec_wgh`, which is derived
-from the full-sample MEC examination weight `WTMEC2YR`; the analytic cohort is
-restricted to adults with positive MEC weights. The dietary Day 1 weight
-`WTDRD1` is retained as `diet_wgh` for future tasks involving dietary-recall
-variables, but no current NHANES task uses it. The GSS builder stores
-`wtssnrps` as `weight`, so all ten current GSS tasks apply it. This follows the
-NHANES guidance to select the weight for the component with the smallest
-eligible sample; see the [NHANES weighting
-tutorial](https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx).
+column.
 
 The four high-dimensional sources (BRFSS, MEPS, NSDUH, and SCF) also expose a
 standardized `weight` column; their five-fold out-of-fold LightGBM fits and
