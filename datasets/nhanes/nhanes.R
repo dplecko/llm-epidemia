@@ -43,7 +43,7 @@ source("zzz-deps.R")
 source("callbacks.R")
 
 dem <- c("mec_wgh", "diet_wgh", "age", "sex", "race")
-body <- c("height", "weight", "waist", "bmi")
+body <- c("height", "body_weight", "waist", "bmi")
 vitals <- c("diastolic_bp", "systolic_bp", "pulse")
 blood <- c("cholesterol", "hdl", "hb_a1c", "insulin")
 chronic <- c("diabetes", "alcohol_weekly", "smoking", "sleep_hours",

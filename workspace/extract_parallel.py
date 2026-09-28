@@ -46,6 +46,7 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
         - "prompt" (str): Base prompt or prompt template.
         - "variables" (List[str]): Outcome variable, optionally with a conditioning variable.
         - "dataset" (str): Path to the dataset parquet file.
+        - "weight_col" (str, optional): Sample-weight column; defaults to "weight".
         - "levels" (List[List[str]] | None): Discrete level groupings for classification.
         - "second_prompt" (str, optional): Follow‑up question (for "story" mode).
     check_cache (bool): If *True* and the task was already solved for the model, skip the run.
@@ -161,8 +162,9 @@ def task_extract(model_name, model, task_spec, check_cache=False, prob=False):
                 model_weights = decode_prob_matrix(levels, model_weights)
                 model_vals = q_levels
 
-            if "weight" in filtered_data.columns:
-                weights = filtered_data["weight"].tolist()
+            weight_col = task_spec.get("weight_col", "weight")
+            if weight_col in filtered_data.columns:
+                weights = filtered_data[weight_col].tolist()
             else:
                 weights = [1] * len(true_vals)
             

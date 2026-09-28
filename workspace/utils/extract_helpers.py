@@ -64,7 +64,7 @@ def d2d_wgh_col(dataset):
     elif "census" in dataset:
         mc_wgh_col = "weight"
     elif "gss" in dataset:
-        mc_wgh_col = "wgh"
+        mc_wgh_col = "weight"
     else:
         mc_wgh_col = None
 

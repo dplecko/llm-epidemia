@@ -3,10 +3,11 @@
   "benchmark_name": "LLM Epidemiology Benchmark",
   "benchmark_version": "1.0.0",
   "release_date": null,
-  "prepared_date": "2026-09-04",
+  "prepared_date": "2026-09-28",
   "intended_git_tag": "benchmark-v1.0.0",
   "status": "release-candidate",
-  "results_code_revision": "3f2d569c3c513402f32b0030b26c35a863ccd861",
+  "results_code_revision": null,
+  "results_code_revision_note": "Set to the release commit containing the corrected GSS and NHANES weighting implementation before publishing v1.0.0.",
   "task_inventory": {
     "low_dimensional": 75,
     "high_dimensional": 94,
@@ -63,7 +64,7 @@
       "source_release": "NHANES 2021-2023 public-use files (L suffix)",
       "source_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/",
       "build_script": "datasets/nhanes/nhanes.R",
-      "weight": "mec_wgh and diet_wgh are retained, but the current low-dimensional evaluator does not consume either nonstandard column"
+      "weight": "WTMEC2YR is stored as mec_wgh and used by all four current tasks; WTDRD1 is retained as diet_wgh for future dietary-recall tasks"
     },
     {
       "id": "brfss",
@@ -103,7 +104,7 @@
       "source_release": "GSS 2022 cross-section public-use Stata file",
       "source_url": "https://gss.norc.org/content/dam/gss/get-the-data/documents/stata/2022_stata.zip",
       "build_script": "datasets/gss/build.py",
-      "weight": "wtssnrps is stored as wgh; the current low-dimensional evaluator does not consume this nonstandard column"
+      "weight": "wtssnrps is stored as weight and used by all ten current tasks"
     },
     {
       "id": "ipeds",

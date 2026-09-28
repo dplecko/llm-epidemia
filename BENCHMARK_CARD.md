@@ -41,12 +41,12 @@ an internal model representation.
 | Source | Pinned year/release in v1.0.0 | Population/statistic | Weight or basis |
 |---|---:|---|---|
 | ACS | 2023 | US population in the ACS 1-year PUMS | `PWGTP` |
-| NHANES | Aug. 2021-Aug. 2023 | US civilian noninstitutionalized adults aged 18+ covered by the released files | `mec_wgh` and `diet_wgh` retained; see weighting note below |
+| NHANES | Aug. 2021-Aug. 2023 | US civilian noninstitutionalized adults aged 18+ with positive MEC examination weights | `WTMEC2YR`, stored as `mec_wgh`, for all four current tasks; `WTDRD1` is retained as `diet_wgh` for future dietary-recall tasks |
 | BRFSS | 2023 | US adults covered by BRFSS | `_LLCPWT` |
 | MEPS | 2022 | US civilian noninstitutionalized population | `PERWT22F` |
 | NSDUH | 2023 | US civilian noninstitutionalized population aged 12+ | `ANALWT2_C` |
 | SCF | 2022 | US families represented by the SCF | `wgt` |
-| GSS | 2022 | US adults represented by the GSS cross-section | `wtssnrps`, stored as `wgh`; see weighting note below |
+| GSS | 2022 | US adults represented by the GSS cross-section | `wtssnrps`, stored as `weight`, for all ten current tasks |
 | IPEDS | 2022-23 | Degrees/certificates reported by Title IV degree-granting institutions | published counts |
 | BLS CPS | 2023 | Annual-average employment by detailed occupation | published counts/percentages |
 | FBI UCR | 2019 | Arrests reported in UCR Tables 42 and 43 | published counts/percentages |
@@ -57,15 +57,24 @@ continuous variables, and source-specific missing-data handling. Most builders
 download their inputs; IPEDS and BLS use locally supplied spreadsheets. No new
 personal data are collected.
 
-For low-dimensional tasks, the current evaluator applies record weights when a
-processed dataset exposes a column named `weight`; otherwise it uses equal
-record weights. Consequently, the current GSS (`wgh`) and NHANES (`mec_wgh` and
-`diet_wgh`) low-dimensional evaluations do **not** apply their retained survey
-weights. The four high-dimensional sources (BRFSS, MEPS, NSDUH, and SCF) expose
-a standardized `weight` column; their five-fold out-of-fold LightGBM fits and
-evaluation distances use it. Bootstrap resampling represents finite-sample
-uncertainty in the normalized score. This distinction should be considered
-when interpreting population representativeness.
+All current tasks based on survey microdata apply the source-provided record
+weights. For low-dimensional tasks, the evaluator uses a task-specific
+`weight_col` when one is declared and otherwise uses the standardized `weight`
+column. All four current NHANES tasks explicitly use `mec_wgh`, which is derived
+from the full-sample MEC examination weight `WTMEC2YR`; the analytic cohort is
+restricted to adults with positive MEC weights. The dietary Day 1 weight
+`WTDRD1` is retained as `diet_wgh` for future tasks involving dietary-recall
+variables, but no current NHANES task uses it. The GSS builder stores
+`wtssnrps` as `weight`, so all ten current GSS tasks apply it. This follows the
+NHANES guidance to select the weight for the component with the smallest
+eligible sample; see the [NHANES weighting
+tutorial](https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx).
+
+The four high-dimensional sources (BRFSS, MEPS, NSDUH, and SCF) also expose a
+standardized `weight` column; their five-fold out-of-fold LightGBM fits and
+evaluation distances use it. IPEDS, BLS, and FBI tasks instead use published
+counts or percentages. Bootstrap resampling represents finite-sample
+uncertainty in the normalized score.
 
 ## Tasks, prompts, and scoring
 

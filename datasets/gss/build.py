@@ -36,7 +36,7 @@ df = df[df["wtssnrps"].notna()]
 print(df.isna().mean().sort_values() * 100)
 
 gss = pd.DataFrame()
-gss["wgh"] = df["wtssnrps"].astype(float)
+gss["weight"] = df["wtssnrps"].astype(float)
 gss["sex"] = df["sex"].map({1: "male", 2: "female"}).astype("category")
 gss["age"] = pd.to_numeric(df["age"], errors="coerce")
 gss["race"] = df["race"].map({1: "white", 2: "black", 3: "other"}).astype("category")

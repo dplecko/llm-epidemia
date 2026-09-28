@@ -42,7 +42,8 @@ def model_mean_distr(task, levels, cache_dir, prob=False):
         cond_var = task["variables"][1]
         data = data[(data[cond_var] >= lo) & (data[cond_var] <= hi)]
 
-    weights = data["weight"] if "weight" in data.columns else np.ones(len(data))
+    weight_col = task.get("weight_col", "weight")
+    weights = data[weight_col] if weight_col in data.columns else np.ones(len(data))
     distr = np.array([weights[data[task["variables"][0]] == level].sum() for level in levels])
     distr = distr / distr.sum()
     return map_distr_to_like_ans(distr) if prob else distr
